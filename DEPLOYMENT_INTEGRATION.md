@@ -1,65 +1,65 @@
 # Deployment & Integration Runbook
 
-Platforms: **GitHub** (source of truth) · **Railway** (primary host, authoritative) · **Supabase** (managed Postgres option) · **Vercel** (alternative host).
+Platforms: **GitHub** (source of truth) · **Railway** (primary host — LIVE) · **Vercel** (mirror host — LIVE) · **Supabase** (managed Postgres — one access token away).
+
+## 0. Current live state (2026-08-22)
+
+| Host | URL | Status |
+|---|---|---|
+| Railway | https://english-wizard-production.up.railway.app | LIVE, full stack incl. DB |
+| Vercel | https://english-wizard.vercel.app | LIVE; DB writes pending Supabase (see §3) |
+| GitHub | `mahmoudhamouda1987/english-wizard` @ `main` | pushed, current |
 
 ## 1. GitHub — DONE
 
 - Repo: `mahmoudhamouda1987/english-wizard` (branch `main`).
-- CI-relevant gates run locally before every push: typecheck, lint, unit, build (build now also applies the DB schema), E2E.
-- `.env` is gitignored — never committed.
+- Gates run before every push: typecheck, lint, unit, build, E2E.
+- `.env` gitignored; also excluded from deploy images via `.railwayignore`.
 
-## 2. Railway — primary host
+## 2. Railway — primary host (LIVE)
 
-Config already in repo:
+Config in repo: `railway.toml` (Nixpacks, startCommand `npm run start`, healthcheck `/api/health`), `scripts/start.mjs` applies schema idempotently on boot.
 
-- `railway.toml`: Nixpacks builder, startCommand `npm run start`, healthcheck `/api/health`.
-- `scripts/start.mjs` applies `db/schema.sql` idempotently on every boot.
+Live deployment facts:
 
-Deployed via CLI:
+- Project `stellar-integrity` → service `English-Wizard` + private Postgres.
+- Production fixes that made deploys green: bind `0.0.0.0` (`BIND_HOST` override), build-time schema gate degrades when builders hide secrets.
+- Deploy updates: `railway up --service English-Wizard` from this directory.
+- The service's `DATABASE_URL` uses the internal hostname — reachable only inside Railway (by design).
 
-```
-railway init --name english-wizard
-railway add --database postgres          # creates Postgres service
-railway variables --set "DATABASE_URL=${{Postgres.DATABASE_URL}}"
-railway variables --set "OPENAI_API_KEY=sk-..."
-railway up                               # deploys current directory
-railway domain                           # generate/attach public domain
-```
+Auto-deploy from GitHub: Dashboard → Service → Settings → Source → Connect repo `english-wizard` (one click). After that every push to `main` redeploys.
 
-Auto-deploy from GitHub: Dashboard → Service → Settings → Source → Connect repo `english-wizard` (one click, dashboard-only permission). After that every push to `main` redeploys.
+## 3. Supabase — the shared database step (ONE PASTE REMAINING)
 
-### Switching the database to Supabase (optional)
+Railway's internal Postgres is unreachable from outside Railway (CLI cannot create TCP proxies), so Vercel needs an externally reachable Postgres. Supabase free tier fills this for BOTH hosts:
 
-1. Create a project at supabase.com, then copy the **Connection Pooling** string (port 6543, `pgbouncer=true`).
-2. Apply schema once: `DATABASE_URL="<supabase-pool-url>" node scripts/predeploy-db.mjs`
-3. Point any host at it: `railway variables --set "DATABASE_URL=<supabase-pool-url>"`
-4. SSL is automatic: `src/infrastructure/database.ts` enables TLS for every non-local host (`DATABASE_SSL=false` overrides).
+1. Create token: supabase.com/dashboard/account/tokens → give it to the agent OR run `supabase login --token <token>`.
+2. Agent creates project + gets pooled connection string (port 6543, pgbouncer).
+3. Schema applied once via `node scripts/predeploy-db.mjs` with that URL.
+4. Swap on both hosts:
+   - Railway: `railway variables --service English-Wizard --set "DATABASE_URL=<supabase-pool-url>"`
+   - Vercel: `vercel env rm DATABASE_URL production --yes` then re-add and `vercel --prod`.
+5. SSL automatic (`src/infrastructure/database.ts` enforces TLS for non-local hosts).
 
-No other change is needed — the schema and all repositories are plain PostgreSQL.
+## 4. Vercel — mirror host (LIVE)
 
-## 3. Vercel — alternative host
+- Project `english-wizard`, framework auto-detected Next.js (zero-config; do NOT add multi-service `vercel.json`).
+- Env vars set: `DATABASE_URL` (currently Railway-internal placeholder until Supabase swap), `OPENAI_API_KEY`.
+- Build command applies schema when the builder can reach the DB, degrades gracefully otherwise.
+- Redeploy after env changes: `vercel --prod`.
 
-The build command (`node scripts/predeploy-db.mjs && next build`) applies the schema at build time, so Vercel works without a persistent boot step:
-
-1. Push latest `main` (done below).
-2. vercel.com/new → import `english-wizard`.
-3. Environment variables: `DATABASE_URL` (Supabase pooled URL recommended for serverless), `OPENAI_API_KEY`, optional `ADMIN_EMAILS`.
-4. Deploy. Health check afterwards: `https://<app>.vercel.app/api/health`.
-
-Note: prefer ONE production host against one database. Contract names Railway as authoritative; Vercel preview deployments are safe because schema apply is idempotent.
-
-## 4. Required environment variables
+## 5. Required environment variables
 
 | Variable | Where | Notes |
 |---|---|---|
-| `DATABASE_URL` | Railway/Vercel/CI | Postgres connection string |
-| `OPENAI_API_KEY` | Railway/Vercel | enables AI teacher; without it AI routes return controlled 502s |
-| `ADMIN_EMAILS` | optional | allowlist for `/admin/content`, review APIs |
+| `DATABASE_URL` | Railway/Vercel | Postgres connection string |
+| `OPENAI_API_KEY` | Railway/Vercel | enables AI teacher; controlled 502s without it |
+| `ADMIN_EMAILS` | optional | allowlist for admin/review APIs |
 | `DATABASE_SSL` | optional | force TLS on/off (auto otherwise) |
 
-## 5. Verification checklist after any deploy
+## 6. Verification checklist after any deploy
 
 1. `GET /api/health` → `{"status":"ok"}`
-2. Register a learner → complete diagnostic → lesson appears (schema + persistence OK).
-3. `/api/metrics` returns aggregates (analytics OK).
-4. AI lesson generation works (credits present).
+2. Register a learner → learner-state assigned (DB reachable end-to-end).
+3. `/api/metrics` returns 401 unauthenticated / aggregates authenticated.
+4. AI lesson generation works once provider credits exist.
