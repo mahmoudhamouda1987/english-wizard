@@ -1,0 +1,1 @@
+import { NextResponse } from "next/server";import { clearCurrentSession,COOKIE } from "@/src/infrastructure/auth";export async function POST(){await clearCurrentSession();const res=NextResponse.json({ok:true});res.cookies.set(COOKIE,"",{httpOnly:true,expires:new Date(0),path:"/"});return res;}

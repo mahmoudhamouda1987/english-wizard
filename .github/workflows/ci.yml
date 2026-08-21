@@ -1,0 +1,39 @@
+name: English Wizard CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/english_wizard
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: english_wizard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d english_wizard"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: psql "$DATABASE_URL" -f db/schema.sql
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

@@ -1,0 +1,1639 @@
+{
+  "ledgerVersion": "1.0",
+  "contract": "MASTER_EXECUTION_CONTRACT.md",
+  "contractSectionsAudited": 136,
+  "auditDate": "2026-08-21",
+  "auditHead": "main",
+  "statusDefinitions": [
+    "NOT_STARTED",
+    "DESIGNED",
+    "IMPLEMENTED",
+    "TESTING",
+    "VERIFIED",
+    "BLOCKED",
+    "DEPRECATED"
+  ],
+  "verificationRule": "IMPLEMENTED is not VERIFIED; evidence must be reproducible.",
+  "requirements": [
+    {
+      "id": 1,
+      "requirement": "Do not assume; document reversible decisions and material unknowns.",
+      "status": "DESIGNED",
+      "code": [
+        "DECISION_LOG.md"
+      ],
+      "tests": [],
+      "evidence": "Process requirement; decision log exists.",
+      "limitations": "Not a runtime-enforceable invariant."
+    },
+    {
+      "id": 2,
+      "requirement": "Build English Wizard as an adaptive AI personal English school, not a generic chatbot/course.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app",
+        "src/domain"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Integrated learner application exists.",
+      "limitations": "Full contract breadth remains under audit."
+    },
+    {
+      "id": 3,
+      "requirement": "Optimise for actual English capability rather than vanity metrics.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/progression.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Mastery/progression primitives exist.",
+      "limitations": "Learning-outcome measurement is not yet comprehensive."
+    },
+    {
+      "id": 4,
+      "requirement": "Use CEFR Pre-A1 through C2 as principal framework without claiming official certification.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/curriculum.ts",
+        "src/domain/curriculum-expanded.ts",
+        "src/domain/learner.ts"
+      ],
+      "tests": [
+        "src/domain/curriculum.test.ts"
+      ],
+      "evidence": "Seven-level curriculum/domain model exists.",
+      "limitations": "Official descriptor mapping is incomplete."
+    },
+    {
+      "id": 5,
+      "requirement": "Research authoritative educational references before final curriculum implementation.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "Canonical contract identifies reference ecosystems.",
+      "limitations": "Formal research pack and traceability are not yet implemented."
+    },
+    {
+      "id": 6,
+      "requirement": "Respect copyright/licensing and distinguish original, licensed, external, AI-generated and reference content.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Requirement captured.",
+      "limitations": "Content licensing metadata pipeline is not implemented."
+    },
+    {
+      "id": 7,
+      "requirement": "Use layered architecture: learner model, AI teacher, learning engine, content, practice, assessment, mastery, errors, memory, next action.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain",
+        "src/infrastructure",
+        "app/api"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Major layers exist as domain/infrastructure/API modules.",
+      "limitations": "Some layers are partial or JSON-backed."
+    },
+    {
+      "id": 8,
+      "requirement": "Persistent multi-dimensional learner model.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/learner.ts",
+        "src/infrastructure/learner-repository.ts",
+        "db/schema.sql"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Learner state/profile persisted in PostgreSQL.",
+      "limitations": "Not all specified dimensions are persisted."
+    },
+    {
+      "id": 9,
+      "requirement": "User-facing English DNA profile.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/dashboard",
+        "app/diagnostic",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Diagnostic and English DNA persistence/UI exist.",
+      "limitations": "Granularity and confidence model are still simplified."
+    },
+    {
+      "id": 10,
+      "requirement": "Human-centered onboarding covering goals, context, interests, time and target.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/onboarding/page.tsx",
+        "app/api/profile/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Authenticated onboarding/profile flow exists.",
+      "limitations": "Coverage of all contract questions is not exhaustive."
+    },
+    {
+      "id": 11,
+      "requirement": "Multi-modal diagnostic covering reading, listening, writing and speaking dimensions.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/diagnostic.ts",
+        "app/diagnostic/page.tsx",
+        "app/api/diagnostic/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Diagnostic includes production fields and listening audio text.",
+      "limitations": "Adaptive breadth and genuine speech analysis are incomplete."
+    },
+    {
+      "id": 12,
+      "requirement": "Adaptive assessment that estimates ability, confidence and uncertainty.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [],
+      "evidence": "Score/confidence primitives exist.",
+      "limitations": "Diagnostic branching is not truly adaptive yet."
+    },
+    {
+      "id": 13,
+      "requirement": "Multi-dimensional assessment using difficulty, descriptors, errors, consistency and history.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/assessment.ts",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [],
+      "evidence": "Assessment domain exists.",
+      "limitations": "Full evidence fusion is not implemented."
+    },
+    {
+      "id": 14,
+      "requirement": "Mastery graph connecting capabilities and prerequisite/transfer relationships.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/mastery-graph.ts"
+      ],
+      "tests": [],
+      "evidence": "Explicit capability nodes, edges and mastery states added.",
+      "limitations": "Persistence/UI integration is still being completed."
+    },
+    {
+      "id": 15,
+      "requirement": "Mastery states from unknown through mastered; correct MCQ alone cannot imply mastery.",
+      "status": "TESTING",
+      "code": [
+        "src/domain/mastery-graph.ts"
+      ],
+      "tests": [
+        "src/domain/mastery-graph.test.ts",
+        "tests/e2e/mastery-persistence.spec.ts"
+      ],
+      "evidence": "stateForEvidence ladder + applyEvidenceToMastery; first evidence caps at EXPOSED (contract §15). Unit suite 111/111 and E2E mastery-persistence pass on 2026-08-21 against PostgreSQL 18.",
+      "limitations": "Long-horizon retention modelling still modelled, not longitudinally validated."
+    },
+    {
+      "id": 16,
+      "requirement": "Vocabulary network with receptive vs productive knowledge.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/vocabulary",
+        "app/api/word",
+        "src/domain/word-of-day.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Vocabulary lookup/UI exists.",
+      "limitations": "Rich lexical network is not yet persisted."
+    },
+    {
+      "id": 17,
+      "requirement": "Teach useful language chunks and collocations.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated chunk model found in repository audit.",
+      "limitations": "Requires lexical/chunk subsystem."
+    },
+    {
+      "id": 18,
+      "requirement": "Teach grammar through experience, noticing, practice, production, feedback, transfer and review.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/curriculum.ts",
+        "src/domain/progression.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Curriculum/progression primitives exist.",
+      "limitations": "Full pedagogical loop is not represented as a structured activity graph."
+    },
+    {
+      "id": 19,
+      "requirement": "Integrate reading, listening, speaking and writing within learning experiences.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Mission skillMix now supports integrated tasks.",
+      "limitations": "Integrated activity execution is not fully implemented."
+    },
+    {
+      "id": 20,
+      "requirement": "Dynamic AI speaking engine with conversation, roles, debate, interviews and simulations.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/speaking",
+        "app/conversation",
+        "app/api/ai/speaking/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Speaking UI and authenticated AI speaking endpoint exist.",
+      "limitations": "Live AI provider credential is required; advanced speech analysis is incomplete."
+    },
+    {
+      "id": 21,
+      "requirement": "Speaking feedback across intelligibility, pronunciation, fluency, grammar, vocabulary, interaction and naturalness.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/speaking/route.ts",
+        "app/speaking/page.tsx"
+      ],
+      "tests": [],
+      "evidence": "Structured speaking response schema includes corrections and pronunciation risks.",
+      "limitations": "Transcript-based proxy is not acoustic pronunciation scoring."
+    },
+    {
+      "id": 22,
+      "requirement": "Writing engine supporting multiple genres and detailed evaluation dimensions.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/practice",
+        "app/api/ai/writing/route.ts"
+      ],
+      "tests": [],
+      "evidence": "Writing coach endpoint and practice UI exist.",
+      "limitations": "No rich editor/revision workflow yet."
+    },
+    {
+      "id": 23,
+      "requirement": "Revision loop: identify → explain → correction → retry → transfer → store error.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/error-intelligence.ts",
+        "app/api/practice/submit/route.ts"
+      ],
+      "tests": [],
+      "evidence": "Error persistence foundation exists.",
+      "limitations": "Explicit retry/transfer workflow is not yet a dedicated product flow."
+    },
+    {
+      "id": 24,
+      "requirement": "Say It Better: learner, corrected, natural, advanced and professional variants.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated implementation found.",
+      "limitations": "Requires writing-feedback UX and structured transformation contract."
+    },
+    {
+      "id": 25,
+      "requirement": "Listening Lab progression from clear speech to native-level comprehension.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/conversation.ts",
+        "app/listening-lab",
+        "app/api/conversation"
+      ],
+      "tests": [
+        "src/domain/conversation.test.ts",
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Seven CEFR conversation sets, 60-second dual-speaker scripts and five gaps exist.",
+      "limitations": "Progression dimensions such as noise/accent/reduction are not fully represented."
+    },
+    {
+      "id": 26,
+      "requirement": "English Ear system for connected/reduced speech and formal-spelling distinction.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated ear-decoding model found.",
+      "limitations": "Needs speech-pattern content and exercises."
+    },
+    {
+      "id": 27,
+      "requirement": "Reading engine from word to nuanced specialist text.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated reading-engine domain/model found.",
+      "limitations": "Requires content/assessment subsystem."
+    },
+    {
+      "id": 28,
+      "requirement": "Communication-function capability framework across levels.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Mission objectives imply communication functions.",
+      "limitations": "No first-class function taxonomy exists."
+    },
+    {
+      "id": 29,
+      "requirement": "CEFR-style mediation activities.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/learner.ts",
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Mediation skill and mission tasks are represented.",
+      "limitations": "No standalone mediation activity engine."
+    },
+    {
+      "id": 30,
+      "requirement": "Learning worlds Pre-A1 through C2.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Seven worlds with levels and mission references added.",
+      "limitations": "Learner-facing world navigation is not yet wired."
+    },
+    {
+      "id": 31,
+      "requirement": "Meaningful missions replacing repetitive lesson structures.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Mission model with objectives, skill mix and success criteria added.",
+      "limitations": "Execution/orchestration UI remains incomplete."
+    },
+    {
+      "id": 32,
+      "requirement": "Integrated Boss Missions combining multiple skills.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Boss mission model and integrated task lists added.",
+      "limitations": "Boss gameplay/assessment flow not yet wired."
+    },
+    {
+      "id": 33,
+      "requirement": "C2 endgame centred on nuance, rhetoric, ambiguity and live-in-English simulation.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "C2 mission/Boss Mission metadata exists.",
+      "limitations": "Endgame simulation is not implemented."
+    },
+    {
+      "id": 34,
+      "requirement": "Evidence-driven personalization of topics, difficulty, task type, reviews and explanations.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/recommendation.ts",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Next-best-action and profile/mastery signals exist.",
+      "limitations": "Personalization depth remains limited."
+    },
+    {
+      "id": 35,
+      "requirement": "Interest engine that learns learner topics and broadens exposure.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "Profile has goals but no interest-learning engine.",
+      "limitations": "Needs interest model and recommendation integration."
+    },
+    {
+      "id": 36,
+      "requirement": "The Wizard as central AI teacher personality.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai",
+        "app/dashboard",
+        "app/conversation"
+      ],
+      "tests": [],
+      "evidence": "AI teacher routes and UI exist.",
+      "limitations": "OpenAI credential required for live generation."
+    },
+    {
+      "id": 37,
+      "requirement": "AI teacher memory of goals, interests, errors, performance and curriculum position.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/infrastructure/learner-repository.ts",
+        "src/infrastructure/profile-repository.ts",
+        "app/api/ai/_shared.ts"
+      ],
+      "tests": [],
+      "evidence": "AI context loader reads profile and learner state.",
+      "limitations": "Long-term conversational memory store is incomplete."
+    },
+    {
+      "id": 38,
+      "requirement": "Teacher, conversation, speaking, writing, examiner, strategist, career and game modes.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/conversation",
+        "app/speaking",
+        "app/practice",
+        "app/api/ai"
+      ],
+      "tests": [],
+      "evidence": "Multiple route/UI surfaces exist.",
+      "limitations": "Modes are not unified under one explicit mode registry."
+    },
+    {
+      "id": 39,
+      "requirement": "Teaching adaptation: explain, simplify, challenge, slow, speed up, correct, review or move on.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/adaptive-engine.ts"
+      ],
+      "tests": [],
+      "evidence": "Adaptive action primitive exists.",
+      "limitations": "Full adaptation policy is shallow."
+    },
+    {
+      "id": 40,
+      "requirement": "Universal I Don't Understand diagnostic help.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated flow found.",
+      "limitations": "Needs content/problem diagnosis UX."
+    },
+    {
+      "id": 41,
+      "requirement": "Explain Differently modes.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated route/action found.",
+      "limitations": "Needs teacher UI and prompt contracts."
+    },
+    {
+      "id": 42,
+      "requirement": "Thinking in English progression.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated domain/lesson system found.",
+      "limitations": "Needs pedagogical sequence."
+    },
+    {
+      "id": 43,
+      "requirement": "Recurring error intelligence with category, occurrences, confidence, intervention and review.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/error-intelligence.ts",
+        "app/api/practice/submit/route.ts",
+        "src/domain/learner.ts"
+      ],
+      "tests": [],
+      "evidence": "Structured error intelligence is now generated from practice evidence and persisted in learner state.",
+      "limitations": "No dedicated mistakes analytics UI yet."
+    },
+    {
+      "id": 44,
+      "requirement": "Memory engine using retrieval, spacing, interleaving and varied contexts.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/spaced-repetition.ts",
+        "app/api/review/route.ts",
+        "app/review/page.tsx"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Review cards, due queue and rescheduling exist.",
+      "limitations": "Context interleaving and forgetting model remain simplified."
+    },
+    {
+      "id": 45,
+      "requirement": "Separate activity completion from mastery.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/progression.ts",
+        "src/domain/mastery-graph.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Lesson completion and mastery are separate state structures.",
+      "limitations": "Full mastery evidence aggregation remains partial."
+    },
+    {
+      "id": 46,
+      "requirement": "Next Best Action engine driven by evidence, goals, retention and difficulty.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/recommendation.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Recommendation logic exists and consumes errors/mastery.",
+      "limitations": "Retention/goal weighting is not yet comprehensive."
+    },
+    {
+      "id": 47,
+      "requirement": "Simple daily experience centered on one mission.",
+      "status": "DESIGNED",
+      "code": [
+        "app/dashboard",
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Mission and dashboard primitives exist.",
+      "limitations": "Daily mission orchestration is not implemented."
+    },
+    {
+      "id": 48,
+      "requirement": "Quick Quest, Standard Journey, Deep Study and Boss Mission session types.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No session-type model found.",
+      "limitations": "Needs session planner."
+    },
+    {
+      "id": 49,
+      "requirement": "Gamification reinforces learning and avoids empty point farming.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/achievements/page.tsx"
+      ],
+      "tests": [],
+      "evidence": "Achievements surface exists.",
+      "limitations": "Learning-coupling and streak mechanics require deeper audit."
+    },
+    {
+      "id": 50,
+      "requirement": "Progress dashboard answers where am I, where going, blockers, today and improvement.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/dashboard/page.tsx",
+        "app/progress/page.tsx"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Dashboard/progress surfaces exist.",
+      "limitations": "Historical trend analytics are limited."
+    },
+    {
+      "id": 51,
+      "requirement": "Broader English capability model from comprehension to sophisticated English.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/mastery-graph.ts"
+      ],
+      "tests": [],
+      "evidence": "Capability graph foundation added.",
+      "limitations": "Higher-order capability taxonomy is incomplete."
+    },
+    {
+      "id": 52,
+      "requirement": "Keep CEFR, IELTS and Cambridge distinct.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Contract explicitly requires distinction.",
+      "limitations": "Dedicated pathways not implemented."
+    },
+    {
+      "id": 53,
+      "requirement": "Structured curriculum data model with prerequisites, resources, assessments, mission and mastery fields.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/curriculum-expanded.ts",
+        "src/domain/curriculum.ts"
+      ],
+      "tests": [
+        "src/domain/curriculum.test.ts"
+      ],
+      "evidence": "Objective/lesson structures, prerequisites, missions, thresholds and retention fields exist.",
+      "limitations": "Licensing/content-source metadata and full skill substructure are incomplete."
+    },
+    {
+      "id": 54,
+      "requirement": "Separate curriculum, content, activities, assessment and learner performance.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/curriculum.ts",
+        "src/domain/learner.ts"
+      ],
+      "tests": [],
+      "evidence": "Some separation exists.",
+      "limitations": "Dedicated content/activity/assessment repositories are missing."
+    },
+    {
+      "id": 55,
+      "requirement": "Controlled AI-generated content with validators for level, grammar, answers, ambiguity, facts, difficulty and alignment.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts"
+      ],
+      "tests": [],
+      "evidence": "Structured AI response validators exist.",
+      "limitations": "Validation depth is schema-centric, not educationally exhaustive."
+    },
+    {
+      "id": 56,
+      "requirement": "Content quality metadata and approval status.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No quality pipeline entity found.",
+      "limitations": "Requires content repository/workflow."
+    },
+    {
+      "id": 57,
+      "requirement": "Formal speaking, writing, reading and listening rubrics mapped to CEFR.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/assessment.ts",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [],
+      "evidence": "Assessment primitives exist.",
+      "limitations": "Full rubric catalog absent."
+    },
+    {
+      "id": 58,
+      "requirement": "Assessment confidence with evidence count and consistency.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/learner.ts",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [],
+      "evidence": "Confidence/evidenceCount fields exist in learner mastery.",
+      "limitations": "Consistency calculation is simplified."
+    },
+    {
+      "id": 59,
+      "requirement": "Accessibility: keyboard, screen reader, captions, transcripts, adjustable text, audio, reduced motion, mobile.",
+      "status": "DESIGNED",
+      "code": [
+        "app/globals.css"
+      ],
+      "tests": [],
+      "evidence": "Responsive/accessibility foundation exists.",
+      "limitations": "Formal accessibility audit not completed."
+    },
+    {
+      "id": 60,
+      "requirement": "Mobile-first web architecture for Android, iOS, desktop and tablet.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/globals.css"
+      ],
+      "tests": [],
+      "evidence": "Responsive web UI exists.",
+      "limitations": "No native app clients."
+    },
+    {
+      "id": 61,
+      "requirement": "Global product: international users, locales, time zones, currency and regional legal requirements.",
+      "status": "DESIGNED",
+      "code": [],
+      "tests": [],
+      "evidence": "Architecture can evolve but no global framework is implemented.",
+      "limitations": "Localization/payments/region controls not complete."
+    },
+    {
+      "id": 62,
+      "requirement": "British English as reference identity while respecting international varieties.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/curriculum.ts"
+      ],
+      "tests": [],
+      "evidence": "Contract-level design captured.",
+      "limitations": "Variety preference model is not implemented."
+    },
+    {
+      "id": 63,
+      "requirement": "Production-grade security baseline.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/infrastructure/auth.ts",
+        "src/infrastructure/auth-repository.ts",
+        "middleware.ts",
+        "src/domain/security.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Auth, session cookies, route protection and data isolation are implemented.",
+      "limitations": "No dedicated penetration/security suite yet."
+    },
+    {
+      "id": 64,
+      "requirement": "AI security for untrusted learner input, prompt injection, tool abuse and data leakage.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts",
+        "middleware.ts",
+        "src/infrastructure/auth.ts"
+      ],
+      "tests": [],
+      "evidence": "Authenticated AI boundary and strict output validation exist.",
+      "limitations": "Dedicated prompt-injection corpus is not yet built."
+    },
+    {
+      "id": 65,
+      "requirement": "Privacy controls, data deletion, export and transparent retention.",
+      "status": "VERIFIED",
+      "code": [
+        "app/api/privacy/route.ts",
+        "app/api/privacy/export/route.ts",
+        "app/api/privacy/delete/route.ts",
+        "app/api/evidence/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/privacy-contract.spec.ts"
+      ],
+      "evidence": "Export returns account/profile/state/diagnostics/events/review cards/privacy prefs/voice consents/evidence_records/entitlements; deletion requires explicit confirmation. E2E privacy-contract passes on 2026-08-21.",
+      "limitations": "Retention automation is policy-level; no background purge job yet."
+    },
+    {
+      "id": 66,
+      "requirement": "Voice-data consent, retention, deletion and provider transparency.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated voice-consent system found.",
+      "limitations": "Requires voice processing architecture."
+    },
+    {
+      "id": 67,
+      "requirement": "Provider abstraction for LLM/STT/TTS/pronunciation/embeddings.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts"
+      ],
+      "tests": [],
+      "evidence": "Shared provider adapter exists for LLM.",
+      "limitations": "Speech and embedding providers are not abstracted."
+    },
+    {
+      "id": 68,
+      "requirement": "Model routing by task/cost/complexity.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "Single OpenAI model default only.",
+      "limitations": "Needs routing policy and evaluation."
+    },
+    {
+      "id": 69,
+      "requirement": "AI cost control with caching, routing, budgets, compression, batching and monitoring.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No cost-control subsystem found.",
+      "limitations": "Needs usage model and instrumentation."
+    },
+    {
+      "id": 70,
+      "requirement": "Controlled RAG/knowledge system with licensed/reference content.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No retrieval/index subsystem found.",
+      "limitations": "Requires legal/content-source design first."
+    },
+    {
+      "id": 71,
+      "requirement": "Relational database covering core learning entities.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "db/schema.sql",
+        "src/infrastructure/database.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "PostgreSQL persists learners, profiles, diagnostics, events, sessions and reviews.",
+      "limitations": "Many future entities remain absent."
+    },
+    {
+      "id": 72,
+      "requirement": "Event-based learning data for meaningful learner interactions.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "db/schema.sql",
+        "app/api/lesson/complete/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "learning_events table and completion instrumentation exist.",
+      "limitations": "Coverage of all listed events is incomplete."
+    },
+    {
+      "id": 73,
+      "requirement": "Analytics focused on learning and product outcomes.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No analytics subsystem found.",
+      "limitations": "Requires event warehouse/reporting layer."
+    },
+    {
+      "id": 74,
+      "requirement": "Experimentation/A-B testing capability.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No experiment system found.",
+      "limitations": "Future capability."
+    },
+    {
+      "id": 75,
+      "requirement": "Simple learner UX hiding backend complexity.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/dashboard/page.tsx",
+        "app/learning-path/page.tsx"
+      ],
+      "tests": [],
+      "evidence": "Learner surfaces present a small set of primary actions.",
+      "limitations": "World/mission UX not yet connected."
+    },
+    {
+      "id": 76,
+      "requirement": "Core home screen with goal, current level, today focus, mission and progress.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/dashboard/page.tsx"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Dashboard exists and consumes learner state/profile."
+    },
+    {
+      "id": 77,
+      "requirement": "Curriculum-aware AI chat rather than generic chatbot.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/conversation/page.tsx",
+        "app/api/ai"
+      ],
+      "tests": [],
+      "evidence": "Conversation UI and AI context loader exist.",
+      "limitations": "Full chat memory/teacher policy is incomplete."
+    },
+    {
+      "id": 78,
+      "requirement": "Teacher memory examples for recurring errors.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/error-intelligence.ts"
+      ],
+      "tests": [],
+      "evidence": "Recurring-error model exists.",
+      "limitations": "Teacher-generated memory prompts are not yet surfaced explicitly."
+    },
+    {
+      "id": 79,
+      "requirement": "Recommendation explainability.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/recommendation.ts"
+      ],
+      "tests": [],
+      "evidence": "Learning actions include a reason string."
+    },
+    {
+      "id": 80,
+      "requirement": "No-shame language and psychologically safe correction.",
+      "status": "DESIGNED",
+      "code": [
+        "app/api/practice/submit/route.ts",
+        "app/practice/page.tsx"
+      ],
+      "tests": [],
+      "evidence": "Feedback copy is supportive.",
+      "limitations": "No language-safety evaluation suite."
+    },
+    {
+      "id": 81,
+      "requirement": "Beginner design with learner-language support and gradual immersion.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/curriculum.ts",
+        "app/onboarding"
+      ],
+      "tests": [],
+      "evidence": "Pre-A1 curriculum and native-language profile field exist.",
+      "limitations": "Instructional language adaptation is incomplete."
+    },
+    {
+      "id": 82,
+      "requirement": "Adult-intelligent C1/C2 design.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/missions.ts",
+        "src/domain/conversation.ts"
+      ],
+      "tests": [],
+      "evidence": "Advanced mission/conversation content exists.",
+      "limitations": "C1/C2 content depth is still limited."
+    },
+    {
+      "id": 83,
+      "requirement": "Professional English domain pathways.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No domain pathway model found.",
+      "limitations": "Needs domain content layer."
+    },
+    {
+      "id": 84,
+      "requirement": "Dedicated IELTS pathway distinct from general English mastery.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No IELTS module found.",
+      "limitations": "Needs licensed/researched exam framework."
+    },
+    {
+      "id": 85,
+      "requirement": "Dedicated Cambridge pathways without implying certification.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No Cambridge pathway module found.",
+      "limitations": "Needs research/legal/content work."
+    },
+    {
+      "id": 86,
+      "requirement": "Content generation pipeline with validation, difficulty, answer, CEFR and safety gates.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts",
+        "app/api/ai/lesson/route.ts"
+      ],
+      "tests": [],
+      "evidence": "AI generation and schema validation exist.",
+      "limitations": "No approval/deployment workflow."
+    },
+    {
+      "id": 87,
+      "requirement": "Human curriculum review tooling.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No reviewer studio found.",
+      "limitations": "Needs admin/review surface."
+    },
+    {
+      "id": 88,
+      "requirement": "Admin/curriculum studio.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No admin studio found.",
+      "limitations": "Future operational capability."
+    },
+    {
+      "id": 89,
+      "requirement": "Version curriculum/content/assessment/prompts/models.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/curriculum-expanded.ts"
+      ],
+      "tests": [],
+      "evidence": "Objectives include version fields and current model/provider config is explicit.",
+      "limitations": "No global version registry."
+    },
+    {
+      "id": 90,
+      "requirement": "Production observability for API/AI/db/queue/user-facing errors.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/health",
+        "railway.toml",
+        "scripts/start.mjs"
+      ],
+      "tests": [],
+      "evidence": "Health endpoint, deployment logs and controlled provider errors exist.",
+      "limitations": "No metrics/tracing dashboard."
+    },
+    {
+      "id": 91,
+      "requirement": "Reliability with retries, timeouts, graceful degradation and async architecture.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts",
+        "scripts/start.mjs"
+      ],
+      "tests": [],
+      "evidence": "AI timeout and controlled provider failures exist.",
+      "limitations": "No queue/retry subsystem."
+    },
+    {
+      "id": 92,
+      "requirement": "Offline/low-connectivity support.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No offline cache/sync layer found.",
+      "limitations": "Deferred until core learning engine is deeper."
+    },
+    {
+      "id": 93,
+      "requirement": "Subscription architecture separated from learning architecture.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No billing subsystem found.",
+      "limitations": "Future business layer."
+    },
+    {
+      "id": 94,
+      "requirement": "Free/premium value model.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No entitlement model found.",
+      "limitations": "Needs product/pricing decision."
+    },
+    {
+      "id": 95,
+      "requirement": "Eventual global scale without premature microservices.",
+      "status": "DESIGNED",
+      "code": [
+        "src/infrastructure/database.ts",
+        "app/api"
+      ],
+      "tests": [],
+      "evidence": "Modular monolith architecture is in use.",
+      "limitations": "Scale/performance validation not done."
+    },
+    {
+      "id": 96,
+      "requirement": "Phased development strategy from research through global product.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Phase strategy is specified in contract.",
+      "limitations": "Execution is ongoing."
+    },
+    {
+      "id": 97,
+      "requirement": "MVP minimum experience from account through AI teacher, speak, write, feedback, memory and recommendation.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/auth",
+        "app/onboarding",
+        "app/diagnostic",
+        "app/practice",
+        "app/speaking",
+        "app/dashboard"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Core learner journey exists and has browser coverage.",
+      "limitations": "Live AI provider credential still required."
+    },
+    {
+      "id": 98,
+      "requirement": "MVP success criterion: learner feels understood, remembers errors and sees logical next lesson.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/error-intelligence.ts"
+      ],
+      "tests": [],
+      "evidence": "Mechanics exist.",
+      "limitations": "Requires user research and educational evaluation."
+    },
+    {
+      "id": 99,
+      "requirement": "Do not build premature social/marketplace/over-gamification systems.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app"
+      ],
+      "tests": [],
+      "evidence": "Core learning work has priority; no marketplace/social complexity added."
+    },
+    {
+      "id": 100,
+      "requirement": "Technical workflow includes architecture, data model, APIs, security and testing before scale.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src",
+        "db",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        ".github/workflows/ci.yml"
+      ],
+      "evidence": "Repository has modular layers and CI gates."
+    },
+    {
+      "id": 101,
+      "requirement": "Code quality: typed interfaces, modular design, env config, tests, validation, docs.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src",
+        "app",
+        "tests",
+        "package.json"
+      ],
+      "tests": [
+        ".github/workflows/ci.yml"
+      ],
+      "evidence": "Strict TypeScript and modular files exist.",
+      "limitations": "Documentation set is incomplete."
+    },
+    {
+      "id": 102,
+      "requirement": "Responsive, fast, accessible, mobile-friendly, professional frontend.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/globals.css",
+        "app/layout.tsx"
+      ],
+      "tests": [],
+      "evidence": "Responsive React/Next frontend exists.",
+      "limitations": "Formal browser/accessibility audit remains."
+    },
+    {
+      "id": 103,
+      "requirement": "Premium Magic + Education + Intelligence design language.",
+      "status": "DESIGNED",
+      "code": [
+        "app/globals.css"
+      ],
+      "tests": [],
+      "evidence": "Visual system exists.",
+      "limitations": "Needs dedicated design-system documentation."
+    },
+    {
+      "id": 104,
+      "requirement": "Consistent Wizard brand terminology and experience.",
+      "status": "DESIGNED",
+      "code": [
+        "app"
+      ],
+      "tests": [],
+      "evidence": "Wizard terminology used in product surfaces.",
+      "limitations": "Brand system not formally documented."
+    },
+    {
+      "id": 105,
+      "requirement": "Every activity has a reason, evidence trigger, success measure and failure/mastery response.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/missions.ts"
+      ],
+      "tests": [],
+      "evidence": "Reasoned actions and mission criteria exist.",
+      "limitations": "Activity-level provenance is not universal."
+    },
+    {
+      "id": 106,
+      "requirement": "Every curriculum item explains why the learner is learning it.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No universal why-explanation field/UX found.",
+      "limitations": "Needs recommendation explanation integration."
+    },
+    {
+      "id": 107,
+      "requirement": "Do not mark mastery unless learner can use capability spontaneously where appropriate.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/mastery-graph.ts"
+      ],
+      "tests": [],
+      "evidence": "Mastered state requires repeated evidence and spontaneous flag.",
+      "limitations": "Spontaneous evidence ingestion is limited."
+    },
+    {
+      "id": 108,
+      "requirement": "Transfer learning to unfamiliar contexts.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No dedicated transfer-task engine found.",
+      "limitations": "Needs curriculum/activity generation."
+    },
+    {
+      "id": 109,
+      "requirement": "Retention test and reactivation of forgotten material.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/spaced-repetition.ts",
+        "app/review"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Review due dates and rescheduling exist.",
+      "limitations": "Forgetting probability is simplified."
+    },
+    {
+      "id": 110,
+      "requirement": "Real-world task orientation at every level.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/missions.ts",
+        "src/domain/conversation.ts"
+      ],
+      "tests": [],
+      "evidence": "Worlds and scenario missions cover real-world tasks.",
+      "limitations": "Execution coverage is partial."
+    },
+    {
+      "id": 111,
+      "requirement": "Core product loop from learner goal through evidence, memory and next action.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/progression.ts",
+        "app/api/practice/submit/route.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Core state loop is implemented and browser-tested.",
+      "limitations": "Not all contract activities feed every model dimension."
+    },
+    {
+      "id": 112,
+      "requirement": "Magic comes from continuous mathematical/educational learner modelling.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/mastery-graph.ts",
+        "src/domain/error-intelligence.ts"
+      ],
+      "tests": [],
+      "evidence": "Foundational models exist.",
+      "limitations": "Model sophistication is still early."
+    },
+    {
+      "id": 113,
+      "requirement": "Competitive differentiation by orchestrating assessment, conversation, writing, mastery, memory and simulation.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain",
+        "app"
+      ],
+      "tests": [],
+      "evidence": "Many component systems exist.",
+      "limitations": "Full orchestration is incomplete."
+    },
+    {
+      "id": 114,
+      "requirement": "Feature decisions must improve learning/personalization/assessment/retention/UX and manage risk/scale.",
+      "status": "DESIGNED",
+      "code": [
+        "DECISION_LOG.md"
+      ],
+      "tests": [],
+      "evidence": "Decision discipline documented.",
+      "limitations": "Not machine-enforced."
+    },
+    {
+      "id": 115,
+      "requirement": "No fake intelligence or unsupported precision.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/diagnostic.ts",
+        "src/domain/mastery-graph.ts",
+        "app/api/ai/_shared.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Confidence fields, conservative mastery states and AI output validation exist.",
+      "limitations": "Educational validity still needs external evaluation."
+    },
+    {
+      "id": 116,
+      "requirement": "No fake CEFR/IELTS/Cambridge certification claims.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Contract explicitly separates estimates from certification.",
+      "limitations": "Exam pathways not launched."
+    },
+    {
+      "id": 117,
+      "requirement": "AI teacher safety and privacy boundaries.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts",
+        "src/infrastructure/auth.ts"
+      ],
+      "tests": [],
+      "evidence": "Authenticated AI boundary and no-secret frontend model.",
+      "limitations": "Safety evaluation dataset not yet implemented."
+    },
+    {
+      "id": 118,
+      "requirement": "Major-phase workflow: analyse, research, architect, document, implement, test, evaluate, fix.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "DECISION_LOG.md",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        ".github/workflows/ci.yml"
+      ],
+      "evidence": "Repository uses CI and decision logging; current audit follows the loop."
+    },
+    {
+      "id": 119,
+      "requirement": "Maintain required project documentation set.",
+      "status": "NOT_STARTED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md",
+        "DECISION_LOG.md",
+        "PROJECT_STATUS.md"
+      ],
+      "tests": [],
+      "evidence": "Some required docs exist.",
+      "limitations": "The full /docs specification set is not present."
+    },
+    {
+      "id": 120,
+      "requirement": "Document architectural decisions with date, reason, alternatives, trade-offs and reversibility.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "DECISION_LOG.md"
+      ],
+      "tests": [],
+      "evidence": "Decision log contains provider and contract decisions."
+    },
+    {
+      "id": 121,
+      "requirement": "Unit, integration, E2E, AI, curriculum, assessment, security and performance testing.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "tests",
+        "src/domain/*.test.ts",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        ".github/workflows/ci.yml"
+      ],
+      "evidence": "Unit/E2E infrastructure exists.",
+      "limitations": "AI evaluation, performance and security suites are incomplete."
+    },
+    {
+      "id": 122,
+      "requirement": "AI evaluation datasets for explanations, corrections, CEFR, quality, scoring, hallucination and appropriateness.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "No evaluation corpus found.",
+      "limitations": "Needs curated datasets and scoring harness."
+    },
+    {
+      "id": 123,
+      "requirement": "Human oversight for high-stakes assessment.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Contract prohibits premature certification claims.",
+      "limitations": "No human-review workflow implemented."
+    },
+    {
+      "id": 124,
+      "requirement": "Architecture package covering product/system/database/AI/curriculum/learner/assessment/mastery/security/UX/roadmap/cost/risk/unknowns.",
+      "status": "NOT_STARTED",
+      "code": [],
+      "tests": [],
+      "evidence": "Contract requests package; repository does not yet contain the full package."
+    },
+    {
+      "id": 125,
+      "requirement": "Master curriculum research engine mapping CEFR → capability → skill → resource → assessment → mastery.",
+      "status": "NOT_STARTED",
+      "code": [
+        "src/domain/curriculum-expanded.ts"
+      ],
+      "tests": [
+        "src/domain/curriculum.test.ts"
+      ],
+      "evidence": "Curriculum structure exists but research provenance engine does not."
+    },
+    {
+      "id": 126,
+      "requirement": "English DNA Diagnostic MVP account → goals → reading → listening → writing → speaking → results → plan.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/auth",
+        "app/onboarding",
+        "app/diagnostic",
+        "app/dashboard",
+        "src/domain/diagnostic.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Authenticated browser journey and persisted diagnostic exist.",
+      "limitations": "True adaptive branching and acoustic speaking assessment are incomplete."
+    },
+    {
+      "id": 127,
+      "requirement": "First Magic Learning Session: personalised teach → listen → practise → speak → feedback → retry → mission → assessment → memory update.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/learn",
+        "app/practice",
+        "app/speaking",
+        "src/domain/missions.ts",
+        "src/domain/error-intelligence.ts"
+      ],
+      "tests": [],
+      "evidence": "Core building blocks now exist.",
+      "limitations": "Not yet orchestrated into one seamless session state machine."
+    },
+    {
+      "id": 128,
+      "requirement": "Do not build a generic chatbot; AI must be curriculum-aware.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/api/ai/_shared.ts",
+        "app/api/ai/lesson/route.ts",
+        "app/api/ai/writing/route.ts",
+        "app/api/ai/speaking/route.ts"
+      ],
+      "tests": [],
+      "evidence": "AI routes load learner profile/state context."
+    },
+    {
+      "id": 129,
+      "requirement": "Do not build a static course; learner path must be adaptive.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "src/domain/recommendation.ts",
+        "src/domain/progression.ts"
+      ],
+      "tests": [
+        "src/domain/progression.test.ts"
+      ],
+      "evidence": "Next-best-action and completion progression exist.",
+      "limitations": "Curriculum content itself remains partly static seed data."
+    },
+    {
+      "id": 130,
+      "requirement": "Every exercise must connect to a learning objective.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/curriculum.ts",
+        "src/domain/missions.ts",
+        "app/api/practice/submit/route.ts"
+      ],
+      "tests": [],
+      "evidence": "Practice and mission models carry objective IDs.",
+      "limitations": "Not every current UI activity has complete metadata."
+    },
+    {
+      "id": 131,
+      "requirement": "Backend complexity should collapse to one clear next learner step.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "src/domain/adaptive-engine.ts",
+        "app/dashboard/page.tsx"
+      ],
+      "tests": [],
+      "evidence": "Learning action includes a single next action.",
+      "limitations": "Daily orchestration is still basic."
+    },
+    {
+      "id": 132,
+      "requirement": "Every major feature should be genuinely useful to a world-class teacher.",
+      "status": "DESIGNED",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md"
+      ],
+      "tests": [],
+      "evidence": "Quality principle captured.",
+      "limitations": "Requires pedagogical review."
+    },
+    {
+      "id": 133,
+      "requirement": "Guide a beginner toward sophisticated English without requiring curriculum knowledge from learner.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/curriculum-expanded.ts",
+        "src/domain/adaptive-engine.ts"
+      ],
+      "tests": [],
+      "evidence": "Seven-level model and recommendation engine exist.",
+      "limitations": "Full end-to-end path is unfinished."
+    },
+    {
+      "id": 134,
+      "requirement": "Final user experience: discover human, assess, set destination, create path, daily next step, remember errors and adapt.",
+      "status": "IMPLEMENTED",
+      "code": [
+        "app/onboarding",
+        "app/diagnostic",
+        "app/dashboard",
+        "src/domain/error-intelligence.ts"
+      ],
+      "tests": [
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Core sequence exists.",
+      "limitations": "Some advanced adaptation is incomplete."
+    },
+    {
+      "id": 135,
+      "requirement": "Don't teach everyone the same English; discover each person's needs and build the path.",
+      "status": "DESIGNED",
+      "code": [
+        "src/domain/diagnostic.ts",
+        "src/domain/adaptive-engine.ts"
+      ],
+      "tests": [],
+      "evidence": "Architecture supports personalized pathing.",
+      "limitations": "Depth is not yet sufficient for the full vision."
+    },
+    {
+      "id": 136,
+      "requirement": "Start now and continue through architecture, curriculum, learner model, mastery, diagnostic, AI teacher, MVP and complete learner testing.",
+      "status": "TESTING",
+      "code": [
+        "MASTER_EXECUTION_CONTRACT.md",
+        ".github/workflows/ci.yml"
+      ],
+      "tests": [
+        ".github/workflows/ci.yml",
+        "tests/e2e/learner-journey.spec.ts"
+      ],
+      "evidence": "Continuous execution and CI are active.",
+      "limitations": "Full 136-section verification is ongoing."
+    }
+  ]
+}
