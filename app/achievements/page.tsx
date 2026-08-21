@@ -43,7 +43,7 @@ export default function AchievementsPage() {
           : Boolean(profile?.englishDna?.generatedAt);
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
       <p className="eyebrow">Milestones</p>
       <h1>Achievements</h1>
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>

@@ -4,6 +4,12 @@ import { useRouter } from "next/navigation";
 
 type Profile = { displayName: string; nativeLanguage: string; targetLevel: string; dailyMinutes: number };
 type Privacy = { analytics: boolean; personalized_ai: boolean; voice_processing: boolean; voice_retention_days: number; share_for_human_review: boolean };
+type PlanInfo = { tier: string; name: string; priceLabel: string; highlights: string[] };
+type SubscriptionState = {
+  effectiveTier: string;
+  subscription: { status: string; cancelAtPeriodEnd: boolean } | null;
+  plans: PlanInfo[];
+};
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -18,6 +24,34 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [plan, setPlan] = useState<SubscriptionState | null>(null);
+  const [planBusy, setPlanBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/subscription")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => { if (payload?.plans) setPlan({ effectiveTier: payload.effectiveTier, subscription: payload.subscription ?? null, plans: payload.plans }); })
+      .catch(() => undefined);
+  }, []);
+
+  async function changePlan(tier: string) {
+    setPlanBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/subscription", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "CHANGE_PLAN", tier }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? "Plan change failed.");
+      setPlan((current) => (current ? { ...current, effectiveTier: payload.effectiveTier } : current));
+    } catch (changeError) {
+      setError(changeError instanceof Error ? changeError.message : "Plan change failed.");
+    } finally {
+      setPlanBusy(false);
+    }
+  }
 
   useEffect(() => {
     Promise.all([fetch("/api/profile"), fetch("/api/privacy")])
@@ -95,7 +129,7 @@ export default function SettingsPage() {
 
   if (!profile) {
     return (
-      <main style={{ maxWidth: 700, margin: "0 auto", padding: 48 }}>
+      <main id="main-content" style={{ maxWidth: 700, margin: "0 auto", padding: 48 }}>
         <h1>Settings</h1>
         <p>{error || "Complete onboarding first."}</p>
       </main>
@@ -103,7 +137,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main style={{ maxWidth: 700, margin: "0 auto", padding: 48 }}>
+    <main id="main-content" style={{ maxWidth: 700, margin: "0 auto", padding: 48 }}>
       <p className="eyebrow">Learner settings</p>
       <h1>Shape your learning</h1>
 
@@ -113,6 +147,28 @@ export default function SettingsPage() {
         <label>Target level<select value={profile.targetLevel} onChange={(event) => setProfile({ ...profile, targetLevel: event.target.value })}>{["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"].map((level) => <option key={level}>{level}</option>)}</select></label>
         <label>Daily minutes<input type="number" min="5" max="180" value={profile.dailyMinutes} onChange={(event) => setProfile({ ...profile, dailyMinutes: Number(event.target.value) })} /></label>
       </section>
+
+      {plan && (
+        <section className="panel" style={{ display: "grid", gap: 12, marginTop: 18 }}>
+          <h2>Plan</h2>
+          <p className="subtle">Current plan: <strong>{plan.effectiveTier}</strong>{plan.subscription?.status === "CANCELLED" ? " (cancels at period end)" : ""}. Changing plans never touches your learning data.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12 }}>
+            {plan.plans.map((item) => (
+              <article className={plan.effectiveTier === item.tier ? "panel" : "panel"} key={item.tier} style={{ margin: 0 }}>
+                <strong>{item.name}</strong>
+                <p className="subtle">{item.highlights.join(" · ")}</p>
+                <button
+                  className={plan.effectiveTier === item.tier ? "button secondary" : "button"}
+                  disabled={planBusy || plan.effectiveTier === item.tier}
+                  onClick={() => changePlan(item.tier)}
+                >
+                  {plan.effectiveTier === item.tier ? "Current plan" : `Switch to ${item.name}`}
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="panel" style={{ display: "grid", gap: 12, marginTop: 18 }}>
         <h2>Privacy</h2>

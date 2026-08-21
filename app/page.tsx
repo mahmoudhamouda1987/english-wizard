@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main style={{ maxWidth: 1100, margin: "0 auto", padding: "72px 24px" }}>
+    <main id="main-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "72px 24px" }}>
       <section style={{ background: "white", borderRadius: 24, padding: 48, boxShadow: "0 12px 40px rgba(20,30,60,.08)" }}>
         <p style={{ fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 12 }}>English Wizard</p>
         <h1 style={{ fontSize: "clamp(40px, 7vw, 76px)", lineHeight: 1.02, margin: "0 0 20px" }}>

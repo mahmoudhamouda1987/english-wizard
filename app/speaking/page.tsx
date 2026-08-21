@@ -94,7 +94,7 @@ export default function SpeakingPage() {
   }
 
   return (
-    <main style={{ maxWidth: 860, margin: "0 auto", padding: "52px 24px" }}>
+    <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "52px 24px" }}>
       <p className="eyebrow">Speaking Coach</p>
       <h1>Speak naturally. Get useful feedback.</h1>
       <p className="subtle">

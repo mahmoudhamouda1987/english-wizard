@@ -34,9 +34,9 @@ export interface AIQualityGate {
 }
 
 const DEFAULT_MODELS: Record<ModelTier, string> = {
-  FAST: process.env.OPENAI_FAST_MODEL ?? process.env.OPENAI_MODEL ?? 'gpt-5.6',
-  BALANCED: process.env.OPENAI_MODEL ?? 'gpt-5.6',
-  PREMIUM: process.env.OPENAI_PREMIUM_MODEL ?? process.env.OPENAI_MODEL ?? 'gpt-5.6'
+  FAST: process.env.OPENAI_FAST_MODEL ?? process.env.OPENAI_MODEL ?? 'gpt-5.4-nano',
+  BALANCED: process.env.OPENAI_MODEL ?? 'gpt-5.4-mini',
+  PREMIUM: process.env.OPENAI_PREMIUM_MODEL ?? process.env.OPENAI_MODEL ?? 'gpt-5.4'
 };
 
 export function routeAITask(task: AITask, complexity: 'LOW' | 'MEDIUM' | 'HIGH'): ModelRoute {

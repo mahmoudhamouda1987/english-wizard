@@ -44,10 +44,10 @@ export default function ReviewPage() {
   }
 
   const card = cards[index];
-  if (loading) return <main style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}><p className="eyebrow">Review</p><h1>Loading your review queue…</h1></main>;
-  if (!card) return <main style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}><p className="eyebrow">Review</p><h1>{cards.length === 0 ? "Nothing is due right now." : "Review complete."}</h1><p className="subtle">Your recall schedule is persisted and will surface the next due items automatically.</p>{message && <p>{message}</p>}<a className="button" href="/dashboard">Back to dashboard →</a></main>;
+  if (loading) return <main id="main-content" style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}><p className="eyebrow">Review</p><h1>Loading your review queue…</h1></main>;
+  if (!card) return <main id="main-content" style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}><p className="eyebrow">Review</p><h1>{cards.length === 0 ? "Nothing is due right now." : "Review complete."}</h1><p className="subtle">Your recall schedule is persisted and will surface the next due items automatically.</p>{message && <p>{message}</p>}<a className="button" href="/dashboard">Back to dashboard →</a></main>;
 
-  return <main style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}>
+  return <main id="main-content" style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}>
     <p className="eyebrow">Spaced Review · {card.skill}</p>
     <h1>{card.prompt}</h1>
     {showAnswer ? <section className="panel" style={{ marginTop: 20 }}><h2>Answer</h2><p>{card.answer ?? "No saved answer — use this item as a recall prompt."}</p></section> : <p className="subtle">Recall first. Reveal the answer only when you have committed to a response.</p>}

@@ -50,6 +50,7 @@ const links: Record<string, string> = {
   EnglishEar: "/english-ear",
   ReadingEngine: "/reading",
   SayItBetter: "/say-it-better",
+  Pathways: "/pathways",
   SpeakingCoach: "/speaking",
   Review: "/review",
   Practice: "/practice",
@@ -126,7 +127,7 @@ export default function DashboardPage() {
   }, [analytics]);
 
   return (
-    <main className="dashboard-shell">
+    <main id="main-content" className="dashboard-shell">
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark">✦</div>

@@ -4,7 +4,9 @@ import { query } from "@/src/infrastructure/database";
 import { getProfile } from "@/src/infrastructure/profile-repository";
 import { getLearnerState } from "@/src/infrastructure/learner-repository";
 import { buildEvidence, type EvidenceModality } from "@/src/domain/learning-evidence";
-import { routeAITask, type AITask, type ModelRoute } from "@/src/domain/ai-operations";
+import { routeAITask, fingerprintRequest, type AITask, type ModelRoute } from "@/src/domain/ai-operations";
+import { checkFeature } from "@/src/domain/subscription";
+import { getSubscription } from "@/src/infrastructure/subscription-repository";
 import { rankKnowledgeDocuments, type RagRights } from "@/src/domain/rag";
 import type { LearningLevel } from "@/src/domain/advanced-learning";
 
@@ -23,6 +25,7 @@ type AICallOptions = {
   task?: AITask;
   complexity?: "LOW" | "MEDIUM" | "HIGH";
   retrievalQuery?: string;
+  cacheContextVersion?: string;
 };
 
 type UsageLike = { total_tokens?: unknown; input_tokens?: unknown; output_tokens?: unknown };
@@ -90,6 +93,14 @@ async function retrieveApprovedContext(search: string): Promise<string> {
   }
 }
 
+async function aiRequestsToday(learnerId: string): Promise<number> {
+  const result = await query<{ count: string }>(
+    `SELECT COUNT(*)::text AS count FROM learning_events WHERE learner_id = $1 AND event_type = 'AI_FEEDBACK' AND occurred_at >= CURRENT_DATE`,
+    [learnerId],
+  );
+  return Number(result.rows[0]?.count ?? 0);
+}
+
 export async function callAI(system: string, user: string, options: AICallOptions = {}) {
   const requestId = randomUUID();
   const startedAt = Date.now();
@@ -102,6 +113,39 @@ export async function callAI(system: string, user: string, options: AICallOption
 
   if (!apiKey) {
     return { error: "AI service is not configured. Set OPENAI_API_KEY on the server.", status: 503 as const, requestId };
+  }
+
+  if (options.learnerId) {
+    try {
+      const [subscription, usedToday] = await Promise.all([getSubscription(options.learnerId), aiRequestsToday(options.learnerId)]);
+      const gate = checkFeature(subscription, "AI_TEACHER", usedToday);
+      if (!gate.allowed) {
+        return { error: "Your plan's daily AI limit is reached. Your saved learning data is safe; upgrade or continue tomorrow.", status: 429 as const, requestId, planTier: gate.tier, quota: gate.quota ?? 0 };
+      }
+    } catch {
+      // quota enforcement is fail-open only when subscription tables are unavailable
+    }
+  }
+
+  let groundedUser = user;
+  if (options.retrievalQuery) {
+    const context = await retrieveApprovedContext(options.retrievalQuery);
+    if (context) groundedUser = `${user}\n\nAPPROVED REFERENCE CONTEXT:\n${context}\n\nUse the reference context only when relevant. Do not imply a source was consulted if no context is provided.`;
+  }
+
+  const cacheKey = fingerprintRequest({ task, normalizedInput: `${system}\n${groundedUser}`, contextVersion: options.cacheContextVersion ?? route.model });
+  try {
+    const cached = await query<{ payload: { value: Record<string, unknown>; usageTokens?: number } }>(
+      `UPDATE ai_response_cache SET hit_count = hit_count + 1, last_hit_at = NOW() WHERE cache_key = $1 RETURNING payload`,
+      [cacheKey],
+    );
+    if (cached.rows.length) {
+      const hit = cached.rows[0].payload;
+      if (options.learnerId) await recordAiEvent({ learnerId: options.learnerId, requestId, operation: task, provider: "openai", model, result: "SUCCESS", latencyMs: Date.now() - startedAt, signalCount: hit.usageTokens ?? undefined });
+      return { value: hit.value, requestId, provider: "openai", model, latencyMs: Date.now() - startedAt, usageTokens: hit.usageTokens ?? 0, budgetUsedCents: 0, cached: true };
+    }
+  } catch {
+    // cache table may not exist yet; proceed without cache
   }
 
   let budget: { usedCents: number; hardLimitCents: number } | undefined;
@@ -117,12 +161,6 @@ export async function callAI(system: string, user: string, options: AICallOption
     }
   }
 
-  let groundedUser = user;
-  if (options.retrievalQuery) {
-    const context = await retrieveApprovedContext(options.retrievalQuery);
-    if (context) groundedUser = `${user}\n\nAPPROVED REFERENCE CONTEXT:\n${context}\n\nUse the reference context only when relevant. Do not imply a source was consulted if no context is provided.`;
-  }
-
   try {
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -132,6 +170,7 @@ export async function callAI(system: string, user: string, options: AICallOption
       },
       body: JSON.stringify({
         model,
+        max_output_tokens: route.maxTokens,
         input: [
           { role: "system", content: [{ type: "input_text", text: system + jsonInstruction }] },
           { role: "user", content: [{ type: "input_text", text: groundedUser }] },
@@ -155,7 +194,16 @@ export async function callAI(system: string, user: string, options: AICallOption
     try {
       const value = JSON.parse(cleaned) as Record<string, unknown>;
       if (options.learnerId) await recordAiEvent({ learnerId: options.learnerId, requestId, operation: task, provider: "openai", model, result: "SUCCESS", latencyMs, signalCount: usageTokens || undefined, score: budget?.usedCents });
-      return { value, requestId, provider: "openai", model, latencyMs, usageTokens, budgetUsedCents: budget?.usedCents };
+      try {
+        await query(
+          `INSERT INTO ai_response_cache (cache_key, model, payload) VALUES ($1, $2, $3::jsonb)
+           ON CONFLICT (cache_key) DO NOTHING`,
+          [cacheKey, model, JSON.stringify({ value, usageTokens })],
+        );
+      } catch {
+        // cache is best-effort
+      }
+      return { value, requestId, provider: "openai", model, latencyMs, usageTokens, budgetUsedCents: budget?.usedCents, cached: false };
     } catch {
       if (options.learnerId) await recordAiEvent({ learnerId: options.learnerId, requestId, operation: task, provider: "openai", model, result: "INVALID_PAYLOAD", latencyMs, signalCount: usageTokens || undefined });
       return { error: "AI provider returned malformed JSON.", status: 502 as const, requestId };

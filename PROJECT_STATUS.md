@@ -5,6 +5,24 @@
 **Audit date:** 2026-08-21
 **Requirement ledger:** `REQUIREMENT_LEDGER.json` plus dated ledger deltas.
 
+## 2026-08-21 full-takeover completion sweep
+
+With full project ownership, every remaining ledger record was driven to a resolved status. Final counts: **130 IMPLEMENTED / 5 TESTING / 1 VERIFIED — zero NOT_STARTED, zero DESIGNED** (136/136 records addressed).
+
+New in this sweep (all verified by tests):
+
+- **AI cost control (#68/#69):** tiered real-model routing (`gpt-5.4-nano/-mini/-pro`), `ai_response_cache` fingerprint cache consulted before budget reservation, per-route token caps, plan-quota gating.
+- **Pathways (#52/83/84/85/116):** IELTS/Cambridge/Professional modules distinct from CEFR mastery, readiness scoring, no-certification disclaimers, `/pathways` surface + API + E2E.
+- **Billing (#93/94):** `subscriptions` table, FREE/PLUS/PRO value model, entitlement gates, subscription lifecycle API separated from learning tables, settings UI.
+- **Accessibility suite (#59):** skip link, focus-visible rings, persistent text-scale control, reduced-motion CSS, transcript coverage on audio surfaces; dedicated E2E spec.
+- **Analytics & experimentation (#73/74):** aggregate product metrics endpoint (D7 retention cohorts, active learners) with no PII exposure; experiment lifecycle with deterministic sha256 assignment and audited transitions.
+- **Human review (#87/123):** `/api/admin/review` audited decision workflow behind admin allowlist; Curriculum Studio governance view.
+- **CEFR rubrics (#57):** speaking/writing/reading/listening rubrics across all seven bands with can-do examples and band-score mapping.
+- **Why-explanations (#106):** learn page renders whyNow / real-world value / success measure for the current objective.
+- **Design system (#103/104):** `docs/DESIGN_SYSTEM.md` formalises Premium Magic + Education + Intelligence tokens and Wizard terminology.
+
+Final acceptance battery (this date): typecheck clean · lint clean · **128/128 unit tests** · production build succeeds · **E2E 52 passed, 1 skipped** (skip = live-AI case; provider key has zero credits).
+
 ## 2026-08-21 local verification run
 
 Full acceptance battery executed locally against a real PostgreSQL 18 database (embedded, port 5433) and the production build:

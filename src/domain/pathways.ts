@@ -34,6 +34,14 @@ export interface ExamPathway {
   readinessCriteria: string[];
 }
 
+export interface PathwaySelectionRecord {
+  pathway: PathwayKind;
+  domain?: ProfessionalDomain;
+  track?: ProfessionalTrack;
+  target?: string;
+  selectedAt: string;
+}
+
 export interface PathwayEvidence {
   capabilityId: string;
   skill: string;

@@ -23,7 +23,7 @@ export default function MistakesPage() {
   }, []);
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
       <p className="eyebrow">Error memory</p>
       <h1>Mistakes to review</h1>
       <p className="subtle">Repeated errors stay visible so future practice can target them.</p>

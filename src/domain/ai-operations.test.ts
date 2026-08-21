@@ -8,6 +8,19 @@ describe("AI operations", () => {
     expect(routeAITask("LESSON", "MEDIUM").tier).toBe("BALANCED");
   });
 
+  it("routes to real OpenAI model identifiers with cost-ordered capacity", () => {
+    const fast = routeAITask("EXPLANATION", "LOW");
+    const balanced = routeAITask("LESSON", "MEDIUM");
+    const premium = routeAITask("DIAGNOSTIC", "HIGH");
+    for (const route of [fast, balanced, premium]) {
+      expect(route.model).toMatch(/^gpt-[a-z0-9.\-]+$/);
+      expect(route.model).not.toContain("gpt-5.6\"");
+    }
+    expect(new Set([fast.model, balanced.model, premium.model]).size).toBe(3);
+    expect(fast.maxTokens).toBeLessThan(balanced.maxTokens);
+    expect(balanced.maxTokens).toBeLessThan(premium.maxTokens);
+  });
+
   it("enforces hard and soft budget states", () => {
     const budget = { learnerId: "l1", dailyCents: 100, usedCents: 60, hardLimitCents: 100, softLimitCents: 50 };
     expect(budgetState(budget)).toBe("SOFT_LIMIT");

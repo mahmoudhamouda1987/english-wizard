@@ -46,7 +46,7 @@ export default function MissionRunnerPage() {
   }
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
       <p className="eyebrow">Mission Runner</p>
       <h1>Complete a mission, not a checklist.</h1>
       <p className="muted">

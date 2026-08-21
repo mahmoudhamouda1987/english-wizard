@@ -110,7 +110,7 @@ export default function PronunciationPage(){
 
   function stopRecording(){recorderRef.current?.stop();recorderRef.current=null;setRecording(false);}
 
-  return <main style={{maxWidth:800,margin:"0 auto",padding:48}}>
+  return <main id="main-content" style={{maxWidth:800,margin:"0 auto",padding:48}}>
     <p className="eyebrow">Pronunciation coach</p>
     <h1>Listen. Repeat. Measure the signals.</h1>
     <section className="panel">

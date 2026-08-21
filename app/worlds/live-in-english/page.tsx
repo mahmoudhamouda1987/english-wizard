@@ -55,7 +55,7 @@ export default function LiveInEnglishPage() {
   const complete = !!state && state.stageIndex >= C2_ENDGAME_STAGES.length;
 
   return (
-    <main className="conversation-shell">
+    <main id="main-content" className="conversation-shell">
       <header className="conversation-header">
         <p className="eyebrow">C2 · Boss Mission</p>
         <h1>Live in English</h1>

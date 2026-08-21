@@ -14,7 +14,7 @@ export default function CurriculumStudioPage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 p-6">
+    <main id="main-content" className="mx-auto max-w-6xl space-y-6 p-6">
       <header>
         <p className="text-sm uppercase tracking-wide text-slate-500">English Wizard</p>
         <h1 className="text-3xl font-semibold">Curriculum Studio</h1>

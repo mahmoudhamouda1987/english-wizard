@@ -126,7 +126,7 @@ export default function DiagnosticPage() {
   }
 
   if (result) return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: "56px 24px" }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: "56px 24px" }}>
       <p className="eyebrow">English DNA</p>
       <h1>Your starting profile: {result.level}</h1>
       <p style={{ fontSize: 22 }}>Diagnostic score: <strong>{result.overallScore}%</strong></p>
@@ -140,7 +140,7 @@ export default function DiagnosticPage() {
   );
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: "56px 24px" }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: "56px 24px" }}>
       <p className="eyebrow">Adaptive Diagnostic</p>
       <h1>Let’s map your English with real evidence.</h1>
       <p className="subtle">The next question is selected from your answers to probe uncertainty and coverage instead of forcing everyone through the same sequence.</p>

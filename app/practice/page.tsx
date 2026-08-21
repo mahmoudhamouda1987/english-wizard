@@ -51,7 +51,7 @@ export default function PracticePage() {
   }
 
   return (
-    <main style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px" }}>
+    <main id="main-content" style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px" }}>
       <p className="eyebrow">Practice</p>
       <h1>Practice → evidence → feedback</h1>
 

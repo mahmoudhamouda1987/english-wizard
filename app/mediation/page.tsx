@@ -57,7 +57,7 @@ export default function MediationPage() {
   }, []);
 
   return (
-    <main className="conversation-shell">
+    <main id="main-content" className="conversation-shell">
       <header className="conversation-header">
         <div><p className="eyebrow">Mediation Lab</p><h1>Carry meaning from one person, text or situation to another</h1><p className="subtle">Summarise, explain, relay and facilitate without simply copying the source.</p></div>
         <label className="level-picker">Level<select value={level} onChange={(e) => { const value = e.target.value as CEFRLevel; setLevel(value); void load(value); }}>{levels.map((item) => <option key={item}>{item}</option>)}</select></label>

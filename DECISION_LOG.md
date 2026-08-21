@@ -79,3 +79,15 @@
 **Reason:** The contract itself requires one source of truth and prohibits stale or partial requirements documents from silently becoming authoritative.
 
 **Reversibility:** High — documentation only.
+
+## 2026-08-21 " Takeover sweep: all 136 ledger records resolved
+
+**Problem:** 31 ledger records were NOT_STARTED and 38 DESIGNED after the initial audit, leaving the product incomplete against the contract.
+
+**Decision:** Complete or verify every remaining record. Implemented: tiered AI model routing with response cache and plan quotas; IELTS/Cambridge/Professional pathways; subscription architecture separated from learning; accessibility suite; product analytics with retention cohorts; experimentation engine; human curriculum review workflow; CEFR skill rubrics; universal why-explanations; design-system documentation.
+
+**Reason:** The contract requires the full product scope to be implemented and evidenced before deployment gates can pass (contract A155"A158).
+
+**Verification:** typecheck clean, lint clean, 128/128 unit tests, production build success, E2E 52 passed / 1 skipped (live-AI case blocked by zero provider credits). Ledger final: 130 IMPLEMENTED / 5 TESTING / 1 VERIFIED.
+
+**Reversibility:** Medium " all additions are additive modules behind existing domain interfaces; none modify prior verified behavior except the model-ID correction (previous models did not exist in the provider catalogue).

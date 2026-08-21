@@ -4,7 +4,7 @@ import { WORLDS, MISSIONS, BOSS_MISSIONS } from "@/src/domain/missions";
 import { SESSION_MODES } from "@/src/domain/learning-systems";
 
 export default function WorldsPage(){
-  return <main style={{maxWidth:1100,margin:"0 auto",padding:"48px 24px"}}>
+  return <main id="main-content" style={{maxWidth:1100,margin:"0 auto",padding:"48px 24px"}}>
     <p className="eyebrow">English Wizard Worlds</p>
     <h1>Learn through missions, not just lessons.</h1>
     <p className="subtle">Each world represents a meaningful stage of English capability. Your next mission should be chosen from evidence, not from a fixed checklist.</p>

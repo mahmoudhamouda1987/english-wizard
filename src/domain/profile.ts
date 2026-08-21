@@ -1,4 +1,5 @@
 import type { CEFRLevel } from "./learner";
+import type { PathwaySelectionRecord } from "./pathways";
 
 export interface LearnerProfile {
   learnerId: string;
@@ -7,6 +8,7 @@ export interface LearnerProfile {
   targetLevel: CEFRLevel;
   dailyMinutes: number;
   goals: string[];
+  pathwaySelection?: PathwaySelectionRecord | null;
   englishDna: {
     overallLevel: string;
     strengths: string[];

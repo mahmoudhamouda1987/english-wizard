@@ -25,14 +25,14 @@ export default function ProgressPage() {
 
   if (!state)
     return (
-      <main style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
+      <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
         <h1>Progress</h1>
         <p>Loading saved progress…</p>
       </main>
     );
 
   return (
-    <main style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
+    <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
       <p className="eyebrow">Evidence dashboard</p>
       <h1>Your progress</h1>
       <div className="stats-grid">

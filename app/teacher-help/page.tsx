@@ -51,7 +51,7 @@ export default function TeacherHelpPage() {
   }
 
   return (
-    <main className="conversation-shell">
+    <main id="main-content" className="conversation-shell">
       <header className="conversation-header">
         <div>
           <p className="eyebrow">The Wizard helps differently</p>

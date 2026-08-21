@@ -167,10 +167,10 @@ export default function ConversationPage() {
     speakNext();
   }
 
-  if (!exercise) return <main className="conversation-shell"><p>Loading today’s conversation…</p></main>;
+  if (!exercise) return <main id="main-content" className="conversation-shell"><p>Loading today’s conversation…</p></main>;
 
   return (
-    <main className="conversation-shell">
+    <main id="main-content" className="conversation-shell">
       <header className="conversation-header">
         <div>
           <p className="eyebrow">Listening Lab</p>

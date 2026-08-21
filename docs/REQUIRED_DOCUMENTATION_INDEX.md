@@ -19,9 +19,12 @@ This index satisfies the contract's documentation requirement while allowing equ
 | Privacy model | `/api/privacy`, `/api/privacy/export`, `/api/privacy/delete`, `db/schema.sql` |
 | AI provider strategy | `app/api/ai/_shared.ts`, OpenAI Responses API abstraction |
 | Cost model | `src/domain/ai-operations.ts`, entitlements/experimentation models |
-| Testing strategy | `tests/e2e/learner-journey.spec.ts`, `src/domain/*.test.ts`, release gate |
+| Testing strategy | `tests/e2e/learner-journey.spec.ts`, `tests/e2e/accessibility-suite.spec.ts`, `src/domain/*.test.ts`, release gate |
 | Design system | `app/**` and shared styling conventions |
-| Roadmap | `MASTER_EXECUTION_CONTRACT.md` phases + ledger/deltas |
+| Pathways specification | `src/domain/pathways.ts`, `app/api/pathways/route.ts`, `tests/e2e/pathways.spec.ts` |
+| Subscription/billing architecture | `src/domain/subscription.ts`, `app/api/subscription/route.ts`, `db/schema.sql` (`subscriptions` table) |
+| Roadmap | `docs/ARCHITECTURE_PACKAGE.md` §Roadmap + `MASTER_EXECUTION_CONTRACT.md` phases + ledger/deltas |
+| Risk register & material unknowns | `docs/ARCHITECTURE_PACKAGE.md` §Risk register / §Material unknowns |
 | Decision log | `DECISION_LOG.md` |
 
 ## Evidence rule
