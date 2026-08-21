@@ -40,8 +40,8 @@
 
 ## BLOCKED (external resource)
 
-- Live OpenAI execution: provided API key is valid but has zero credits (`insufficient_quota`). All code paths, cache/budget/quota controls are ready and tested; one E2E test (`ai-evidence.spec.ts`) self-skips until credits exist. Action: add credits at platform.openai.com billing, then run `npx playwright test tests/e2e/ai-evidence.spec.ts`.
-- Railway deploy itself (requires project owner's Railway account); all deployment gates prepared: `railway.toml` (Nixpacks, `/api/health` healthcheck), `Dockerfile`, predeploy schema script.
+- Live OpenAI execution: provided API key has zero credits (`insufficient_quota`). All code paths, cache/budget/quota controls are ready and tested; one E2E test (`ai-evidence.spec.ts`) self-skips until credits exist. Action: add credits at platform.openai.com billing, then run `npx playwright test tests/e2e/ai-evidence.spec.ts`.
+- Supabase/Vercel wiring needs one credential each (no tokens on this machine). Everything else is prepared — see `DEPLOYMENT_INTEGRATION.md`: Supabase = paste pooled connection string as `DATABASE_URL`; Vercel = import repo at vercel.com/new and set env vars.
 
 ## KNOWN ISSUES
 
@@ -51,7 +51,11 @@
 
 ## Deployment status
 
-Production-ready: build passes, health endpoint, idempotent schema bootstrap, secrets server-side only, restart policy configured. Deploy = connect repo to Railway service with `DATABASE_URL` + `OPENAI_API_KEY`; first boot applies schema automatically.
+LIVE as of 2026-08-22: `https://english-wizard-production.up.railway.app` (Railway project `stellar-integrity`, service `English-Wizard`, backed by that project's Postgres).
+
+- Latest verified commit deployed via `railway up`; healthcheck green after two production fixes: server now binds `0.0.0.0` explicitly (container `HOSTNAME` broke the probe) and the build-time schema gate degrades gracefully when builders hide secrets.
+- Production smoke: `/api/health` 200 · auth-gated new routes live (401) · learner registration → learner-state assignment works against the production DB · 28 curriculum lessons served.
+- Schema applies idempotently on every boot; secrets stay server-side; `.env` excluded from image uploads via `.railwayignore`. Full runbook: `DEPLOYMENT_INTEGRATION.md`.
 
 ## Final journey re-run
 

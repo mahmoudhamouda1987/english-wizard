@@ -91,3 +91,15 @@
 **Verification:** typecheck clean, lint clean, 128/128 unit tests, production build success, E2E 52 passed / 1 skipped (live-AI case blocked by zero provider credits). Ledger final: 130 IMPLEMENTED / 5 TESTING / 1 VERIFIED.
 
 **Reversibility:** Medium " all additions are additive modules behind existing domain interfaces; none modify prior verified behavior except the model-ID correction (previous models did not exist in the provider catalogue).
+
+## 2026-08-22 " Production deployment live on Railway + GitHub integration
+
+**Problem:** The verified codebase existed only locally; the Railway service ran stale code, and two production-only defects were unknown.
+
+**Decision:** Integrate GitHub as source of truth (pushed main to mahmoudhamouda1987/english-wizard) and deploy via Railway CLI. Fixed what production exposed: (1) start.mjs bound Next.js to the Linux container HOSTNAME, so the healthcheck probe could not reach it " now binds 0.0.0.0 with BIND_HOST override; (2) build-time schema gate failed on platforms that hide variables from builders " now warns and defers to runtime bootstrap.
+
+**Reason:** Contract 155"158 require a deployed, health-checked release; these defects are invisible outside a real deploy target.
+
+**Verification:** Deployment SUCCESS; https://english-wizard-production.up.railway.app/api/health returns ok; /api/metrics auth-gated (new code confirmed); learner registration and learner-state assignment verified against production Postgres.
+
+**Reversibility:** High " both fixes are one-line behavior narrowings; prior local behavior unchanged.
