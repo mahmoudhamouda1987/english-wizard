@@ -13,8 +13,8 @@ if (!process.env.DATABASE_URL && existsSync(new URL("../.env", import.meta.url))
 }
 
 if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is required for database initialization.");
-  process.exit(1);
+  console.warn("[predeploy] DATABASE_URL not available at build time; skipping schema apply (runtime start applies it).");
+  process.exit(0);
 }
 
 const sql = await readFile(new URL("../db/schema.sql", import.meta.url), "utf8");
