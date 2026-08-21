@@ -208,13 +208,14 @@
       "requirement": "Mastery states from unknown through mastered; correct MCQ alone cannot imply mastery.",
       "status": "TESTING",
       "code": [
-        "src/domain/mastery-graph.ts"
+        "src/domain/mastery-graph.ts",
+        "src/domain/retention-longitudinal.test.ts"
       ],
       "tests": [
         "src/domain/mastery-graph.test.ts",
         "tests/e2e/mastery-persistence.spec.ts"
       ],
-      "evidence": "stateForEvidence ladder + applyEvidenceToMastery; first evidence caps at EXPOSED (contract §15). Unit suite 111/111 and E2E mastery-persistence pass on 2026-08-21 against PostgreSQL 18.",
+      "evidence": "stateForEvidence ladder + applyEvidenceToMastery; first evidence caps at EXPOSED (contract §15). Unit suite 111/111 and E2E mastery-persistence pass on 2026-08-21 against PostgreSQL 18. Longitudinal simulation test validates staged mastery progression and SM-2 review horizons over simulated weeks.",
       "limitations": "Long-horizon retention modelling still modelled, not longitudinally validated."
     },
     {
@@ -778,7 +779,7 @@
       "tests": [
         "tests/e2e/accessibility-suite.spec.ts"
       ],
-      "evidence": "Accessibility suite: skip link, landmarks, focus-visible, adjustable text scale (persisted), reduced-motion CSS, transcripts on audio surfaces; covered by dedicated E2E."
+      "evidence": "Accessibility suite: skip link, landmarks, focus-visible, persistent text scale, reduced motion, transcripts + automated axe WCAG 2 AA scans on core surfaces (contrast tokens corrected to #5b6272)."
     },
     {
       "id": 60,

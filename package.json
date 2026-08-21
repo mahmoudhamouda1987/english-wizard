@@ -19,6 +19,7 @@
     "react-dom": "latest"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "latest",
     "@types/node": "22.10.0",
     "@types/pg": "8.20.0",

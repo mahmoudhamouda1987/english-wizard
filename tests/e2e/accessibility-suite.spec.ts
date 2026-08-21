@@ -1,4 +1,18 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+
+test("core learning surfaces pass automated WCAG checks (axe)", async ({ page }) => {
+  const email = `axe-${Date.now()}@example.com`;
+  const registered = await page.request.post("/api/auth/register", { data: { email, displayName: "Axe Learner", password: "StrongPass123!" } });
+  expect(registered.ok()).toBeTruthy();
+
+  for (const route of ["/dashboard", "/learn", "/chunks", "/settings", "/pathways"]) {
+    await page.goto(route);
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const serious = results.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");
+    expect(serious, `${route} has serious WCAG violations: ${JSON.stringify(serious.map((v) => ({ id: v.id, nodes: v.nodes.length })))}`).toHaveLength(0);
+  }
+});
 
 test("keyboard users can skip navigation and every page exposes a labelled main landmark", async ({ page }) => {
   await page.goto("/dashboard");
