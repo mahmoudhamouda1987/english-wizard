@@ -1,8 +1,16 @@
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import process from "node:process";
 import pg from "pg";
 
 const { Pool } = pg;
+
+if (!process.env.DATABASE_URL && existsSync(new URL("../.env", import.meta.url))) {
+  for (const line of (await readFile(new URL("../.env", import.meta.url), "utf8")).split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^["']|["']$/g, "");
+  }
+}
 
 if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL is required for database initialization.");

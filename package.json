@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/predeploy-db.mjs && next build",
     "start": "node scripts/start.mjs",
     "predeploy": "node scripts/predeploy-db.mjs",
     "lint": "eslint .",
