@@ -2,12 +2,12 @@
 
 Platforms: **GitHub** (source of truth) · **Railway** (primary host — LIVE) · **Vercel** (mirror host — LIVE) · **Supabase** (managed Postgres — one access token away).
 
-## 0. Current live state (2026-08-22)
+## 0. Current live state (2026-08-22) — ALL PLATFORMS WIRED
 
 | Host | URL | Status |
 |---|---|---|
 | Railway | https://english-wizard-production.up.railway.app | LIVE, full stack incl. DB |
-| Vercel | https://english-wizard.vercel.app | LIVE; DB writes pending Supabase (see §3) |
+| Vercel | https://english-wizard.vercel.app | LIVE, full stack incl. DB |
 | GitHub | `mahmoudhamouda1987/english-wizard` @ `main` | pushed, current |
 
 ## 1. GitHub — DONE
@@ -29,17 +29,12 @@ Live deployment facts:
 
 Auto-deploy from GitHub: Dashboard → Service → Settings → Source → Connect repo `english-wizard` (one click). After that every push to `main` redeploys.
 
-## 3. Supabase — the shared database step (ONE PASTE REMAINING)
+## 3. Supabase — DONE (shared database for both hosts)
 
-Railway's internal Postgres is unreachable from outside Railway (CLI cannot create TCP proxies), so Vercel needs an externally reachable Postgres. Supabase free tier fills this for BOTH hosts:
-
-1. Create token: supabase.com/dashboard/account/tokens → give it to the agent OR run `supabase login --token <token>`.
-2. Agent creates project + gets pooled connection string (port 6543, pgbouncer).
-3. Schema applied once via `node scripts/predeploy-db.mjs` with that URL.
-4. Swap on both hosts:
-   - Railway: `railway variables --service English-Wizard --set "DATABASE_URL=<supabase-pool-url>"`
-   - Vercel: `vercel env rm DATABASE_URL production --yes` then re-add and `vercel --prod`.
-5. SSL automatic (`src/infrastructure/database.ts` enforces TLS for non-local hosts).
+- Project english-wizard (ref xgwanwsdfplafecipbqv, eu-central-1) created via CLI.
+- Schema applied through the Supavisor pooler (port 6543, pgbouncer) — 22 public tables verified.
+- Both hosts use the SAME pooled URL; SSL enforced automatically by src/infrastructure/database.ts.
+- Local development intentionally keeps the embedded PostgreSQL (port 5433) so test runs never touch production data.
 
 ## 4. Vercel — mirror host (LIVE)
 
