@@ -103,3 +103,15 @@
 **Verification:** Deployment SUCCESS; https://english-wizard-production.up.railway.app/api/health returns ok; /api/metrics auth-gated (new code confirmed); learner registration and learner-state assignment verified against production Postgres.
 
 **Reversibility:** High " both fixes are one-line behavior narrowings; prior local behavior unchanged.
+
+## 2026-08-22 " Supabase becomes the shared production database for all hosts
+
+**Problem:** Railway's managed Postgres is internal-only (no CLI-provisionable TCP proxy), so the Vercel deployment could not reach any database.
+
+**Decision:** Created Supabase project english-wizard via CLI, applied the idempotent schema through the Supavisor pooler, and pointed BOTH Railway and Vercel at the same pooled connection string. Local/test environments intentionally remain on the embedded PostgreSQL instance to keep test data out of production.
+
+**Reason:** One externally reachable Postgres serves both hosts without duplicating data; pooler transaction mode suits serverless; SSL is enforced by the existing non-local-host detection in database.ts.
+
+**Verification:** 22 public tables present in Supabase; Railway redeploy SUCCESS with register+learner-state verified against Supabase; Vercel production redeploy with identical end-to-end smoke on https://english-wizard.vercel.app.
+
+**Reversibility:** High " swapping DATABASE_URL per host returns to any previous arrangement; schema is plain PostgreSQL.
