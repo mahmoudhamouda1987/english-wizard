@@ -47,3 +47,5 @@ CREATE INDEX IF NOT EXISTS content_versions_entity_idx ON content_versions(entit
 CREATE INDEX IF NOT EXISTS ai_usage_daily_date_idx ON ai_usage_daily(usage_date,learner_id);
 CREATE INDEX IF NOT EXISTS knowledge_documents_source_idx ON knowledge_documents(source_id,version);
 CREATE TABLE IF NOT EXISTS certificates (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,display_name TEXT NOT NULL,level TEXT NOT NULL,overall_percent INTEGER NOT NULL,issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),revoked BOOLEAN NOT NULL DEFAULT FALSE);
+
+CREATE TABLE IF NOT EXISTS streak_state (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,freezes INTEGER NOT NULL DEFAULT 2,bridged_on DATE,last_bridged_gap INTEGER NOT NULL DEFAULT 0,updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());

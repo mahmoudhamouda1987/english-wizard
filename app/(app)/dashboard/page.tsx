@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Dash {
@@ -12,6 +12,8 @@ interface Dash {
   xp: number;
   nextXp: number;
   streak: number;
+  freezes: number;
+  quests: Array<{ id: string; label: string; target: number; current: number; xp: number }>;
   week: Array<{ label: string; value: number }>;
   skills: Array<{ label: string; value: number }>;
   series: number[];
@@ -23,6 +25,33 @@ interface Dash {
   totalLessons: number;
   vocabularyWords: number;
 }
+
+const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string; href: string; sub?: boolean }> }> = [
+  { items: [{ icon: "▦", label: "Dashboard", href: "/dashboard" }, { icon: "🧭", label: "My Journey", href: "/learning-path" }, { icon: "📚", label: "Lessons", href: "/learn" }] },
+  { section: "", items: [{ icon: "⚡", label: "Practice", href: "/practice", sub: true }] },
+  { items: [{ icon: "🌍", label: "Worlds & Missions", href: "/worlds" }] },
+  { items: [{ icon: "🎯", label: "Review & Mastery", href: "/review" }, { icon: "📈", label: "Progress", href: "/progress" }] },
+  {
+    section: "Skills",
+    items: [
+      { icon: "👂", label: "English Ear", href: "/english-ear" },
+      { icon: "🎙️", label: "Say It Better", href: "/say-it-better" },
+      { icon: "📖", label: "Reading Engine", href: "/reading" },
+      { icon: "✍️", label: "Writing", href: "/writing" },
+      { icon: "🔤", label: "Vocabulary", href: "/vocabulary" },
+      { icon: "🧩", label: "Grammar", href: "/grammar" },
+      { icon: "💡", label: "Thinking in English", href: "/thinking-in-english" },
+    ],
+  },
+  {
+    section: "Exams & More",
+    items: [
+      { icon: "🎓", label: "Tests & Exams", href: "/pathways" },
+      { icon: "💬", label: "Community", href: "/community" },
+      { icon: "🤖", label: "Teacher AI", href: "/teacher-help" },
+    ],
+  },
+];
 
 function greeting() {
   const h = new Date().getHours();
@@ -113,16 +142,7 @@ export default function DashboardPage() {
       });
   }, [router]);
 
-  const flatNav = [
-    { label: "Dashboard", href: "/dashboard" }, { label: "My Journey", href: "/learning-path" }, { label: "Lessons", href: "/learn" },
-    { label: "Quick Practice", href: "/practice" }, { label: "Worlds & Missions", href: "/worlds" }, { label: "Conversation", href: "/conversation" },
-    { label: "Say It Better", href: "/say-it-better" }, { label: "Pronunciation", href: "/pronunciation" }, { label: "Review & Mastery", href: "/review" },
-    { label: "Progress", href: "/progress" }, { label: "Mistakes", href: "/mistakes" }, { label: "Achievements", href: "/achievements" },
-    { label: "Leaderboard", href: "/leaderboard" }, { label: "English Ear", href: "/english-ear" }, { label: "Reading Engine", href: "/reading" },
-    { label: "Writing", href: "/writing" }, { label: "Vocabulary", href: "/vocabulary" }, { label: "Grammar", href: "/grammar" },
-    { label: "Thinking in English", href: "/thinking-in-english" }, { label: "Tests & Exams", href: "/pathways" }, { label: "Teacher AI", href: "/teacher-help" },
-    { label: "Community", href: "/community" }, { label: "Settings", href: "/settings" },
-  ];
+  const flatNav = useMemo(() => NAV.flatMap((g) => g.items.map((i) => ({ ...i }))), []);
   function search(e: React.FormEvent) {
     e.preventDefault();
     const hit = flatNav.find((item) => item.label.toLowerCase().includes(query.trim().toLowerCase()));
@@ -130,23 +150,23 @@ export default function DashboardPage() {
   }
 
   const planItems = [
-    { icon: "Ã°Å¸â€Â¤", label: "Vocabulary", href: "/vocabulary" },
-    { icon: "Ã°Å¸â€˜â€š", label: "Listening (English Ear)", href: "/english-ear" },
-    { icon: "Ã°Å¸Å½â„¢Ã¯Â¸Â", label: "Speaking (Say It Better)", href: "/say-it-better" },
-    { icon: "Ã°Å¸â€œâ€“", label: "Reading", href: "/reading" },
+    { icon: "🔤", label: "Vocabulary", href: "/vocabulary" },
+    { icon: "👂", label: "Listening (English Ear)", href: "/english-ear" },
+    { icon: "🎙️", label: "Speaking (Say It Better)", href: "/say-it-better" },
+    { icon: "📖", label: "Reading", href: "/reading" },
   ];
 
   const sessionTypes = [
-    { icon: "Ã¢Å¡Â¡", name: "Quick Quest", time: "10Ã¢â‚¬â€œ15 min", desc: "Quick practice", href: "/practice" },
-    { icon: "Ã°Å¸â€”ÂºÃ¯Â¸Â", name: "Standard Journey", time: "30Ã¢â‚¬â€œ45 min", desc: "Build your skills", href: "/learning-path" },
-    { icon: "Ã°Å¸Å½â€œ", name: "Deep Study", time: "60+ min", desc: "Go deeper", href: "/learn" },
-    { icon: "Ã°Å¸Ââ€ ", name: "Boss Mission", time: "Challenge", desc: "Hard missions", href: "/worlds" },
+    { icon: "⚡", name: "Quick Quest", time: "10–15 min", desc: "Quick practice", href: "/practice" },
+    { icon: "🗺️", name: "Standard Journey", time: "30–45 min", desc: "Build your skills", href: "/learning-path" },
+    { icon: "🎓", name: "Deep Study", time: "60+ min", desc: "Go deeper", href: "/learn" },
+    { icon: "🏆", name: "Boss Mission", time: "Challenge", desc: "Hard missions", href: "/worlds" },
   ];
 
   const achievements = [
-    ...(data && data.streak >= 3 ? [{ icon: "Ã°Å¸â€Â¥", title: `${data.streak}-Day Streak`, sub: "Learning days in a row", xp: "+200 XP" }] : []),
-    ...(data && data.overallPercent >= 60 ? [{ icon: "Ã°Å¸Ââ€¦", title: "Consistency Champion", sub: `Average skill strength ${data.overallPercent}%`, xp: "+100 XP" }] : []),
-    ...(data && data.completedLessons >= 1 ? [{ icon: "Ã°Å¸â€œËœ", title: "First Steps", sub: `${data.completedLessons} lesson${data.completedLessons === 1 ? "" : "s"} completed`, xp: "+50 XP" }] : []),
+    ...(data && data.streak >= 3 ? [{ icon: "🔥", title: `${data.streak}-Day Streak`, sub: "Learning days in a row", xp: "+200 XP" }] : []),
+    ...(data && data.overallPercent >= 60 ? [{ icon: "🏅", title: "Consistency Champion", sub: `Average skill strength ${data.overallPercent}%`, xp: "+100 XP" }] : []),
+    ...(data && data.completedLessons >= 1 ? [{ icon: "📘", title: "First Steps", sub: `${data.completedLessons} lesson${data.completedLessons === 1 ? "" : "s"} completed`, xp: "+50 XP" }] : []),
   ];
 
   const levels = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -158,16 +178,16 @@ export default function DashboardPage() {
       <main id="main-content" className="dash-main">
         <header className="dash-header">
           <div>
-            <h1>{greeting()}{data ? `, ${data.firstName}!` : "!"} Ã°Å¸â€˜â€¹</h1>
+            <h1>{greeting()}{data ? `, ${data.firstName}!` : "!"} 👋</h1>
             <p className="subtle">Let&rsquo;s continue your journey to English mastery.</p>
           </div>
           <form className="searchbox" role="search" onSubmit={search}>
-            <input aria-label="Search anything" placeholder="Search anythingÃ¢â‚¬Â¦" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <input aria-label="Search anything" placeholder="Search anything…" value={query} onChange={(e) => setQuery(e.target.value)} />
             <kbd>Ctrl K</kbd>
           </form>
           <div className="header-widgets">
-            <span className="streak-pill" title="Daily learning streak">Ã°Å¸â€Â¥ {data ? data.streak : 0} day streak</span>
-            <a className="bell" href="/review" aria-label={`Review queue, ${data?.reviewDue ?? 0} due`}>Ã°Å¸â€â€{data && data.reviewDue > 0 ? <b className="badge">{Math.min(9, data.reviewDue)}</b> : null}</a>
+            <span className="streak-pill" title="Daily learning streak">🔥 {data ? data.streak : 0} · <span title="Streak freezes">🧊 {data ? data.freezes : 0}</span></span>
+            <a className="bell" href="/review" aria-label={`Review queue, ${data?.reviewDue ?? 0} due`}>🔔{data && data.reviewDue > 0 ? <b className="badge">{Math.min(9, data.reviewDue)}</b> : null}</a>
             <a className="avatar" href="/settings" aria-label="Profile settings">{data ? data.firstName.slice(0, 2).toUpperCase() : "EW"}</a>
           </div>
         </header>
@@ -176,26 +196,38 @@ export default function DashboardPage() {
           <div className="stat-tile"><strong>{data ? data.completedLessons : 0}<small> / {data ? data.totalLessons : 28}</small></strong><span>Lessons completed</span></div>
           <a className="stat-tile" href={data?.currentLessonId ? `/learn?lesson=${encodeURIComponent(data.currentLessonId)}` : "/diagnostic"}>
             <strong>{data?.currentLessonId ? data.currentLessonId.replace(/^lesson-/, "").replace(/-/g, " ") : "Placement check"}</strong>
-            <span>Next best action Ã¢â€ â€™</span>
+            <span>Next best action →</span>
           </a>
-          <a className="stat-tile" href="/review"><strong>{data ? data.reviewDue : 0}</strong><span>Review cards due Ã¢â€ â€™</span></a>
+          <a className="stat-tile" href="/review"><strong>{data ? data.reviewDue : 0}</strong><span>Review cards due →</span></a>
         </section>
 
-        {!data && !error && <div className="state-card">Loading your command centerÃ¢â‚¬Â¦</div>}
+        {data && (
+          <section className="quest-strip" aria-label="Daily quests">
+            {data.quests.map((q) => (
+              <div className={`stat-tile quest-tile ${q.current >= q.target ? "done" : ""}`} key={q.id}>
+                <div className="quest-head"><strong>{q.label}</strong><em className="xp-tag">+{q.xp} XP</em></div>
+                <div className="track"><span style={{ width: `${Math.round((q.current / q.target) * 100)}%` }} /></div>
+                <small className="subtle">{q.current >= q.target ? "Complete ✓" : `${q.current}/${q.target}`}</small>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {!data && !error && <div className="state-card">Loading your command center…</div>}
 
         {data && (
           <>
             <div className="hero-row">
               <section className="hero-card" aria-label="Level progress">
                 <p>You are on your way to</p>
-                <h2>{data.nextLevel} Ã¢â‚¬â€œ {data.levelIndex >= 3 ? "Upper-Intermediate" : data.levelIndex <= 0 ? "Beginner" : data.levelIndex === 1 ? "Elementary" : data.levelIndex === 2 ? "Intermediate" : data.levelIndex === 4 ? "Advanced" : "Proficient"} <span className="info-dot" title="Evidence-based internal estimate">Ã¢â€œËœ</span></h2>
+                <h2>{data.nextLevel} – {data.levelIndex >= 3 ? "Upper-Intermediate" : data.levelIndex <= 0 ? "Beginner" : data.levelIndex === 1 ? "Elementary" : data.levelIndex === 2 ? "Intermediate" : data.levelIndex === 4 ? "Advanced" : "Proficient"} <span className="info-dot" title="Evidence-based internal estimate">ⓘ</span></h2>
                 <div className="hero-progress">
                   <div className="hero-progress-head"><span>Overall Progress</span><strong>{data.overallPercent}%</strong></div>
                   <div className="track light"><span style={{ width: `${data.overallPercent}%` }} /></div>
                   <p className="xp-line">XP <strong>{data.xp.toLocaleString()}</strong> / {data.nextXp.toLocaleString()}</p>
                 </div>
-                <a className="button hero-btn" href={data.currentLessonId ? `/learn?lesson=${encodeURIComponent(data.currentLessonId)}` : "/diagnostic"}>Continue Journey Ã¢â€ â€™</a>
-                <div className="mountain" aria-hidden="true">Ã¢â€ºÂ°Ã¯Â¸Â<span>Ã°Å¸Å¡Â©</span></div>
+                <a className="button hero-btn" href={data.currentLessonId ? `/learn?lesson=${encodeURIComponent(data.currentLessonId)}` : "/diagnostic"}>Continue Journey →</a>
+                <div className="mountain" aria-hidden="true">⛰️<span>🚩</span></div>
               </section>
 
               <aside className="goal-card panel">
@@ -205,18 +237,18 @@ export default function DashboardPage() {
                   <ul className="goal-stats">
                     <li><span>Goal</span><strong>{data.dailyMinutes * 7}m</strong></li>
                     <li><span>Active days</span><strong>{data.week.filter((d) => d.value > 0).length}/7</strong></li>
-                    <li><span>Streak</span><strong>{data.streak} Ã°Å¸â€Â¥</strong></li>
+                    <li><span>Streak</span><strong>{data.streak} 🔥</strong></li>
                   </ul>
                 </div>
                 <div className="week-dots">
                   {data.week.map((day) => (
-                    <span key={day.label} className={day.value > 0 ? "wdot done" : "wdot"} title={`${day.label}: ${day.value > 0 ? "active" : "no activity"}`}>{day.value > 0 ? "Ã¢Å“â€œ" : day.label}</span>
+                    <span key={day.label} className={day.value > 0 ? "wdot done" : "wdot"} title={`${day.label}: ${day.value > 0 ? "active" : "no activity"}`}>{day.value > 0 ? "✓" : day.label}</span>
                   ))}
                 </div>
               </aside>
 
               <aside className="panel plan-card">
-                <div className="panel-title"><h3>Today&rsquo;s Plan</h3><span>Ã°Å¸â€œâ€¦</span></div>
+                <div className="panel-title"><h3>Today&rsquo;s Plan</h3><span>📅</span></div>
                 <ul className="plan-list">
                   {planItems.map((item) => (
                     <li key={item.label}>
@@ -225,7 +257,7 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
-                <a className="button start-plan" href={data.currentLessonId ? "/learn" : "/diagnostic"}>Ã¢â€“Â¶ Start Plan</a>
+                <a className="button start-plan" href={data.currentLessonId ? "/learn" : "/diagnostic"}>▶ Start Plan</a>
               </aside>
             </div>
 
@@ -267,8 +299,8 @@ export default function DashboardPage() {
                 <div className="continue-grid">
                   {[
                     { badge: "Listening", color: "#3b82f6", title: "English Ear drill", meta: "Connected speech", href: "/english-ear", pct: data.skills[0]?.value ?? 40 },
-                    { badge: "Reading", color: "#10b981", title: "Reading Engine", meta: data.currentLessonId ? `Lesson Ã‚Â· ${data.currentLessonId.replaceAll("-", " ").slice(0, 22)}` : "New passage", href: "/reading", pct: data.skills[2]?.value ?? 35 },
-                    { badge: "Grammar", color: "#f59e0b", title: "Grammar in context", meta: "Noticing Ã¢â€ â€™ production", href: "/learn", pct: data.skills[4]?.value ?? 30 },
+                    { badge: "Reading", color: "#10b981", title: "Reading Engine", meta: data.currentLessonId ? `Lesson · ${data.currentLessonId.replaceAll("-", " ").slice(0, 22)}` : "New passage", href: "/reading", pct: data.skills[2]?.value ?? 35 },
+                    { badge: "Grammar", color: "#f59e0b", title: "Grammar in context", meta: "Noticing → production", href: "/learn", pct: data.skills[4]?.value ?? 30 },
                     { badge: "Speaking", color: "#ef4444", title: "Say It Better", meta: "Upgrade your phrasing", href: "/say-it-better", pct: data.skills[1]?.value ?? 45 },
                   ].map((card) => (
                     <a className="continue-card" href={card.href} key={card.badge}>
@@ -290,17 +322,17 @@ export default function DashboardPage() {
                       <strong className="vocab-num">{data.vocabularyWords.toLocaleString()}</strong>
                       <span>Words learned</span>
                     </div>
-                    <div className="vocab-tiles" aria-hidden="true"><i>A</i><i>Ã¥Â­â€”</i></div>
+                    <div className="vocab-tiles" aria-hidden="true"><i>A</i><i>字</i></div>
                   </div>
                   <a className="button practice-vocab" href="/vocabulary">Practice Vocabulary</a>
                 </section>
 
                 <section className="panel milestone-card">
-                  <span className="milestone-medal" aria-hidden="true">Ã°Å¸Å½â€“Ã¯Â¸Â</span>
+                  <span className="milestone-medal" aria-hidden="true">🎖️</span>
                   <div>
                     <strong>Next Milestone</strong>
                     <p className="subtle">Reach 75% average strength to unlock the {data.nextLevel} checkpoint test.</p>
-                    <a className="link-arrow" href="/diagnostic">Preview Test Ã¢â€ â€™</a>
+                    <a className="link-arrow" href="/diagnostic">Preview Test →</a>
                   </div>
                 </section>
               </div>
@@ -322,8 +354,8 @@ export default function DashboardPage() {
               <section className="panel buddy-card">
                 <div className="panel-title"><h3>AI Study Buddy</h3><span className="beta-pill">Beta</span></div>
                 <div className="buddy-row">
-                  <span className="buddy-avatar" aria-hidden="true">Ã°Å¸Â¤â€“</span>
-                  <p>Hi {data.firstName}! I&rsquo;m here to help you learn smarter Ã¢â‚¬â€ ask for explanations, examples or feedback.</p>
+                  <span className="buddy-avatar" aria-hidden="true">🤖</span>
+                  <p>Hi {data.firstName}! I&rsquo;m here to help you learn smarter — ask for explanations, examples or feedback.</p>
                 </div>
                 <a className="button secondary buddy-btn" href="/teacher-help">Ask me anything</a>
               </section>

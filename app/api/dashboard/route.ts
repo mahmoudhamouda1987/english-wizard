@@ -27,15 +27,52 @@ export async function GET() {
   const rows = eventsRes.rows;
   const dayKey = (d: Date | string) => new Date(d).toISOString().slice(0, 10);
 
-  // Streak: consecutive days (ending today or yesterday) that have any event.
+  // Streak state with freeze bridging.
+  const streakRes = await query<{ freezes: number; bridged_on: string | null }>(
+    `SELECT freezes, bridged_on::text FROM streak_state WHERE learner_id=$1`,
+    [session.learnerId],
+  );
+  let freezes = streakRes.rows[0]?.freezes ?? 2;
+  if (!streakRes.rows[0]) {
+    await query(`INSERT INTO streak_state (learner_id, freezes) VALUES ($1, $2) ON CONFLICT DO NOTHING`, [session.learnerId, 2]);
+  }
+  const bridgeAlreadyToday = streakRes.rows[0]?.bridged_on === dayKey(new Date());
+
+  // Streak: consecutive active days ending today or yesterday; one gap may be bridged per day using a freeze.
   const activeDays = new Set(rows.map((r) => dayKey(r.occurred_at)));
   let streak = 0;
   const cursor = new Date();
   if (!activeDays.has(dayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+  let bridgesLeft = bridgeAlreadyToday ? 0 : freezes;
+  let bridgedNow = false;
   while (activeDays.has(dayKey(cursor))) {
     streak += 1;
     cursor.setDate(cursor.getDate() - 1);
+    if (!activeDays.has(dayKey(cursor)) && bridgesLeft > 0) {
+      bridgesLeft -= 1;
+      freezes -= 1;
+      bridgedNow = true;
+      cursor.setDate(cursor.getDate() - 1);
+    }
   }
+  if (bridgedNow || !streakRes.rows[0]) {
+    await query(
+      `INSERT INTO streak_state (learner_id, freezes, bridged_on, updated_at) VALUES ($1,$2,$3,NOW())
+       ON CONFLICT (learner_id) DO UPDATE SET freezes=EXCLUDED.freezes, bridged_on=EXCLUDED.bridged_on, updated_at=NOW()`,
+      [session.learnerId, Math.max(0, freezes), bridgedNow ? dayKey(new Date()) : null],
+    );
+    freezes = Math.max(0, freezes);
+  }
+
+  // Daily quests from today's activity.
+  const today = dayKey(new Date());
+  const evidenceToday = rows.filter((r) => r.event_type === "LEARNING_EVIDENCE" && dayKey(r.occurred_at) === today).length;
+  const reviewsToday = Number(reviewsRes.rows[0]?.count ?? 0);
+  const quests = [
+    { id: "xp-50", label: "Earn 50 XP", target: 50, current: Math.min(50, evidenceToday * 25), xp: 10 },
+    { id: "answer-5", label: "Answer 5 questions", target: 5, current: Math.min(5, evidenceToday), xp: 15 },
+    { id: "review-2", label: "Complete 2 review cards", target: 2, current: Math.min(2, reviewsToday), xp: 10 },
+  ];
 
   const evidenceCount = rows.filter((r) => r.event_type === "LEARNING_EVIDENCE").length;
   const xp = evidenceCount * 25 + (state?.completedLessonIds.length ?? 0) * 100;
@@ -105,6 +142,8 @@ export async function GET() {
     xp,
     nextXp: Math.max(500, Math.ceil(xp / 500) * 500),
     streak,
+    freezes,
+    quests,
     week,
     skills,
     series,
