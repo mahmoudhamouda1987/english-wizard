@@ -32,6 +32,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
   { section: "", items: [{ icon: "⚡", label: "Practice", href: "/practice", sub: true }] },
   { items: [{ icon: "🌍", label: "Worlds & Missions", href: "/worlds" }] },
   { items: [{ icon: "🎯", label: "Review & Mastery", href: "/review" }, { icon: "📈", label: "Progress", href: "/progress" }] },
+  { items: [{ icon: "🎁", label: "Invite Friends", href: "/referral" }] },
   {
     section: "Skills",
     items: [

@@ -21,6 +21,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
   { section: "Review & Progress", items: [
     { icon: "🎯", label: "Review & Mastery", href: "/review" },
     { icon: "📈", label: "Progress", href: "/progress" },
+    { icon: "🗂️", label: "Portfolio", href: "/portfolio" },
     { icon: "⚠️", label: "Mistakes", href: "/mistakes" },
     { icon: "🏆", label: "Achievements", href: "/achievements" },
     { icon: "🥇", label: "Leaderboard", href: "/leaderboard" },
@@ -37,6 +38,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
     { icon: "🎓", label: "Tests & Exams", href: "/pathways" },
     { icon: "🥗", label: "Chunks & Mediation", href: "/chunks" },
     { icon: "🤖", label: "Teacher AI", href: "/teacher-help" },
+    { icon: "🎁", label: "Invite friends", href: "/referral" },
     { icon: "👥", label: "Community", href: "/community" },
     { icon: "⚙️", label: "Settings", href: "/settings" },
   ] },

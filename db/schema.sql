@@ -53,3 +53,6 @@ CREATE TABLE IF NOT EXISTS streak_state (learner_id UUID PRIMARY KEY REFERENCES 
 -- Migration: older databases carry a status CHECK without PAUSED; rebuild the constraint idempotently.
 ALTER TABLE subscriptions DROP CONSTRAINT IF EXISTS subscriptions_status_check;
 ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_status_check CHECK (status IN ('ACTIVE','CANCELLED','PAUSED','PAST_DUE','TRIALING'));
+
+CREATE TABLE IF NOT EXISTS referrals (id UUID PRIMARY KEY,code TEXT UNIQUE NOT NULL,referrer_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,invited_id UUID REFERENCES learners(id) ON DELETE SET NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),completed_at TIMESTAMPTZ);
+CREATE INDEX IF NOT EXISTS referrals_referrer_idx ON referrals(referrer_id);

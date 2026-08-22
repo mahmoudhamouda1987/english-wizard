@@ -14,6 +14,7 @@ function AuthCard() {
   const router = useRouter();
   const params = useSearchParams();
   const nextPath = params.get("next");
+  const referralCode = params.get("ref") ?? "";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,7 +23,7 @@ function AuthCard() {
     const r = await fetch(`/api/auth/${mode}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email, displayName, password }),
+      body: JSON.stringify({ email, displayName, password, ...(mode === "register" && referralCode ? { referralCode } : {}) }),
     });
     const p = await r.json();
     setBusy(false);
