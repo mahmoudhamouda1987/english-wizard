@@ -15,6 +15,26 @@ type ProfileSummary = { englishDna?: { generatedAt?: string } };
 export default function AchievementsPage() {
   const [state, setState] = useState<LearnerStateSummary | null>(null);
   const [profile, setProfile] = useState<ProfileSummary | null>(null);
+  const [certId, setCertId] = useState<string | null>(null);
+  const [certBusy, setCertBusy] = useState(false);
+  const [certError, setCertError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/certificate").then((r) => r.json()).then((p) => { if (p.certificate?.id) setCertId(p.certificate.id); }).catch(() => undefined);
+  }, []);
+
+  async function issueCertificate() {
+    setCertBusy(true);
+    setCertError("");
+    try {
+      const r = await fetch("/api/certificate", { method: "POST" });
+      const p = await r.json();
+      if (!r.ok) { setCertError(p.error ?? "Unable to issue certificate."); return; }
+      setCertId(p.id);
+    } finally {
+      setCertBusy(false);
+    }
+  }
 
   useEffect(() => {
     const id = localStorage.getItem("english-wizard-learner-id");
@@ -59,6 +79,31 @@ export default function AchievementsPage() {
           </section>
         ))}
       </div>
+
+      <section className="panel" style={{ marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 18, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <h2>CEFR certificate</h2>
+            <p>Turn your measured evidence into a shareable, verifiable certificate.</p>
+          </div>
+          {certId ? (
+            <a className="button" href={`/certificate/${certId}`}>View my certificate →</a>
+          ) : (
+            <button className="button" disabled={certBusy} onClick={() => void issueCertificate()}>{certBusy ? "Issuing…" : "Generate certificate"}</button>
+          )}
+        </div>
+        {certError && <p role="alert" className="subtle" style={{ marginTop: 10 }}>{certError}</p>}
+      </section>
+
+      <section className="panel" style={{ marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 18, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <h2>Export your review deck</h2>
+            <p>Take your spaced-repetition cards anywhere — imports straight into Anki or any CSV flashcard app.</p>
+          </div>
+          <a className="button secondary" href="/api/review/export">Download CSV</a>
+        </div>
+      </section>
     </main>
   );
 }

@@ -46,3 +46,4 @@ CREATE INDEX IF NOT EXISTS observability_events_time_idx ON observability_events
 CREATE INDEX IF NOT EXISTS content_versions_entity_idx ON content_versions(entity_id,kind,created_at DESC);
 CREATE INDEX IF NOT EXISTS ai_usage_daily_date_idx ON ai_usage_daily(usage_date,learner_id);
 CREATE INDEX IF NOT EXISTS knowledge_documents_source_idx ON knowledge_documents(source_id,version);
+CREATE TABLE IF NOT EXISTS certificates (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,display_name TEXT NOT NULL,level TEXT NOT NULL,overall_percent INTEGER NOT NULL,issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),revoked BOOLEAN NOT NULL DEFAULT FALSE);
