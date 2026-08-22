@@ -109,6 +109,21 @@ html[data-text-size="XLARGE"] { --ew-text-scale: 1.3; }
 .snav { background:#0d1930; color:#fff; padding:20px 14px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; }
 .snav-brand { display:flex; align-items:center; gap:10px; font-size:17px; color:#fff; padding:4px 8px 16px; }
 .brand-mark.small { width:34px; height:34px; font-size:18px; border-radius:11px; display:grid; place-items:center; background:linear-gradient(135deg,#8a57ff,#5a31ca); }
+.brand-logo { border-radius:10px; object-fit:cover; display:block; background:#fff; }
+.site-header { display:flex; align-items:center; gap:18px; padding:16px 28px; background:#fff; border-bottom:1px solid #e4e8f0; position:sticky; top:0; z-index:50; }
+.site-header img { border-radius:10px; }
+.site-brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:17px; color:#172033; flex:1; }
+.site-nav { display:flex; align-items:center; gap:10px; }
+.site-nav a { padding:9px 16px; border-radius:10px; font-weight:700; font-size:14px; color:#3c455c; }
+.site-nav a:hover { background:#f2f0fb; color:#4626b8; }
+.site-nav a.primary { background:#6840d6; color:#fff; }
+.site-nav a.primary:hover { background:#5a31ca; color:#fff; }
+.hero-band { background:linear-gradient(120deg,#5a31ca,#6840d6 45%,#8a57ff); color:#fff; border-radius:24px; padding:64px 48px; margin-top:24px; position:relative; overflow:hidden; }
+.feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-top:24px; }
+.feature-card { background:#fff; border:1px solid #e4e8f0; border-radius:18px; padding:22px; display:grid; gap:8px; }
+.feature-card:hover { box-shadow:0 8px 24px rgba(23,32,51,.08); border-color:#c9bdf5; }
+.feature-card .fc-icon { width:44px; height:44px; border-radius:12px; background:#f2f0fb; display:grid; place-items:center; font-size:21px; }
+.feature-card p { margin:0; color:#5b6272; font-size:14px; line-height:1.55; }
 .snav-section { color:#8ea0c9; font-size:11px; text-transform:uppercase; letter-spacing:.1em; margin:14px 8px 4px; }
 .snav-item { display:flex; align-items:center; gap:10px; color:#dbe3f7; padding:9px 12px; border-radius:10px; font-size:14px; }
 .snav-item:hover { background:rgba(255,255,255,.08); }

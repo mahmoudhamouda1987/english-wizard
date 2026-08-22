@@ -10,6 +10,7 @@ export function proxy(req: NextRequest) {
   if (protectedPath.some((path) => req.nextUrl.pathname === path || req.nextUrl.pathname.startsWith(`${path}/`)) && !req.cookies.get("ew_session")) {
     const url = req.nextUrl.clone();
     url.pathname = "/auth";
+    url.searchParams.set("next", `${req.nextUrl.pathname}${req.nextUrl.search}`);
     return NextResponse.redirect(url);
   }
   const response = NextResponse.next();

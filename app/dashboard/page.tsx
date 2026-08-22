@@ -174,7 +174,7 @@ export default function DashboardPage() {
   return (
     <div className="app-shell">
       <aside className="snav" aria-label="Primary navigation">
-        <a className="snav-brand" href="/dashboard"><span className="brand-mark small">🧙</span> <strong>English Wizard</strong></a>
+        <a className="snav-brand" href="/dashboard"><img src="/logo.png" alt="" width={34} height={34} className="brand-logo" /> <strong>English Wizard</strong></a>
         <nav>
           {NAV.map((group, gi) => (
             <div key={gi}>

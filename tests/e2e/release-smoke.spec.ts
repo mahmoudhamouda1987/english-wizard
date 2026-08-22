@@ -26,6 +26,7 @@ test("public production shell and security release contract", async ({ request, 
   expect((await request.post("/api/ai/lesson", { data: { goal: "grammar" } })).status()).toBe(401);
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Your English learning journey starts here/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Start learning" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Measure what you know/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Start learning" }).first()).toBeVisible();
+  expect(await page.locator('img[alt="English Wizard logo"]').first().isVisible()).toBeTruthy();
 });
