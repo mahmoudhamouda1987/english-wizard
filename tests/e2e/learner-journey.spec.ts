@@ -25,7 +25,7 @@ test("onboarding creates a persisted learner and dashboard loads state", async (
   await page.getByRole("button", { name: /Start diagnostic/ }).click();
   await expect(page).toHaveURL(/\/diagnostic/);
   await page.goto("/dashboard");
-  await expect(page.getByRole("heading", { name: /Good morning|Your learning journey/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)|Your learning journey/ })).toBeVisible();
   await expect(page.getByText("Lessons completed")).toBeVisible();
   await expect(page.getByText("Next best action")).toBeVisible();
 });
