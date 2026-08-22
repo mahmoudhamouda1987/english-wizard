@@ -1,4 +1,5 @@
 "use client";
+import { RECOGNITION_LANG } from "@/src/domain/tts";
 
 import { useRef, useState } from "react";
 
@@ -49,7 +50,7 @@ export default function SpeakingPage() {
       return;
     }
     const recognition = new Ctor();
-    recognition.lang = "en-US";
+    recognition.lang = RECOGNITION_LANG;
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.onresult = (event) => {

@@ -1,4 +1,5 @@
 "use client";
+import { speakText } from "@/src/domain/tts";
 
 import { useEffect, useRef, useState } from "react";
 import { assessAcousticPronunciation } from "@/src/domain/pronunciation-acoustic";
@@ -63,7 +64,7 @@ export default function PronunciationPage(){
     }).catch(()=>setStatus("Sign in to use pronunciation recording."));
   },[]);
 
-  function speak(){const u=new SpeechSynthesisUtterance(phrases[active]);u.lang="en-US";window.speechSynthesis?.speak(u)}
+  function speak(){speakText(phrases[active],{lang:"en-GB",rate:0.9})}
 
   async function startRecording(){
     if(!privacy?.voice_processing){setStatus("Voice processing is off. Enable it in Settings → Privacy before recording.");return;}

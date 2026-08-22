@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { PageHero } from "@/app/components/page-hero";
 import { Celebration } from "@/app/components/celebration";
+import { speakText } from "@/src/domain/tts";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 
 interface WordEntry { word: string; type: string; meaning: string; ar: string; example: string }
@@ -118,7 +119,7 @@ export default function VocabularyPage() {
               )}
               <div style={{ display: "flex", gap: 8 }}>
                 <button className={known[w.word] ? "button secondary" : "button"} onClick={() => markKnown(w)}>{known[w.word] ? "✓ Known" : "I know this"}</button>
-                <button className="button secondary" aria-label={`Listen to ${w.word}`} onClick={() => { if (typeof window === "undefined" || !("speechSynthesis" in window)) return; const u = new SpeechSynthesisUtterance(w.word); u.lang = "en-US"; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }}>🔊</button>
+                <button className="button secondary" aria-label={`Listen to ${w.word}`} onClick={() => speakText(w.word, { lang: "en-GB", rate: 0.9 })}>🔊</button>
               </div>
             </article>
           );

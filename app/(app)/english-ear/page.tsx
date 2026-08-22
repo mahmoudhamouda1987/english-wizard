@@ -1,4 +1,5 @@
 "use client";
+import { speakText } from "@/src/domain/tts";
 import { Celebration } from "@/app/components/celebration";
 import { useEffect, useMemo, useState } from "react";
 import type { CEFRLevel } from "@/src/domain/learner";
@@ -14,7 +15,7 @@ export default function EnglishEarPage(){
  const [saved,setSaved]=useState(false);
  const [busy,setBusy]=useState(false);
  useEffect(()=>{fetch("/api/profile").then(r=>r.json()).then(p=>{if(p.profile?.targetLevel)setLevel(p.profile.targetLevel);}).catch(()=>{});},[]);
- function speak(text:string){if(typeof window!=="undefined"&&"speechSynthesis" in window){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";window.speechSynthesis.speak(u);}}
+ function speak(text:string){speakText(text,{lang:"en-GB",rate:0.9});}
  async function check(){
    const normal=(answer.trim().replace(/\s+/g," ")).toLowerCase();
    const expected=item.writtenForm.trim().replace(/\s+/g," ").toLowerCase();

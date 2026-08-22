@@ -1,16 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { speakText } from "@/src/domain/tts";
 
-type WordInfo = { meaning: string; arabicMeaning: string; pronunciation: string; partOfSpeech: string };
+type WordInfo = { meaning: string; arabicMeaning: string; arabicAvailable?: boolean; pronunciation: string; partOfSpeech: string; source?: string };
 
-export function speakWord(text: string, lang: "en-US" | "ar-SA") {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = 0.92;
-  window.speechSynthesis.speak(utterance);
+export function speakWord(text: string, lang: "en-GB" | "ar-SA") {
+  speakText(text, { lang, rate: 0.92 });
 }
 
 export function WordPopover({ word }: { word: string }) {
@@ -43,15 +39,24 @@ export function WordPopover({ word }: { word: string }) {
     >
       {word}
       {open && (
-        <span role="tooltip" style={{ position: "absolute", zIndex: 20, left: 0, top: "calc(100% + 8px)", width: 250, padding: 14, borderRadius: 12, border: "1px solid #dfe3ec", background: "#ffffff", boxShadow: "0 10px 30px rgba(20,20,40,.14)", display: "grid", gap: 7, color: "#25253a" }}>
+        <span role="tooltip" style={{ position: "absolute", zIndex: 20, left: 0, top: "calc(100% + 8px)", width: 260, padding: 14, borderRadius: 12, border: "1px solid #dfe3ec", background: "#ffffff", boxShadow: "0 10px 30px rgba(20,20,40,.14)", display: "grid", gap: 7, color: "#25253a" }}>
           <strong>{clean}</strong>
-          <span style={{ fontSize: 12, opacity: 0.7 }}>{info?.partOfSpeech ?? "word"}</span>
+          <span style={{ fontSize: 12, opacity: 0.7 }}>{info?.partOfSpeech ?? "word"}{info?.source ? ` · ${info.source}` : ""}</span>
           <span>{info?.meaning ?? "Looking up meaning…"}</span>
-          <span>العربية: {info?.arabicMeaning ?? "جارٍ البحث عن الترجمة…"}</span>
-          <span>Pronunciation: {info?.pronunciation ?? "—"}</span>
+          <span dir="rtl" style={{ textAlign: "left" }}>
+            <strong>المعنى بالعربية:</strong>{" "}
+            {info?.arabicAvailable
+              ? info.arabicMeaning
+              : <em style={{ opacity: 0.75 }}>لا يوجد ترجمة موثوقة لهذه الكلمة في قاموسنا بعد — تجنّب الترجمة الآلية.</em>}
+          </span>
+          {info?.pronunciation && info.pronunciation !== "-" && (
+            <span>Pronunciation: <code>{info.pronunciation}</code></span>
+          )}
           <span style={{ display: "flex", gap: 6 }}>
-            <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => speakWord(clean, "en-US")}>🔊 English</button>
-            <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => info && speakWord(info.arabicMeaning, "ar-SA")}>🔊 العربية</button>
+            <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => speakWord(clean, "en-GB")}>🔊 English (UK)</button>
+            {info?.arabicAvailable && (
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => speakWord(info.arabicMeaning, "ar-SA")}>🔊 العربية</button>
+            )}
           </span>
         </span>
       )}

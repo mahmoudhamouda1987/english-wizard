@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
 
 type Question = { id: string; skill: string; prompt: string; options: string[]; audioText?: string };
 type SpeechResultAlternative = { transcript?: string };
@@ -45,12 +46,8 @@ export default function DiagnosticPage() {
   function play(question: Question) {
     if (!question.audioText || typeof window === "undefined" || !("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(question.audioText);
-    utterance.lang = "en-US";
-    utterance.rate = 0.9;
     setListeningId(question.id);
-    utterance.onend = () => setListeningId(null);
-    window.speechSynthesis.speak(utterance);
+    speakText(question.audioText, { lang: "en-GB", rate: 0.9, onEnd: () => setListeningId(null) });
   }
 
   function startSpeaking() {
@@ -62,7 +59,7 @@ export default function DiagnosticPage() {
       return;
     }
     const recognition = new ctor();
-    recognition.lang = "en-US";
+    recognition.lang = RECOGNITION_LANG;
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onresult = (event) => {

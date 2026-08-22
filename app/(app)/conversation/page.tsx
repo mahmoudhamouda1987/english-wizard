@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 import { wordOfDayForLevel } from "@/src/domain/word-of-day";
 import { conversationForLevel } from "@/src/domain/conversation";
+import { speakText } from "@/src/domain/tts";
 
 type Exercise = ReturnType<typeof conversationForLevel>;
 
@@ -24,13 +25,8 @@ const CURATED: Record<string, { arabic: string; pronunciation: string }> = {
   advice: { arabic: "نصيحة", pronunciation: "/ədˈvaɪs/" },
 };
 
-function speak(text: string, lang: string, rate = 0.92) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang;
-  utterance.rate = rate;
-  window.speechSynthesis.speak(utterance);
+function speak(text: string, _lang: string, rate = 0.92) {
+  speakText(text, { lang: "en-GB", rate });
 }
 
 type WordInfo = { meaning: string; arabic: string; pronunciation: string; partOfSpeech: string };
@@ -70,7 +66,7 @@ function TooltipWord({ word }: { word: string }) {
           <span>{info?.meaning ?? "Looking up meaning…"}</span>
           <span>العربية: {info?.arabic ?? "جارٍ البحث عن الترجمة…"}</span>
           <span>Pronunciation: {info?.pronunciation ?? "—"}</span>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => speak(clean, "en-US")}>🔊 English</button>
+          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => speak(clean, "en-GB")}>🔊 English</button>
           <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => info && speak(info.arabic, "ar-SA")}>🔊 العربية</button>
         </span>
       )}
@@ -162,13 +158,13 @@ export default function ConversationPage() {
       }
       const turnIndex = index;
       const turn = exercise.turns[index++];
-      const utterance = new SpeechSynthesisUtterance(turn.text);
-      utterance.lang = "en-US";
-      utterance.rate = 0.9;
-      utterance.pitch = turn.speaker === "A" ? 1.08 : 0.86;
-      utterance.onstart = () => { setActiveSpeaker(turn.speaker); setActiveTurn(turnIndex); };
-      utterance.onend = speakNext;
-      window.speechSynthesis.speak(utterance);
+      speakText(turn.text, {
+        lang: "en-GB",
+        rate: 0.9,
+        pitch: turn.speaker === "A" ? 1.08 : 0.86,
+        onStart: () => { setActiveSpeaker(turn.speaker); setActiveTurn(turnIndex); },
+        onEnd: speakNext,
+      });
     };
     speakNext();
   }
@@ -242,7 +238,7 @@ export default function ConversationPage() {
           <h3>{word.word}</h3>
           <span className="word-type">{word.partOfSpeech} · {word.level}</span>
           <div className="word-pronounce">
-            <button className="button secondary" type="button" onClick={() => speak(word.word, "en-US")}>🔊 English</button>{" "}
+            <button className="button secondary" type="button" onClick={() => speak(word.word, "en-GB")}>🔊 English</button>{" "}
             <button className="button secondary" type="button" onClick={() => speak(word.arabicMeaning, "ar-SA")}>🔊 العربية</button>
           </div>
           <p><strong>Meaning:</strong> {word.meaning}</p>
