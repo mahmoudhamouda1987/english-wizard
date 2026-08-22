@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PageHero } from "@/app/components/page-hero";
+import { Celebration } from "@/app/components/celebration";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 
 interface WordEntry { word: string; type: string; meaning: string; ar: string; example: string }
@@ -88,6 +89,7 @@ export default function VocabularyPage() {
   return (
     <main id="main-content" className="dash-main">
       <PageHero icon="🔤" title="Vocabulary builder" sub={`Level ${level} · ${words.length} high-value words with Arabic meanings, examples and audio. Mark what you truly know — it becomes learner evidence.`} />
+      <Celebration trigger={knownCount > 0 && knownCount % 5 === 0 ? `k${knownCount}` : ""} />
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         {LEVELS.map((l) => (

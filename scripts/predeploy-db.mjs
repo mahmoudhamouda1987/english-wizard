@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+﻿import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import process from "node:process";
 import pg from "pg";
@@ -34,3 +34,4 @@ try {
 } finally {
   await pool.end();
 }
+

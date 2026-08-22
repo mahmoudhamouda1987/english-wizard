@@ -3,8 +3,9 @@ import { conversationForLevel, CONVERSATIONS } from "./conversation";
 import { wordOfDayForLevel } from "./word-of-day";
 
 describe("conversation listening lab", () => {
-  it("provides one conversation for every CEFR level", () => {
-    expect(CONVERSATIONS.map((item) => item.level)).toEqual(["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"]);
+  it("provides at least one conversation for every CEFR level", () => {
+    expect([...new Set(CONVERSATIONS.map((item) => item.level))]).toEqual(["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"]);
+    expect(CONVERSATIONS.length).toBeGreaterThanOrEqual(14);
     for (const level of ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"] as const) {
       const exercise = conversationForLevel(level);
       expect(exercise.durationSeconds).toBe(60);

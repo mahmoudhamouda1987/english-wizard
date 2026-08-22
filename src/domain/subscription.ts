@@ -1,6 +1,6 @@
 import { PLAN_ENTITLEMENTS, canUseFeature, entitlementFor, type Feature, type PlanTier } from "./entitlements";
 
-export type SubscriptionStatus = "ACTIVE" | "CANCELLED" | "PAST_DUE" | "TRIALING";
+export type SubscriptionStatus = "ACTIVE" | "CANCELLED" | "PAUSED" | "PAST_DUE" | "TRIALING";
 
 export interface SubscriptionRecord {
   learnerId: string;

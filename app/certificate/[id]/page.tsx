@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { query } from "@/src/infrastructure/database";
+import { certificateFingerprint, certificateQrDataUrl } from "@/src/domain/certificate-verification";
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +18,27 @@ const LEVEL_DESCRIPTION: Record<string, string> = {
   C2: "Mastery — can express themselves effortlessly and precisely.",
 };
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return { title: "Certificate not found" };
+  const certs = await query<CertRow>(`SELECT display_name, level, overall_percent, issued_at, revoked FROM certificates WHERE id = $1`, [id]);
+  const cert = certs.rows[0];
+  if (!cert || cert.revoked) return { title: "Certificate not found" };
+  const title = `${cert.display_name} — CEFR ${cert.level} · English Wizard`;
+  const description = `Verified evidence-based proficiency record: ${LEVEL_DESCRIPTION[cert.level] ?? ""} Overall mastery ${cert.overall_percent}%.`;
+  return { title, description, openGraph: { title, description }, twitter: { card: "summary_large_image", title, description } };
+}
+
 export default async function CertificatePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const certs = await query<CertRow>(`SELECT display_name, level, overall_percent, issued_at, revoked FROM certificates WHERE id = $1`, [id]);
   const cert = certs.rows[0];
   if (!cert || cert.revoked) notFound();
+
+  const fingerprint = certificateFingerprint(id, cert.level, new Date(cert.issued_at));
+  const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/certificate/${id}`;
+  const qr = await certificateQrDataUrl(verifyUrl);
 
   return (
     <main id="main-content" style={{ maxWidth: 780, margin: "0 auto", padding: "48px 24px" }}>
@@ -34,8 +51,15 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
         <p style={{ color: "#5b6272", maxWidth: 480, margin: "0 auto 18px" }}>{LEVEL_DESCRIPTION[cert.level] ?? ""}</p>
         <p><strong>Overall mastery score:</strong> {cert.overall_percent}%</p>
         <p className="subtle">Issued {new Date(cert.issued_at).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })}</p>
-        <p className="subtle" style={{ marginTop: 18, fontSize: 12 }}>
-          Verifiable record · ID {id}<br />This certificate reflects measured learning evidence inside English Wizard and follows the CEFR scale.
+        <img src={qr} alt={`QR code linking to verification page ${verifyUrl}`} width={160} height={160} style={{ margin: "18px auto 6px", borderRadius: 12, border: "1px solid #e4e8f0" }} />
+        <p className="subtle" style={{ fontSize: 12 }}>Scan to verify this credential</p>
+        <div style={{ display: "inline-block", marginTop: 10, padding: "8px 14px", background: "#f4f2fb", borderRadius: 10, fontSize: 11, fontFamily: "monospace", color: "#4626b8" }}>
+          Signature {fingerprint.slice(0, 16)}…{fingerprint.slice(-8)}
+        </div>
+        <p className="subtle" style={{ marginTop: 16, fontSize: 12 }}>
+          Verifiable record · ID {id}<br />
+          This certificate reflects measured learning evidence inside English Wizard, follows the CEFR scale,
+          and carries a tamper-evident signature bound to the holder, level and issue date.
         </p>
         <Link className="button secondary" href="/" style={{ marginTop: 16, display: "inline-block" }}>Learn with English Wizard →</Link>
       </section>

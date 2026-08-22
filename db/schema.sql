@@ -34,7 +34,7 @@ ALTER TABLE experiments ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL
 CREATE TABLE IF NOT EXISTS entitlements (learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,tier TEXT NOT NULL,feature TEXT NOT NULL,quota INTEGER,used INTEGER NOT NULL DEFAULT 0,reset_at TIMESTAMPTZ,PRIMARY KEY(learner_id,feature));
 CREATE TABLE IF NOT EXISTS ai_usage_daily (learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,usage_date DATE NOT NULL DEFAULT CURRENT_DATE,estimated_cents INTEGER NOT NULL DEFAULT 0,request_count INTEGER NOT NULL DEFAULT 0,PRIMARY KEY (learner_id, usage_date));
 CREATE TABLE IF NOT EXISTS ai_response_cache (cache_key TEXT PRIMARY KEY,model TEXT NOT NULL,payload JSONB NOT NULL,hit_count INTEGER NOT NULL DEFAULT 0,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),last_hit_at TIMESTAMPTZ);
-CREATE TABLE IF NOT EXISTS subscriptions (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,tier TEXT NOT NULL DEFAULT 'FREE' CHECK (tier IN ('FREE','PLUS','PRO')),status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','CANCELLED','PAST_DUE','TRIALING')),provider TEXT NOT NULL DEFAULT 'NONE',external_reference TEXT,period_start TIMESTAMPTZ NOT NULL DEFAULT NOW(),period_end TIMESTAMPTZ,cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS subscriptions (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,tier TEXT NOT NULL DEFAULT 'FREE' CHECK (tier IN ('FREE','PLUS','PRO')),status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','CANCELLED','PAUSED','PAST_DUE','TRIALING')),provider TEXT NOT NULL DEFAULT 'NONE',external_reference TEXT,period_start TIMESTAMPTZ NOT NULL DEFAULT NOW(),period_end TIMESTAMPTZ,cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE INDEX IF NOT EXISTS learning_events_learner_time_idx ON learning_events (learner_id,occurred_at DESC);
 CREATE INDEX IF NOT EXISTS diagnostic_attempts_learner_time_idx ON diagnostic_attempts (learner_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS sessions_token_idx ON sessions(token_hash);
@@ -49,3 +49,7 @@ CREATE INDEX IF NOT EXISTS knowledge_documents_source_idx ON knowledge_documents
 CREATE TABLE IF NOT EXISTS certificates (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,display_name TEXT NOT NULL,level TEXT NOT NULL,overall_percent INTEGER NOT NULL,issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),revoked BOOLEAN NOT NULL DEFAULT FALSE);
 
 CREATE TABLE IF NOT EXISTS streak_state (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,freezes INTEGER NOT NULL DEFAULT 2,bridged_on DATE,last_bridged_gap INTEGER NOT NULL DEFAULT 0,updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+
+-- Migration: older databases carry a status CHECK without PAUSED; rebuild the constraint idempotently.
+ALTER TABLE subscriptions DROP CONSTRAINT IF EXISTS subscriptions_status_check;
+ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_status_check CHECK (status IN ('ACTIVE','CANCELLED','PAUSED','PAST_DUE','TRIALING'));

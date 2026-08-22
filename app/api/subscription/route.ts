@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 type ChangeBody = {
-  action?: "CHANGE_PLAN" | "CANCEL" | "RESUME" | "PROVIDER_EVENT";
+  action?: "CHANGE_PLAN" | "CANCEL" | "RESUME" | "PAUSE" | "PROVIDER_EVENT";
   tier?: string;
   provider?: string;
   externalReference?: string;
@@ -75,6 +75,12 @@ export async function POST(request: Request) {
       const record = await save({ status: "ACTIVE", cancelAtPeriodEnd: false });
       return NextResponse.json({ subscription: record, effectiveTier: effectiveTier(record) });
     }
+    case "PAUSE": {
+      if (!current) return NextResponse.json({ error: "No subscription to pause." }, { status: 404 });
+      if (current.tier === "FREE") return NextResponse.json({ error: "The free plan cannot be paused." }, { status: 400 });
+      const record = await save({ status: "PAUSED", cancelAtPeriodEnd: false });
+      return NextResponse.json({ subscription: record, effectiveTier: effectiveTier(record), note: "Premium features pause instead of cancelling — billing stops, learning data and streak freezes are preserved, and you can resume anytime." });
+    }
     case "PROVIDER_EVENT": {
       if (!body.externalReference) return NextResponse.json({ error: "externalReference is required for provider events." }, { status: 400 });
       if (body.tier && !TIERS.includes(body.tier as PlanTier)) return NextResponse.json({ error: `tier must be one of ${TIERS.join(", ")}.` }, { status: 400 });
@@ -87,6 +93,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ subscription: record, effectiveTier: effectiveTier(record) }, { status: 201 });
     }
     default:
-      return NextResponse.json({ error: "action must be CHANGE_PLAN, CANCEL, RESUME or PROVIDER_EVENT." }, { status: 400 });
+      return NextResponse.json({ error: "action must be CHANGE_PLAN, CANCEL, RESUME, PAUSE or PROVIDER_EVENT." }, { status: 400 });
   }
 }
