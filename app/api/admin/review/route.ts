@@ -1,20 +1,15 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/src/infrastructure/auth";
+import { requireAdmin } from "@/src/infrastructure/admin-guard";
 import { query } from "@/src/infrastructure/database";
 
 export const dynamic = "force-dynamic";
 
-function isAdmin(email: string): boolean {
-  const allowlist = (process.env.ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
-  return allowlist.includes(email.toLowerCase());
-}
-
 const ALLOWED_DECISIONS = new Set(["APPROVED", "REJECTED", "HUMAN_REVIEW"]);
 
 export async function GET() {
-  const session = await currentUser();
-  if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  if (!isAdmin(session.email)) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  const guard = await requireAdmin();
+  if (guard.denied) return guard.denied;
+  const session = guard.session;
   const pending = await query(
     `SELECT entity_id, kind, version, change_summary, created_at FROM content_versions ORDER BY created_at DESC LIMIT 100`,
   ).catch(() => ({ rows: [] as unknown[] }));
@@ -22,9 +17,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await currentUser();
-  if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  if (!isAdmin(session.email)) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  const guard = await requireAdmin();
+  if (guard.denied) return guard.denied;
+  const session = guard.session;
 
   let body: Record<string, unknown>;
   try {

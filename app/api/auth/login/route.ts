@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { authenticate, createSession } from "@/src/infrastructure/auth-repository";
 import { COOKIE } from "@/src/infrastructure/auth";
 import { normalizeEmail } from "@/src/domain/auth";
+import { hitRateLimit } from "@/src/infrastructure/rate-limit";
 
 function secureCookie(request: Request) {
   return new URL(request.url).protocol === "https:" || request.headers.get("x-forwarded-proto") === "https";
@@ -12,6 +13,15 @@ export async function POST(req: Request) {
   const email = normalizeEmail(String(b?.email ?? ""));
   const password = String(b?.password ?? "");
   if (!email || password.length < 8) return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+
+  // Brute-force guard: per-account window. Applies regardless of proxy headers.
+  if (email) {
+    const limit = await hitRateLimit(`login:${email}`, "auth.login", 8, 15);
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many sign-in attempts for this account. Please wait a few minutes and try again." }, { status: 429, headers: limit.retryAfterSeconds ? { "Retry-After": String(limit.retryAfterSeconds) } : undefined });
+    }
+  }
+
   const user = await authenticate(email, password);
   if (!user) return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
   const s = await createSession(user.id);

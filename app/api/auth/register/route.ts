@@ -4,6 +4,7 @@ import { COOKIE } from "@/src/infrastructure/auth";
 import { normalizeEmail, validateEmail } from "@/src/domain/auth";
 import { completeReferral } from "@/src/infrastructure/referral-repository";
 import { query } from "@/src/infrastructure/database";
+import { clientIpFrom, hitRateLimit } from "@/src/infrastructure/rate-limit";
 import { randomUUID } from "crypto";
 
 function secureCookie(request: Request) {
@@ -11,8 +12,17 @@ function secureCookie(request: Request) {
 }
 
 export async function POST(req: Request) {
-  try {
-    const b = await req.json() as Record<string, unknown>;
+try {
+// Bulk-abuse guard: per-IP when the request arrives through a proxy (production).
+// Direct local connections (no x-forwarded-for) are never limited, keeping dev and e2e frictionless.
+const ip = clientIpFrom(req);
+if (ip) {
+  const limit = await hitRateLimit(`register:${ip}`, "auth.register", 20, 60);
+  if (!limit.allowed) {
+    return NextResponse.json({ error: "Too many accounts created from this connection. Please try again later." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds ?? 3600) } });
+  }
+}
+const b = await req.json() as Record<string, unknown>;
     const email = normalizeEmail(String(b.email ?? ""));
     const displayName = String(b.displayName ?? "").trim();
     const password = String(b.password ?? "");

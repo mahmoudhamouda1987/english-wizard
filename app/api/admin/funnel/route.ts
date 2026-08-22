@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/src/infrastructure/auth";
+import { requireAdmin } from "@/src/infrastructure/admin-guard";
 import { query } from "@/src/infrastructure/database";
 
 export const dynamic = "force-dynamic";
 
-function isAdmin(email: string): boolean {
-  const allowlist = (process.env.ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
-  return allowlist.includes(email.toLowerCase());
-}
-
 export async function GET() {
-  const session = await currentUser();
-  if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  if (!isAdmin(session.email)) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  const guard = await requireAdmin();
+  if (guard.denied) return guard.denied;
 
   const [signups, diagnostics, firstLessons, activeWeek1, checkpoints, referrals, paid] = await Promise.all([
     query<{ c: string }>(`SELECT COUNT(*)::text AS c FROM learners`),
