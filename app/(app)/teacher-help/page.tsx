@@ -16,6 +16,7 @@ const modes = [
 ] as const;
 
 type Response = { adaptation?: { move: string; rationale: string; nextPrompt: string }; help?: string; thinkingInEnglish?: { stage: string; prompt: string; target: string }; error?: string };
+type Memory = { summaryLines: string[]; memory: { level: string | null; journeyDays: number; completedLessons: number; recurringErrors: Array<{ skill: string; occurrences: number; severity: string; status: string }>; focusSkill: { skill: string; score: number } | null; strongSkill: { skill: string; score: number } | null } };
 
 export default function TeacherHelpPage() {
   const [level, setLevel] = useState<CEFRLevel>("A1");
@@ -24,11 +25,15 @@ export default function TeacherHelpPage() {
   const [target, setTarget] = useState("I don't understand this grammar rule.");
   const [response, setResponse] = useState<Response | null>(null);
   const [busy, setBusy] = useState(false);
+  const [memory, setMemory] = useState<Memory | null>(null);
 
   useEffect(() => {
     fetch("/api/profile")
       .then((r) => r.json())
       .then((data) => data.profile?.targetLevel && setLevel(data.profile.targetLevel))
+      .catch(() => undefined);
+    fetch("/api/teacher-help/memory", { cache: "no-store" })
+      .then(async (r) => { const p = await r.json(); if (r.ok) setMemory(p); })
       .catch(() => undefined);
   }, []);
 
@@ -59,6 +64,23 @@ export default function TeacherHelpPage() {
           <p className="subtle">Tell the Wizard what confused you. It chooses a support move and a new explanation mode instead of simply repeating the same lesson.</p>
         </div>
       </header>
+
+      {memory && (
+        <section className="panel" style={{ marginTop: 16, borderLeft: "4px solid #a855f7" }}>
+          <p className="eyebrow">🧠 What your tutor remembers about you</p>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 18, lineHeight: 1.9 }}>
+            {memory.summaryLines.map((line) => <li key={line}>{line}</li>)}
+            {memory.memory.completedLessons > 0 && <li>{memory.memory.completedLessons} lesson{memory.memory.completedLessons === 1 ? "" : "s"} completed — I build on exactly what you have already proven.</li>}
+          </ul>
+          {memory.memory.recurringErrors.length > 0 && (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+              {memory.memory.recurringErrors.map((e) => (
+                <span key={e.skill + e.occurrences} className="streak-pill" title={`Severity ${e.severity} · status ${e.status}`}>{e.skill} ×{e.occurrences}</span>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="panel" style={{ display: "grid", gap: 14 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

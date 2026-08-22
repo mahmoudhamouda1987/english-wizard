@@ -56,3 +56,6 @@ ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_status_check CHECK (statu
 
 CREATE TABLE IF NOT EXISTS referrals (id UUID PRIMARY KEY,code TEXT UNIQUE NOT NULL,referrer_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,invited_id UUID REFERENCES learners(id) ON DELETE SET NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),completed_at TIMESTAMPTZ);
 CREATE INDEX IF NOT EXISTS referrals_referrer_idx ON referrals(referrer_id);
+
+CREATE TABLE IF NOT EXISTS voice_samples (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,prompt TEXT NOT NULL,transcript TEXT,audio_data_url TEXT NOT NULL,duration_ms INTEGER,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS voice_samples_learner_idx ON voice_samples(learner_id,created_at DESC);
