@@ -74,17 +74,65 @@ export async function GET(request: NextRequest) {
     } catch { /* keep whatever we have */ }
   }
 
-  // 4. Arabic: curated human glossary only — no machine guesses presented as fact.
+  // 4. Arabic: curated human glossary first; otherwise Google Translate.
   const gloss = CURATED[word] ?? null;
+  let arabicMeaning = gloss?.ar ?? "";
+  let arabicSource = gloss ? "English Wizard glossary" : "";
+
+  if (!arabicMeaning) {
+    // Preferred: official Google Cloud Translation API (set GOOGLE_TRANSLATE_API_KEY).
+    const gtKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+    if (gtKey) {
+      try {
+        const official = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${encodeURIComponent(gtKey)}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ q: word, source: "en", target: "ar", format: "text" }),
+          cache: "no-store",
+        });
+        if (official.ok) {
+          const payload = (await official.json()) as { data?: { translations?: Array<{ translatedText?: string }> } };
+          const translated = payload.data?.translations?.[0]?.translatedText?.trim() ?? "";
+          if (translated && /[\u0600-\u06FF]/.test(translated)) {
+            arabicMeaning = translated;
+            arabicSource = "Google Cloud Translation";
+          }
+        }
+      } catch { /* fall through to free endpoint */ }
+    }
+  }
+
+  if (!arabicMeaning) {
+    // Best-effort free endpoint (works on many networks; some IPs are rate-limited by Google).
+    try {
+      const gt = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ar&dt=t&q=${encodeURIComponent(word)}`,
+        { cache: "no-store", headers: { "User-Agent": "Mozilla/5.0 (compatible; EnglishWizard/2.0)" } },
+      );
+      if (gt.ok) {
+        const data = (await gt.json()) as unknown;
+        if (Array.isArray(data) && Array.isArray(data[0])) {
+          const translated = (data[0] as Array<[string | null]>)
+            .map((segment) => segment?.[0] ?? "")
+            .join("")
+            .trim();
+          if (translated && /[\u0600-\u06FF]/.test(translated)) {
+            arabicMeaning = translated;
+            arabicSource = "Google Translate";
+          }
+        }
+      }
+    } catch { /* leave empty; popover shows honest state */ }
+  }
 
   return NextResponse.json({
     word,
     meaning: meaning || "Definition not available yet.",
-    arabicMeaning: gloss?.ar ?? "",
-    arabicAvailable: Boolean(gloss),
+    arabicMeaning,
+    arabicAvailable: Boolean(arabicMeaning),
     pronunciation: pronunciation || "-",
     partOfSpeech: partOfSpeech || gloss?.pos || "word",
-    source: source || (gloss ? "English Wizard glossary" : ""),
-    machineTranslated: false,
+    source: [source, arabicSource].filter(Boolean).join(" · "),
+    machineTranslated: !gloss && Boolean(arabicMeaning),
   });
 }
