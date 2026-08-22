@@ -48,3 +48,11 @@ export function speakText(
 
 /** Speech-recognition locale for learner input: British English. */
 export const RECOGNITION_LANG = "en-GB";
+
+/**
+ * Converts display notation into speakable text: linking underscores
+ * (an_hour → an hour) and narrow IPA vowels that TTS engines mispronounce.
+ */
+export function speechFriendly(text: string): string {
+  return text.replace(/_/g, " ").replace(/ɪ/g, "i").replace(/ə/g, "u");
+}
