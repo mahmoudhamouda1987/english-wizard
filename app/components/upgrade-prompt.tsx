@@ -20,7 +20,7 @@ export function UpgradePrompt({ info, onClose }: { info: UpgradeInfo; onClose: (
         exam pathways, deep study and boss missions.
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6 }}>
-        <a className="button" href="/settings#plan">See plans &amp; upgrade →</a>
+        <a className="button" href="/pricing">See plans &amp; upgrade →</a>
         <a className="button secondary" href="/dashboard">Keep learning free today</a>
       </div>
     </section>
