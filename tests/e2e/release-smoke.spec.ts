@@ -16,7 +16,7 @@ test("public production shell and security release contract", async ({ request, 
 
   const serviceWorker = await request.get("/sw.js");
   expect(serviceWorker.ok()).toBeTruthy();
-  expect(await serviceWorker.text()).toContain("english-wizard-shell-v1");
+  expect(await serviceWorker.text()).toContain("english-wizard-shell-v2");
 
   const offline = await request.get("/offline");
   expect(offline.ok()).toBeTruthy();
