@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ALL_LESSONS } from "@/src/domain/all-lessons";
 
 interface Dash {
   firstName: string;
@@ -129,6 +130,11 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  const currentLessonTitle = useMemo(() => {
+    if (!data?.currentLessonId) return null;
+    return ALL_LESSONS.find((l) => l.id === data.currentLessonId)?.title ?? data.currentLessonId.replace(/^lesson-/, "").replace(/prea1/i, "Pre-A1").replace(/-/g, " ");
+  }, [data]);
+
   useEffect(() => {
     fetch("/api/dashboard", { cache: "no-store" })
       .then(async (r) => {
@@ -169,7 +175,7 @@ export default function DashboardPage() {
     ...(data && data.completedLessons >= 1 ? [{ icon: "📘", title: "First Steps", sub: `${data.completedLessons} lesson${data.completedLessons === 1 ? "" : "s"} completed`, xp: "+50 XP" }] : []),
   ];
 
-  const levels = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const levels = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 
   if (error) return <main id="main-content" style={{ maxWidth: 720, margin: "80px auto", padding: 24 }}><p role="alert" className="state-card error">{error}</p><a className="button secondary" href="/auth">Sign in</a></main>;
 
@@ -195,7 +201,7 @@ export default function DashboardPage() {
         <section className="stat-strip" aria-label="Learning snapshot">
           <div className="stat-tile"><strong>{data ? data.completedLessons : 0}<small> / {data ? data.totalLessons : 28}</small></strong><span>Lessons completed</span></div>
           <a className="stat-tile" href={data?.currentLessonId ? `/learn?lesson=${encodeURIComponent(data.currentLessonId)}` : "/diagnostic"}>
-            <strong>{data?.currentLessonId ? data.currentLessonId.replace(/^lesson-/, "").replace(/-/g, " ") : "Placement check"}</strong>
+            <strong>{currentLessonTitle ?? "Placement check"}</strong>
             <span>Next best action →</span>
           </a>
           <a className="stat-tile" href="/review"><strong>{data ? data.reviewDue : 0}</strong><span>Review cards due →</span></a>
@@ -299,7 +305,7 @@ export default function DashboardPage() {
                 <div className="continue-grid">
                   {[
                     { badge: "Listening", color: "#3b82f6", title: "English Ear drill", meta: "Connected speech", href: "/english-ear", pct: data.skills[0]?.value ?? 40 },
-                    { badge: "Reading", color: "#10b981", title: "Reading Engine", meta: data.currentLessonId ? `Lesson · ${data.currentLessonId.replaceAll("-", " ").slice(0, 22)}` : "New passage", href: "/reading", pct: data.skills[2]?.value ?? 35 },
+                    { badge: "Reading", color: "#10b981", title: "Reading Engine", meta: currentLessonTitle ? `Lesson · ${currentLessonTitle.slice(0, 26)}` : "New passage", href: "/reading", pct: data.skills[2]?.value ?? 35 },
                     { badge: "Grammar", color: "#f59e0b", title: "Grammar in context", meta: "Noticing → production", href: "/learn", pct: data.skills[4]?.value ?? 30 },
                     { badge: "Speaking", color: "#ef4444", title: "Say It Better", meta: "Upgrade your phrasing", href: "/say-it-better", pct: data.skills[1]?.value ?? 45 },
                   ].map((card) => (
@@ -345,7 +351,7 @@ export default function DashboardPage() {
                   {levels.map((lv, i) => (
                     <div key={lv} className={`level-step ${i <= data.levelIndex ? "reached" : ""} ${lv === data.level ? "current" : ""}`}>
                       <span className="lv-dot">{lv}</span>
-                      <small>{["Beginner", "Elementary", "Intermediate", "Upper-Int.", "Advanced", "Proficient"][i]}</small>
+                      <small>{["Starter", "Beginner", "Elementary", "Intermediate", "Upper-Int.", "Advanced", "Proficient"][i]}</small>
                     </div>
                   ))}
                 </div>
