@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@/app/components/theme-toggle";
+import { InstallButton } from "@/app/components/install-button";
 
 const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string; href: string }> }> = [
   { items: [
@@ -68,6 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           ))}
         </nav>
+        <InstallButton />
         <a className="upgrade-btn" href="/pathways">👑 Go Premium</a>
       </aside>
       <div className="dash-host">{children}</div>
