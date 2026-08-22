@@ -135,7 +135,7 @@ export default function DiagnosticPage() {
         <section className="panel"><h2>Focus areas</h2><p>{result.focusAreas.join(" · ") || "Keep building breadth."}</p></section>
       </div>
       <section className="panel" style={{ marginTop: 18 }}><h2>Production evidence</h2><p>Writing: {result.production?.writingScore ?? 0}% · Speaking transcript: {result.production?.speakingScore ?? 0}%</p></section>
-      <a className="button" href="/dashboard" style={{ marginTop: 18 }}>See my learning path →</a>
+      <a className="button" href="/welcome" style={{ marginTop: 18 }}>Claim your first win →</a>
     </main>
   );
 
