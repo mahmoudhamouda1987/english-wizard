@@ -16,6 +16,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
     { icon: "⚡", label: "Quick Practice", href: "/practice" },
     { icon: "🌍", label: "Worlds & Missions", href: "/worlds" },
     { icon: "💬", label: "Conversation", href: "/conversation" },
+    { icon: "🎭", label: "Role-play", href: "/roleplay" },
     { icon: "🎙️", label: "Say It Better", href: "/say-it-better" },
     { icon: "🗣️", label: "Speaking Coach", href: "/pronunciation" },
     { icon: "⏳", label: "Voice Time Machine", href: "/time-machine" },
