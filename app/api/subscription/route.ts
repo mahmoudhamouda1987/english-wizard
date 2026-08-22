@@ -5,6 +5,7 @@ import { query } from "@/src/infrastructure/database";
 import { getSubscription, upsertSubscription } from "@/src/infrastructure/subscription-repository";
 import { effectiveTier, planValueModel, SUBSCRIPTION_PLANS, type SubscriptionRecord } from "@/src/domain/subscription";
 import { PLAN_ENTITLEMENTS, type PlanTier } from "@/src/domain/entitlements";
+import { effectiveTierWithGrace } from "@/src/domain/billing-webhooks";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,13 @@ export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const subscription = await getSubscription(user.learnerId);
-  const tier = effectiveTier(subscription);
+  const access = effectiveTierWithGrace(subscription ? { status: subscription.status, tier: subscription.tier, periodEnd: subscription.periodEnd } : null);
+  const tier = access.inGrace ? access.tier : effectiveTier(subscription);
   return NextResponse.json({
     subscription,
     effectiveTier: tier,
+    inGrace: access.inGrace,
+    graceMessage: access.inGrace ? "A payment failed, but your premium access continues while billing is retried — nothing is lost." : undefined,
     entitlements: PLAN_ENTITLEMENTS[tier],
     valueModel: planValueModel(tier),
     plans: SUBSCRIPTION_PLANS,
