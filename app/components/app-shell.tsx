@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string; href: string }> }> = [
   { items: [
@@ -47,6 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <aside className="snav" aria-label="Primary navigation">
         <Link className="snav-brand" href="/dashboard"><img src="/logo.png" alt="" width={34} height={34} className="brand-logo" /> <strong>English Wizard</strong></Link>
+        <div style={{ display: "flex", justifyContent: "flex-end", paddingBottom: 6 }}><ThemeToggle /></div>
         <nav>
           {NAV.map((group, gi) => (
             <div key={gi}>

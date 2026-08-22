@@ -8,6 +8,10 @@ test("core learning surfaces pass automated WCAG checks (axe)", async ({ page })
 
   for (const route of ["/dashboard", "/learn", "/chunks", "/settings", "/pathways"]) {
     await page.goto(route);
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(() => {
+      document.getAnimations().forEach((a) => { try { a.finish(); } catch { /* ignore */ } });
+    });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     const serious = results.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");
     expect(serious, `${route} has serious WCAG violations: ${JSON.stringify(serious.map((v) => ({ id: v.id, nodes: v.nodes.length })))}`).toHaveLength(0);

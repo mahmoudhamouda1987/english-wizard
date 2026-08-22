@@ -93,6 +93,8 @@ export default function ConversationPage() {
   const [playing, setPlaying] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [activeSpeaker, setActiveSpeaker] = useState<string | null>(null);
+  const [activeTurn, setActiveTurn] = useState<number>(-1);
 
   useEffect(() => {
     const stored = localStorage.getItem("english-wizard-level") as CEFRLevel | null;
@@ -153,14 +155,18 @@ export default function ConversationPage() {
     const speakNext = () => {
       if (!exercise || index >= exercise.turns.length) {
         setPlaying(false);
+        setActiveSpeaker(null);
+        setActiveTurn(-1);
         setSeconds(60);
         return;
       }
+      const turnIndex = index;
       const turn = exercise.turns[index++];
       const utterance = new SpeechSynthesisUtterance(turn.text);
       utterance.lang = "en-US";
       utterance.rate = 0.9;
       utterance.pitch = turn.speaker === "A" ? 1.08 : 0.86;
+      utterance.onstart = () => { setActiveSpeaker(turn.speaker); setActiveTurn(turnIndex); };
       utterance.onend = speakNext;
       window.speechSynthesis.speak(utterance);
     };
@@ -198,6 +204,21 @@ export default function ConversationPage() {
           <button className="button" onClick={playConversation}>{playing ? "Pause conversation" : seconds >= 60 ? "Replay conversation" : "Play conversation"}</button>
           <div className="timeline"><i style={{ width: `${(seconds / 60) * 100}%` }} /></div>
           <span>{String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}</span>
+        </div>
+        <div className="stage" aria-label="Conversation scene">
+          {exercise.speakers.map((speaker, i) => (
+            <div key={speaker.id} className={`actor ${activeSpeaker === speaker.id && playing ? "speaking" : ""}`}>
+              <span className={`ava ${i === 1 ? "amy" : ""}`} aria-hidden="true">{i === 1 ? "👩‍🏫" : "🧑‍💼"}</span>
+              <strong>{speaker.name}</strong>
+              <small>{speaker.role}</small>
+              <span className="wave" aria-hidden="true"><i /><i /><i /><i /><i /></span>
+            </div>
+          ))}
+        </div>
+        <div className="caption-strip" aria-live="polite">
+          {exercise.turns.map((turn, index) => (
+            <p key={index} className={`caption-line ${activeTurn === index ? "active" : ""}`}><b>{turn.name}:</b> {turn.text}</p>
+          ))}
         </div>
         <div className="speaker-row">
           {exercise.speakers.map((speaker) => <span key={speaker.id}><strong>{speaker.name}</strong> · {speaker.role}</span>)}

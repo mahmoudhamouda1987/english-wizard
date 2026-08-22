@@ -1,12 +1,13 @@
 "use client";
+
+import { PageHero } from "@/app/components/page-hero";
 import Link from "next/link";
 import { WORLDS, MISSIONS, BOSS_MISSIONS } from "@/src/domain/missions";
 import { SESSION_MODES } from "@/src/domain/learning-systems";
 
 export default function WorldsPage(){
   return <main id="main-content" style={{maxWidth:1100,margin:"0 auto",padding:"48px 24px"}}>
-    <p className="eyebrow">English Wizard Worlds</p>
-    <h1>Learn through missions, not just lessons.</h1>
+      <PageHero icon="🌍" title="Worlds & Missions" sub="Choose your session: quick quests, journeys, deep study or boss missions." />
     <p className="subtle">Each world represents a meaningful stage of English capability. Your next mission should be chosen from evidence, not from a fixed checklist.</p>
     <div style={{display:"grid",gap:16,marginTop:24}}>
       {WORLDS.map(world=>{

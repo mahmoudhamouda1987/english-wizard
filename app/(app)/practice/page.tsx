@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHero } from "@/app/components/page-hero";
+
 import { useState } from "react";
 
 type WritingFeedback = {
@@ -52,8 +54,7 @@ export default function PracticePage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px" }}>
-      <p className="eyebrow">Practice</p>
-      <h1>Practice → evidence → feedback</h1>
+      <PageHero icon="⚡" title="Practice — evidence & feedback" sub="Real questions with instant, evidence-based feedback across every skill." />
 
       <section className="panel">
         <p style={{ fontSize: 22 }}>Choose the correct sentence:</p>

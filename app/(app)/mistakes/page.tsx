@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHero } from "@/app/components/page-hero";
+
 import { useEffect, useState } from "react";
 
 type ErrorRecord = { id: string; description: string; severity: string; skill: string; occurrences: number };
@@ -24,8 +26,7 @@ export default function MistakesPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
-      <p className="eyebrow">Error memory</p>
-      <h1>Mistakes to review</h1>
+      <PageHero icon="⚠️" title="Mistakes to review" sub="Every error becomes a learning opportunity — revisit and master." />
       <p className="subtle">Repeated errors stay visible so future practice can target them.</p>
       {errors.length === 0 ? (
         <section className="panel"><p>No recurring mistakes recorded yet.</p></section>

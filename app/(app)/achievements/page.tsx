@@ -1,5 +1,7 @@
 "use client";
 
+import { PageHero } from "@/app/components/page-hero";
+
 import { useEffect, useState } from "react";
 
 const badges = [
@@ -64,8 +66,7 @@ export default function AchievementsPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 900, margin: "0 auto", padding: 48 }}>
-      <p className="eyebrow">Milestones</p>
-      <h1>Achievements</h1>
+      <PageHero icon="🏆" title="Achievements & Certificates" sub="Milestones, badges and your verifiable CEFR certificate." />
       <div style={{ display: "grid", gap: 12, marginTop: 24 }}>
         {badges.map((b) => (
           <section className="panel" key={b.id}>

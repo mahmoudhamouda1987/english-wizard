@@ -8,9 +8,14 @@ export const metadata: Metadata = {
   description: "Adaptive AI English learning platform",
 };
 
+const themeScript = `try{var t=localStorage.getItem("ew-theme");if(t==="dark"||( !t&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.dataset.theme="dark";}catch(e){}`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <ServiceWorkerRegister />

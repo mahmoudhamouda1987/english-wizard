@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/app/components/theme-toggle";
 
 const FEATURES = [
   { icon: "🧭", title: "Adaptive diagnostic", text: "A short placement check measures your real level across listening, speaking, reading, writing, grammar and vocabulary.", href: "/diagnostic", cta: "Take the diagnostic" },
@@ -17,6 +18,7 @@ export default function Home() {
         <nav className="site-nav" aria-label="Site">
           <a href="/auth">Sign in</a>
           <a className="primary" href="/onboarding">Start learning</a>
+          <ThemeToggle />
         </nav>
       </header>
       <main id="main-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 64px" }}>
