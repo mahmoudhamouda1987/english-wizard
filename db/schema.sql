@@ -63,3 +63,6 @@ CREATE INDEX IF NOT EXISTS voice_samples_learner_idx ON voice_samples(learner_id
 CREATE TABLE IF NOT EXISTS usage_counters (learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,feature TEXT NOT NULL,day DATE NOT NULL DEFAULT CURRENT_DATE,used INTEGER NOT NULL DEFAULT 0,PRIMARY KEY (learner_id, feature, day));
 
 CREATE TABLE IF NOT EXISTS rate_limits (key TEXT NOT NULL,action TEXT NOT NULL,count INTEGER NOT NULL DEFAULT 0,window_start TIMESTAMPTZ NOT NULL DEFAULT NOW(),PRIMARY KEY (key, action));
+
+CREATE TABLE IF NOT EXISTS corrections (id UUID PRIMARY KEY,submission_id UUID NOT NULL REFERENCES evidence_records(id) ON DELETE CASCADE,reviewer_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,comment TEXT NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX IF NOT EXISTS corrections_submission_idx ON corrections(submission_id);
