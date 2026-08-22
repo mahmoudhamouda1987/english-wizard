@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CEFRLevel, Skill } from "@/src/domain/learner";
+import { UpgradePrompt, parseUpgradePayload } from "@/app/components/upgrade-prompt";
 
 const levels: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 const skills: Skill[] = ["reading", "listening", "writing", "speaking", "grammar", "vocabulary", "pronunciation", "mediation"];
@@ -26,6 +27,7 @@ export default function TeacherHelpPage() {
   const [response, setResponse] = useState<Response | null>(null);
   const [busy, setBusy] = useState(false);
   const [memory, setMemory] = useState<Memory | null>(null);
+  const [upgrade, setUpgrade] = useState<ReturnType<typeof parseUpgradePayload>>(null);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -47,6 +49,7 @@ export default function TeacherHelpPage() {
         body: JSON.stringify({ level, skill, mode, target, askedForHelp: true }),
       });
       const payload = (await result.json()) as Response;
+      if (result.status === 402) setUpgrade(parseUpgradePayload(payload));
       setResponse(result.ok ? payload : { error: payload.error ?? "Unable to get help." });
     } catch {
       setResponse({ error: "Unable to reach the teacher right now." });
@@ -94,6 +97,8 @@ export default function TeacherHelpPage() {
         </div>
         <button type="button" className="button" onClick={askForHelp} disabled={busy || target.trim().length < 3}>{busy ? "The Wizard is thinking…" : "Help me understand"}</button>
       </section>
+
+      {upgrade && <UpgradePrompt info={upgrade} onClose={() => setUpgrade(null)} />}
 
       {response?.error && <section className="panel"><strong>{response.error}</strong></section>}
       {response?.adaptation && (

@@ -59,3 +59,5 @@ CREATE INDEX IF NOT EXISTS referrals_referrer_idx ON referrals(referrer_id);
 
 CREATE TABLE IF NOT EXISTS voice_samples (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,prompt TEXT NOT NULL,transcript TEXT,audio_data_url TEXT NOT NULL,duration_ms INTEGER,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE INDEX IF NOT EXISTS voice_samples_learner_idx ON voice_samples(learner_id,created_at DESC);
+
+CREATE TABLE IF NOT EXISTS usage_counters (learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,feature TEXT NOT NULL,day DATE NOT NULL DEFAULT CURRENT_DATE,used INTEGER NOT NULL DEFAULT 0,PRIMARY KEY (learner_id, feature, day));
