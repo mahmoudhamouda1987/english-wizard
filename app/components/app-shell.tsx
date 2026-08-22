@@ -17,7 +17,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
     { icon: "🌍", label: "Worlds & Missions", href: "/worlds" },
     { icon: "💬", label: "Conversation", href: "/conversation" },
     { icon: "🎙️", label: "Say It Better", href: "/say-it-better" },
-    { icon: "🗣️", label: "Pronunciation", href: "/pronunciation" },
+    { icon: "🗣️", label: "Speaking Coach", href: "/pronunciation" },
     { icon: "⏳", label: "Voice Time Machine", href: "/time-machine" },
     { icon: "🌍", label: "Reality Checkpoints", href: "/checkpoints" },
   ] },

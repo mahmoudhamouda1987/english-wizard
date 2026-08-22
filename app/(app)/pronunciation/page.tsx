@@ -1,137 +1,156 @@
 "use client";
-import { speakText } from "@/src/domain/tts";
 
-import { useEffect, useRef, useState } from "react";
-import { assessAcousticPronunciation } from "@/src/domain/pronunciation-acoustic";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { CEFRLevel } from "@/src/domain/learner";
+import { phrasesForLevel } from "@/src/domain/speaking-lab";
+import { scoreSpeech, type SpeechScore } from "@/src/domain/speech-scoring";
+import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
+import { PageHero } from "@/app/components/page-hero";
+import { Celebration } from "@/app/components/celebration";
 
-const phrases=["My name is Mahmoud.","I work in education.","I would like to improve my English.","Can you tell me where the station is?"];
+const LEVELS: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 
-type PrivacyState = { voice_processing?: boolean; voice_retention_days?: number };
-type ProfileState = { targetLevel?: string; englishDna?: { overallLevel?: string } };
-
-type Metrics = ReturnType<typeof assessAcousticPronunciation> & { durationMs:number; speechLikeRatio:number; silenceRatio:number; rmsMean:number; zeroCrossingRate:number; wordsPerMinuteEstimate:number|null };
-
-async function analyzeRecording(blob: Blob, expectedWordCount: number): Promise<Metrics> {
-  const context = new AudioContext();
-  const buffer = await context.decodeAudioData(await blob.arrayBuffer());
-  const data = buffer.getChannelData(0);
-  const frameSize = 2048;
-  let speechFrames = 0;
-  let rmsSum = 0;
-  let zeroCrossings = 0;
-  let frameCount = 0;
-  for (let offset = 0; offset < data.length; offset += frameSize) {
-    const end = Math.min(offset + frameSize, data.length);
-    if (end <= offset) continue;
-    let energy = 0;
-    let crossings = 0;
-    for (let i = offset; i < end; i += 1) {
-      const sample = data[i];
-      energy += sample * sample;
-      if (i > offset && (data[i - 1] < 0) !== (sample < 0)) crossings += 1;
-    }
-    const rms = Math.sqrt(energy / (end - offset));
-    rmsSum += rms;
-    zeroCrossings += crossings;
-    if (rms > 0.015) speechFrames += 1;
-    frameCount += 1;
-  }
-  const durationMs = buffer.duration * 1000;
-  const speechLikeRatio = frameCount ? speechFrames / frameCount : 0;
-  const silenceRatio = 1 - speechLikeRatio;
-  const rmsMean = frameCount ? rmsSum / frameCount : 0;
-  const zeroCrossingRate = data.length ? zeroCrossings / data.length : 0;
-  await context.close();
-  const wordsPerMinuteEstimate = buffer.duration > 0 ? (expectedWordCount / buffer.duration) * 60 : null;
-  return { ...assessAcousticPronunciation({ durationMs, speechLikeRatio, silenceRatio, rmsMean, zeroCrossingRate, wordsPerMinuteEstimate }, expectedWordCount), durationMs, speechLikeRatio, silenceRatio, rmsMean, zeroCrossingRate, wordsPerMinuteEstimate };
+interface SpeechRecognitionLike {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript?: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
 }
 
-export default function PronunciationPage(){
-  const [active,setActive]=useState(0);
-  const [privacy,setPrivacy]=useState<PrivacyState|null>(null);
-  const [level,setLevel]=useState("B1");
-  const [recording,setRecording]=useState(false);
-  const [status,setStatus]=useState("");
-  const [metrics,setMetrics]=useState<Metrics|null>(null);
-  const recorderRef=useRef<MediaRecorder|null>(null);
-  const chunksRef=useRef<Blob[]>([]);
+export default function SpeakingCoachPage() {
+  const [level, setLevel] = useState<CEFRLevel>("A1");
+  const phrases = useMemo(() => phrasesForLevel(level), [level]);
+  const [index, setIndex] = useState(0);
+  const phrase = phrases[index % phrases.length];
 
-  useEffect(()=>{
-    void Promise.all([fetch("/api/privacy").then((r)=>r.json()),fetch("/api/profile").then((r)=>r.json())]).then(([privacyPayload,profilePayload])=>{
-      setPrivacy(privacyPayload.preferences ?? null);
-      const profile = profilePayload.profile as ProfileState|undefined;
-      setLevel(profile?.englishDna?.overallLevel ?? profile?.targetLevel ?? "B1");
-    }).catch(()=>setStatus("Sign in to use pronunciation recording."));
-  },[]);
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState<string | null>(null);
+  const [score, setScore] = useState<SpeechScore | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [unsupported, setUnsupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
-  function speak(){speakText(phrases[active],{lang:"en-GB",rate:0.9})}
+  useEffect(() => {
+    fetch("/api/profile").then((r) => r.json()).then((p) => { if (p.profile?.targetLevel) setLevel(p.profile.targetLevel); }).catch(() => undefined);
+  }, []);
 
-  async function startRecording(){
-    if(!privacy?.voice_processing){setStatus("Voice processing is off. Enable it in Settings → Privacy before recording.");return;}
-    if(!navigator.mediaDevices?.getUserMedia){setStatus("This browser does not support microphone recording.");return;}
-    try{
-      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      chunksRef.current=[];
-      const recorder=new MediaRecorder(stream);
-      recorder.ondataavailable=(event)=>{if(event.data.size>0) chunksRef.current.push(event.data)};
-      recorder.onstop=async()=>{
-        stream.getTracks().forEach((track)=>track.stop());
-        try{
-          const blob=new Blob(chunksRef.current,{type:recorder.mimeType || "audio/webm"});
-          const expectedWordCount=phrases[active].trim().split(/\s+/).length;
-          const result=await analyzeRecording(blob,expectedWordCount);
-          setMetrics(result);
-          const errorTags=[
-            ...(result.silenceRatio>0.45?["acoustic_pausing"]:[]),
-            ...(result.wordsPerMinuteEstimate!==null && result.wordsPerMinuteEstimate<70?["slow_rhythm"]:[]),
-            ...(result.wordsPerMinuteEstimate!==null && result.wordsPerMinuteEstimate>170?["fast_rhythm"]:[]),
-          ];
-          const response=await fetch("/api/evidence",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({
-            sessionType:"QUICK_QUEST",
-            missionId:"pronunciation-practice",
-            objectiveId:"a1-self-introduction-speaking",
-            capabilityIds:["speaking.pronunciation"],
-            modality:"PRONUNCIATION",
-            outcome:"PARTIAL",
-            score:result.score,
-            confidence:0.55,
-            level,
-            context:"FAMILIAR",
-            errorTags,
-          })});
-          if(!response.ok) throw new Error("evidence");
-          setStatus("Acoustic practice evidence saved. No raw audio was uploaded.");
-        }catch{setStatus("The acoustic analysis could not be completed. Try again.");}
-      };
-      recorder.start();
-      recorderRef.current=recorder;
-      setMetrics(null);setStatus("Recording… speak the phrase naturally.");setRecording(true);
-    }catch{setStatus("Microphone access was not granted.");}
+  function reset() { setTranscript(null); setScore(null); setSaved(false); }
+
+  function playTarget() {
+    speakText(phrase.text, { lang: "en-GB", rate: 0.9 });
   }
 
-  function stopRecording(){recorderRef.current?.stop();recorderRef.current=null;setRecording(false);}
+  function listen() {
+    const ctor = (window as unknown as { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike }).SpeechRecognition
+      ?? (window as unknown as { webkitSpeechRecognition?: new () => SpeechRecognitionLike }).webkitSpeechRecognition;
+    if (!ctor) { setUnsupported(true); return; }
+    try {
+      const recognition = new ctor();
+      recognitionRef.current = recognition;
+      recognition.lang = RECOGNITION_LANG;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.onresult = (event) => {
+        const text = Array.from(event.results ?? []).map((item) => item[0]?.transcript ?? "").join(" ").trim();
+        if (!text) return;
+        setTranscript(text);
+        const result = scoreSpeech(phrase.text, text);
+        setScore(result);
+        void fetch("/api/evidence", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            sessionType: "QUICK_QUEST",
+            missionId: `speaking-coach:${level.toLowerCase()}`,
+            objectiveId: `speaking-coach:${phrase.id}`,
+            capabilityIds: ["pronunciation.intelligibility"],
+            modality: "SPEAKING",
+            outcome: result.accuracy >= 80 ? "CORRECT" : result.accuracy >= 50 ? "PARTIAL" : "INCORRECT",
+            score: result.accuracy,
+            confidence: 0.85,
+            level,
+            context: "FAMILIAR",
+            errorTags: result.missing.length ? [`missed:${result.missing.slice(0, 3).join(",")}`] : [],
+          }),
+        }).then((r) => { if (r.ok) setSaved(true); }).catch(() => undefined);
+      };
+      recognition.onerror = () => setListening(false);
+      recognition.onend = () => setListening(false);
+      setListening(true);
+      recognition.start();
+    } catch {
+      setUnsupported(true);
+      setListening(false);
+    }
+  }
 
-  return <main id="main-content" style={{maxWidth:800,margin:"0 auto",padding:48}}>
-    <p className="eyebrow">Pronunciation coach</p>
-    <h1>Listen. Repeat. Measure the signals.</h1>
-    <section className="panel">
-      <p>Hear the model phrase, repeat it, and optionally record a consented local self-check. English Wizard measures timing, energy, pauses and rhythm as practice signals; it does not claim phoneme-level pronunciation accuracy.</p>
-      <h2 style={{fontSize:28}}>{phrases[active]}</h2>
-      <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-        <button className="button secondary" onClick={speak}>Play phrase</button>
-        {!recording ? <button className="button" onClick={startRecording}>Record local self-check</button> : <button className="button" onClick={stopRecording}>Stop recording</button>}
+  function stop() {
+    recognitionRef.current?.stop();
+    setListening(false);
+  }
+
+  function nextPhrase() {
+    setIndex((v) => (v + 1) % phrases.length);
+    reset();
+  }
+
+  return (
+    <main id="main-content" className="dash-main">
+      <PageHero icon="🗣️" title="Speaking Coach" sub={`Hear it, say it, get scored word-by-word. British English target voice at ${level}.`} />
+      <Celebration trigger={score && score.accuracy >= 80 ? `s${phrase.id}` : ""} />
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {LEVELS.map((x) => <button key={x} className={x === level ? "button" : "button secondary"} onClick={() => { setLevel(x); setIndex(0); reset(); }}>{x}</button>)}
       </div>
-      {status && <p role="status" style={{marginTop:16}}>{status}</p>}
-      {metrics && <div className="panel" style={{marginTop:20}}>
-        <h3>Acoustic practice signals</h3>
-        <p><strong>Proxy score:</strong> {metrics.score}/100</p>
-        <ul>
-          {metrics.signals.map((signal)=> <li key={signal}>{signal}</li>)}
-        </ul>
-        <p style={{fontSize:14,opacity:.8}}>Duration {Math.round(metrics.durationMs)} ms · speech-like {Math.round(metrics.speechLikeRatio*100)}% · silence {Math.round(metrics.silenceRatio*100)}% · estimated rhythm {metrics.wordsPerMinuteEstimate===null?"—":`${Math.round(metrics.wordsPerMinuteEstimate)} WPM`}</p>
-        <p style={{fontSize:13,opacity:.75}}>These are acoustic proxies only. Exact phoneme accuracy and accent quality are not assessed.</p>
-      </div>}
-      <div style={{display:"flex",gap:8,marginTop:22}}>{phrases.map((_,i)=><button key={i} onClick={()=>{setActive(i);setMetrics(null);setStatus("")}}>{i+1}</button>)}</div>
-    </section>
-  </main>
+
+      <section className="panel" style={{ marginTop: 18, padding: 26 }}>
+        <p className="eyebrow">{phrase.focus} · phrase {(index % phrases.length) + 1}/{phrases.length}</p>
+        <h2 style={{ fontSize: 24, lineHeight: 1.5, margin: "8px 0 14px" }}>“{phrase.text}”</h2>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="button secondary" onClick={playTarget}>🔊 Hear British model</button>
+          {!listening ? (
+            <button className="button" onClick={listen}>🎙️ Record my attempt</button>
+          ) : (
+            <button className="button" style={{ background: "#ef4444" }} onClick={stop}>⏹ Stop</button>
+          )}
+          <button className="button secondary" onClick={nextPhrase}>Next phrase →</button>
+        </div>
+        {listening && <p className="subtle" style={{ marginTop: 12 }}>Listening… speak the full sentence clearly.</p>}
+        {unsupported && (
+          <div className="state-card error" style={{ marginTop: 12 }}>
+            Your browser does not support speech recognition. Use Chrome or Edge for scored practice — or practise with “Hear British model” and self-assess.
+          </div>
+        )}
+
+        {score && (
+          <section className="result-box" style={{ marginTop: 18 }} aria-label="Pronunciation score">
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <strong style={{ fontSize: 30 }}>{score.accuracy}%</strong>
+              <span>{score.accuracy >= 90 ? "Native-like clarity 🎯" : score.accuracy >= 80 ? "Very clear — polish the flagged words." : score.accuracy >= 50 ? "Understandable — work on the missing words." : "Let's try again — hear the model first."}</span>
+            </div>
+            {score.missing.length > 0 && (
+              <p style={{ marginTop: 8 }}><strong>Words we didn't hear:</strong> {score.missing.map((w, i) => <span key={`${w}-${i}`} className="streak-pill" style={{ marginRight: 6 }}>{w}</span>)}</p>
+            )}
+            {score.extra.length > 0 && (
+              <p className="subtle" style={{ marginTop: 4 }}>Extra words spoken: {score.extra.slice(0, 8).join(", ")}</p>
+            )}
+            <p className="subtle" style={{ marginTop: 8 }}>You said: “{transcript}”{saved ? " · saved to your learner model ✓" : ""}</p>
+          </section>
+        )}
+      </section>
+
+      <section className="panel" style={{ marginTop: 16, padding: 20 }}>
+        <div className="panel-title"><h3>How scoring works</h3></div>
+        <p className="subtle" style={{ lineHeight: 1.7, margin: 0 }}>
+          Your speech is recognised with British-English models, then aligned word-by-word against the target.
+          Every target word heard in order raises your score; extra words reduce it slightly. Same rules for everyone — no black box.
+          Scoring uses browser speech recognition and does not claim phoneme-level pronunciation accuracy.
+        </p>
+      </section>
+    </main>
+  );
 }
