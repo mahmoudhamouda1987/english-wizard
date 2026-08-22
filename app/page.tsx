@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ThemeToggle } from "@/app/components/theme-toggle";
+
+export const metadata: Metadata = {
+  title: "Most apps measure streaks. We prove progress.",
+  description: "Adaptive CEFR placement, an AI tutor that remembers your mistakes for months, reality checkpoints scored against authentic rubrics - and progress you can hear, show and verify.",
+};
 
 const PROOF_POINTS = [
   { icon: "⏳", title: "Hear yourself improve", text: "Record the same sentence today and in three months — then play your past self beside your present self. Progress you can hear, not a score in a game.", href: "/onboarding", cta: "Try it" },

@@ -4,8 +4,20 @@ import { ServiceWorkerRegister } from "./components/service-worker-register";
 import { TextSizeControl } from "./components/text-size-control";
 
 export const metadata: Metadata = {
-  title: "English Wizard",
-  description: "Adaptive AI English learning platform — prove your progress, not just your streak.",
+  title: { default: "English Wizard — Prove your progress", template: "%s · English Wizard" },
+  description: "Adaptive AI English learning platform — CEFR placement, a tutor that remembers you, verifiable certificates and progress you can hear.",
+  openGraph: {
+    title: "English Wizard — Prove your progress",
+    description: "CEFR Pre-A1 to C2, AI tutor with persistent memory, reality checkpoints and QR-verifiable certificates.",
+    type: "website",
+    images: ["/og-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "English Wizard — Prove your progress",
+    description: "Most apps measure streaks. We prove progress.",
+    images: ["/og-image.png"],
+  },
   appleWebApp: { capable: true, title: "English Wizard", statusBarStyle: "black-translucent" },
   icons: {
     icon: [
