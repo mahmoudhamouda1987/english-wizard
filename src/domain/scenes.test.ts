@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LEARNING_SCENES, sceneById, sceneForLesson, dictationForLevel, fullSceneSetForLesson } from "./scenes";
+import { LEARNING_SCENES, sceneForLesson, dictationForLevel, fullSceneSetForLesson } from "./scenes";
 import { LESSON_MATERIALS } from "./lesson-materials";
 import { MVP_LESSONS } from "./curriculum";
 import { dictationItemsForLevel, dictationBankSize } from "./dictation-bank";

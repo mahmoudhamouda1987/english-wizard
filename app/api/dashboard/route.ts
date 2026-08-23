@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/src/infrastructure/auth";
 import { getProfile } from "@/src/infrastructure/profile-repository";
-import { getLearnerState } from "@/src/infrastructure/learner-repository";
+import { getLearnerState, saveLearnerState } from "@/src/infrastructure/learner-repository";
+import { healLearnerStateForCurriculum, type CurriculumRef } from "@/src/domain/curriculum-heal";
+import { MVP_LESSONS } from "@/src/domain/curriculum";
 import { query } from "@/src/infrastructure/database";
 
 export const dynamic = "force-dynamic";
+
+const CURRICULUM: CurriculumRef[] = MVP_LESSONS.map(({ id, objectiveId }) => ({ id, objectiveId }));
 
 interface EventRow { occurred_at: Date | string; payload: Record<string, unknown>; event_type: string }
 
@@ -12,7 +16,7 @@ export async function GET() {
   const session = await currentUser();
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-  const [profile, state, eventsRes, reviewsRes] = await Promise.all([
+  const [profile, loadedState, eventsRes, reviewsRes] = await Promise.all([
     getProfile(session.learnerId),
     getLearnerState(session.learnerId),
     query<EventRow>(
@@ -23,6 +27,8 @@ export async function GET() {
     ),
     query<{ count: string }>("SELECT COUNT(*)::text AS count FROM review_cards WHERE learner_id=$1 AND due_at <= NOW()", [session.learnerId]),
   ]);
+  const healed = loadedState ? healLearnerStateForCurriculum(loadedState, CURRICULUM) : null;
+  const state = healed ? await saveLearnerState(healed) : loadedState;
 
   const rows = eventsRes.rows;
   const dayKey = (d: Date | string) => new Date(d).toISOString().slice(0, 10);

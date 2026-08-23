@@ -18,7 +18,8 @@ export default function LearningPathPage() {
       const p = await r.json();
       if (!r.ok) throw new Error(p.error);
       setDone(p.state?.completedLessonIds ?? []);
-      setCurrent(p.state?.currentLessonId ?? null);
+      const rawCurrent = p.state?.currentLessonId ?? null;
+      setCurrent(rawCurrent && ordered.some(l => l.id === rawCurrent) ? rawCurrent : null);
     }).catch(() => setError("Sign in and complete onboarding to see your path."));
   }, []);
 
