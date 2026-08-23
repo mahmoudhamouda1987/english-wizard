@@ -51,7 +51,7 @@ export default function LearnPage(){
     <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
       {materialsFor(lesson.id)!.vocab.map(w=>(
         <span key={w.word} className="chip" style={{fontSize:14,padding:"6px 10px"}}>
-          {w.word} <span dir="rtl" className="subtle">· {w.ar}</span>
+          {w.word} <span dir="rtl" style={{opacity:.85}}>· {w.ar}</span>
           <button type="button" onClick={()=>speakText(w.word,{lang:"en-GB",rate:0.85})} aria-label={`Listen to ${w.word}`} style={{marginLeft:6,cursor:"pointer"}}>🔊</button>
         </span>
       ))}

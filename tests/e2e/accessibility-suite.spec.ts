@@ -71,5 +71,6 @@ test("audio learning surfaces expose visible transcripts and accessible audio co
   await expect(page.getByRole("heading", { name: /Conversation transcript/i })).toBeVisible();
 
   await page.goto("/pronunciation");
-  await expect(page.getByRole("button", { name: "Play phrase" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Hear British model/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Record my attempt/ })).toBeVisible();
 });
