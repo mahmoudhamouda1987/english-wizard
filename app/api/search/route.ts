@@ -4,6 +4,7 @@ import { LESSON_MATERIALS } from "@/src/domain/lesson-materials";
 import { GLOSSARY_AR_1 } from "@/src/domain/glossary-ar-1";
 import { GLOSSARY_AR_2 } from "@/src/domain/glossary-ar-2";
 import { LEARNING_CHUNKS } from "@/src/domain/chunks";
+import { LEARNING_SCENES } from "@/src/domain/scenes";
 import { ROLEPLAY_SCENARIOS } from "@/src/domain/roleplay";
 
 export const dynamic = "force-dynamic";
@@ -32,12 +33,10 @@ export async function GET(request: Request) {
     .slice(0, 4)
     .map((s) => ({ kind: "Role-play", title: s.title, meta: s.situation, href: `/roleplay` }));
 
-  const external = [
-    { kind: "British Council", title: `Search “${q}” on LearnEnglish`, meta: "UK CEFR-graded materials", href: `https://learnenglish.britishcouncil.org/search?query=${encodeURIComponent(q)}` },
-    { kind: "BBC", title: `“${q}” on BBC Learning English`, meta: "Real-world audio & video", href: `https://www.bbc.co.uk/learningenglish/english/search?q=${encodeURIComponent(q)}` },
-    { kind: "Cambridge", title: `Free activities for “${q}”`, meta: "Cambridge English practice", href: `https://www.cambridgeenglish.org/learning-english/games-social/` },
-  ];
+  const scenes = LEARNING_SCENES.filter((s) => `${s.title} ${s.setting} ${s.topics.join(" ")}`.toLowerCase().includes(q))
+    .slice(0, 4)
+    .map((s) => ({ kind: "Scene", title: s.title, meta: `${s.levels.join(", ")} · animated dialogue`, href: `/scenes?scene=${encodeURIComponent(s.id)}` }));
 
-  const total = lessons.length + words.length + chunks.length + scenarios.length;
-  return NextResponse.json({ query: q, total, lessons, words, chunks, scenarios, external });
+  const total = lessons.length + words.length + chunks.length + scenarios.length + scenes.length;
+  return NextResponse.json({ query: q, total, lessons, words, chunks, scenarios, scenes });
 }

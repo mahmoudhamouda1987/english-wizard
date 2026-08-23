@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { PageHero } from "@/app/components/page-hero";
 
 interface Hit { kind: string; title: string; meta: string; href: string }
-interface Results { query: string; total: number; lessons: Hit[]; words: Hit[]; chunks: Hit[]; scenarios: Hit[]; external: Hit[] }
+interface Results { query: string; total: number; lessons: Hit[]; words: Hit[]; chunks: Hit[]; scenarios: Hit[]; scenes: Hit[] }
 
 function SearchInner() {
   const params = useSearchParams();
@@ -37,7 +37,7 @@ function SearchInner() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="🔎" title="Search everything" sub="Lessons, words with Arabic, chunks and role-plays — plus trusted UK sources, all in one place." />
+      <PageHero icon="🔎" title="Search everything" sub="Lessons, words with Arabic, animated scenes, chunks and role-plays — all generated inside the platform, nothing links out." />
       <form
         onSubmit={(e) => { e.preventDefault(); window.location.href = `/search?q=${encodeURIComponent(input.trim())}`; }}
         style={{ display: "flex", gap: 8, marginTop: 16 }}
@@ -48,15 +48,15 @@ function SearchInner() {
 
       {!q && <div className="state-card" style={{ marginTop: 16 }}>Type something above — or try the dashboard search box (Ctrl K).</div>}
       {q && data && data.total === 0 && (
-        <div className="state-card" style={{ marginTop: 16 }}>No local matches for “{q}”. The trusted sources below will still have it.</div>
+        <div className="state-card warning" style={{ marginTop: 16 }}>No matches inside the platform for “{q}” yet. Everything you find here is generated in-platform — try a shorter word.</div>
       )}
       {data && (
         <>
           {group(`Lessons (${data.lessons.length})`, data.lessons)}
           {group("Words with Arabic", data.words)}
+          {group("Scenes", data.scenes)}
           {group("Chunks", data.chunks)}
           {group("Role-plays", data.scenarios)}
-          {group("Trusted external sources", data.external)}
         </>
       )}
     </main>

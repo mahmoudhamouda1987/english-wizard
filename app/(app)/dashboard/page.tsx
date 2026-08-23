@@ -159,6 +159,7 @@ export default function DashboardPage() {
   }
 
   const planItems = [
+    { icon: "🎬", label: "Scene Studio", href: "/scenes" },
     { icon: "🔤", label: "Vocabulary", href: "/vocabulary" },
     { icon: "👂", label: "Listening (English Ear)", href: "/english-ear" },
     { icon: "🎙️", label: "Speaking (Say It Better)", href: "/say-it-better" },

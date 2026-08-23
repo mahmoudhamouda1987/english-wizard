@@ -450,3 +450,6 @@ html[data-theme="dark"] .session-card,
 html[data-theme="dark"] .continue-card { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .bubble-tutor,
 html[data-theme="dark"] .ladder-step { background: var(--surface); border-color: var(--border); }
+
+.state-card.warning { border-color:#e8d3a0; color:#7a5a12; background:#fffaec; }
+html[data-theme="dark"] .state-card.warning { background:#2b2413; border-color:#6b5518; color:#fde68a; }

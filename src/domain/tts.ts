@@ -46,6 +46,11 @@ export function speakText(
   window.speechSynthesis.speak(utterance);
 }
 
+export function stopSpeaking(): void {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+}
+
 /** Speech-recognition locale for learner input: British English. */
 export const RECOGNITION_LANG = "en-GB";
 

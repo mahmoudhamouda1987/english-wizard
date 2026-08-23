@@ -32,6 +32,7 @@ const NAV: Array<{ section?: string; items: Array<{ icon: string; label: string;
   ] },
   { section: "Skills", items: [
     { icon: "👂", label: "English Ear", href: "/english-ear" },
+    { icon: "🎬", label: "Scenes", href: "/scenes" },
     { icon: "📖", label: "Reading Engine", href: "/reading" },
     { icon: "✍️", label: "Writing", href: "/writing" },
     { icon: "🔤", label: "Vocabulary", href: "/vocabulary" },
