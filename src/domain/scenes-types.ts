@@ -13,6 +13,8 @@ export interface SceneQuizItem { q: string; choices: string[]; answer: number }
 
 export interface LearningScene {
   id: string;
+  /** Curriculum lessons this scene was written for (exact match beats topic matching). */
+  lessonIds?: string[];
   title: string;
   levels: CEFRLevel[];
   topics: string[];

@@ -8,6 +8,7 @@ import { speakText } from "@/src/domain/tts";
 import { ScenePlayer } from "@/app/components/scene-player";
 import { ListeningLab } from "@/app/components/listening-lab";
 import { sceneForLesson, dictationForLevel } from "@/src/domain/scenes";
+import { practiceForLesson } from "@/src/domain/practice-generator";
 import { UpgradePrompt, parseUpgradePayload } from "@/app/components/upgrade-prompt";
 interface LearnerState{currentLessonId:string|null;completedLessonIds:string[];nextAction:{type:string;id:string;reason?:string;priority?:string}|null}
 interface Lesson{id:string;title:string;mission:string;objectiveId:string;level:string;skill:string}
@@ -69,7 +70,7 @@ function MaterialsTabs({lesson}:{lesson:Lesson}){
     </>
    )}
    {tab==="listen"&&<ListeningLab items={dictationForLevel(lesson.level)} />}
-   {tab==="practice"&&(mats?<QuickPractice exercises={mats.exercises}/>:<p>No practice items yet.</p>)}
+   {tab==="practice"&&(<><QuickPractice exercises={practiceForLesson(lesson.id)} /><p className="subtle" style={{marginBottom:0}}>{practiceForLesson(lesson.id).length} exercises generated for your level — every set is drawn from this lesson level band.</p></>)}
   </section>
  );
 }
