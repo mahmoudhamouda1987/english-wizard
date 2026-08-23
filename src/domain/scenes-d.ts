@@ -4,7 +4,7 @@ import type { LearningScene } from "./scenes-types";
 export const SCENES_D: LearningScene[] = [
   {
     id: "a1-listening-needs",
-    lessonIds: ["lesson-a1-listening"],
+    lessonIds: [],
     title: "What do they need?",
     levels: ["A1"],
     topics: ["listening", "intent", "requests", "everyday exchanges"],
@@ -28,7 +28,7 @@ export const SCENES_D: LearningScene[] = [
   },
   {
     id: "a2-interactions-pharmacy",
-    lessonIds: ["lesson-a2-interactions"],
+    lessonIds: ["lesson-05-health-body"],
     title: "Everyday errand: the pharmacy",
     levels: ["A2"],
     topics: ["shopping", "services", "pharmacy", "transactions", "health"],
@@ -54,7 +54,7 @@ export const SCENES_D: LearningScene[] = [
   },
   {
     id: "a2-past-weekend",
-    lessonIds: ["lesson-a2-past"],
+    lessonIds: ["lesson-07-past-experiences"],
     title: "So, what did you do?",
     levels: ["A2"],
     topics: ["past events", "weekend", "past simple", "time markers"],
@@ -79,7 +79,7 @@ export const SCENES_D: LearningScene[] = [
   },
   {
     id: "a2-messages-invite",
-    lessonIds: ["lesson-a2-messages"],
+    lessonIds: ["lesson-06-people-social-life"],
     title: "Writing a short invitation",
     levels: ["A2"],
     topics: ["writing", "messages", "invitation", "notes"],
@@ -105,7 +105,7 @@ export const SCENES_D: LearningScene[] = [
   },
   {
     id: "a2-listening-lost-bag",
-    lessonIds: ["lesson-a2-listening"],
+    lessonIds: ["lesson-12-travel-international"],
     title: "Following the details",
     levels: ["A2"],
     topics: ["listening", "main idea", "details", "lost property"],
@@ -131,7 +131,7 @@ export const SCENES_D: LearningScene[] = [
   },
   {
     id: "b1-conversation-networking",
-    lessonIds: ["lesson-b1-conversation"],
+    lessonIds: ["lesson-13-relationships-behaviour"],
     title: "An independent conversation",
     levels: ["B1"],
     topics: ["conversation", "follow-up questions", "work", "social", "fluency"],

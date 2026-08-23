@@ -133,7 +133,7 @@ export default function SpeakingCoachPage() {
               <span>{score.accuracy >= 90 ? "Native-like clarity 🎯" : score.accuracy >= 80 ? "Very clear — polish the flagged words." : score.accuracy >= 50 ? "Understandable — work on the missing words." : "Let's try again — hear the model first."}</span>
             </div>
             {score.missing.length > 0 && (
-              <p style={{ marginTop: 8 }}><strong>Words we didn't hear:</strong> {score.missing.map((w, i) => <span key={`${w}-${i}`} className="streak-pill" style={{ marginRight: 6 }}>{w}</span>)}</p>
+              <p style={{ marginTop: 8 }}><strong>Words we didn&rsquo;t hear:</strong> {score.missing.map((w, i) => <span key={`${w}-${i}`} className="streak-pill" style={{ marginRight: 6 }}>{w}</span>)}</p>
             )}
             {score.extra.length > 0 && (
               <p className="subtle" style={{ marginTop: 4 }}>Extra words spoken: {score.extra.slice(0, 8).join(", ")}</p>

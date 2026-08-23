@@ -44,8 +44,9 @@ function MaterialsTabs({lesson,completedLessonIds}:{lesson:Lesson;completedLesso
  const mats=materialsFor(lesson.id);
  const sceneSet=useMemo(()=>fullSceneSetForLesson(lesson.id),[lesson.id]);
  const mission=useMemo(()=>missionFor(lesson.id),[lesson.id]);
- const recycleFrom=useMemo(()=>completedLessonIds.slice(-4),[completedLessonIds]);
- const practiceSet=useMemo(()=>practiceForLesson(lesson.id,recycleFrom),[lesson.id,recycleFrom.join(",")]);
+  const recycleFrom=useMemo(()=>completedLessonIds.slice(-4),[completedLessonIds]);
+  const recycleKey=recycleFrom.join(",");
+  const practiceSet=useMemo(()=>practiceForLesson(lesson.id,recycleKey?recycleKey.split(","):[]),[lesson.id,recycleKey]);
  const scene=sceneSet[Math.min(sceneIdx,sceneSet.length-1)]??sceneSet[0];
  const tabs:Array<[typeof tab,string,string]>=[["mission","🧭","Mission"],["words","🔑","Key words"],["scene",`🎬 Scenes (${sceneSet.length})`,"Scenes"],["listen",`🎧 Listening`,"Listening lab"],["practice","🧠","Practice"]];
  return (
@@ -62,7 +63,7 @@ function MaterialsTabs({lesson,completedLessonIds}:{lesson:Lesson;completedLesso
      <div><p className="eyebrow" style={{margin:"0 0 6px"}}>Life topics in this lesson</p>
       <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{mission.topicTitles.map(t=><span key={t} className="chip">{t}</span>)}{mission.ladderExamples.map((ex,i)=><span key={i} className="chip" style={{opacity:.85}} dir="ltr">“{ex}”</span>)}</div>
      </div>
-     <div><p className="eyebrow" style={{margin:"0 0 4px"}}>You'll meet (recurring characters)</p>
+      <div><p className="eyebrow" style={{margin:"0 0 4px"}}>You&rsquo;ll meet (recurring characters)</p>
       <ul style={{margin:0,paddingLeft:20,lineHeight:1.8}}>{mission.cast.map(c=><li key={c}>{c}</li>)}</ul>
      </div>
      <div style={{padding:14,background:"#f6f2ff",borderRadius:12}}>

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
   const turnCount = Math.max(0, Number(body?.userTurnCount ?? history.filter((h) => h.role === "user").length));
   let reply = await aiReply(scenario, level, history, message, memoryLine);
-  let engine: "ai" | "scripted" = reply ? "ai" : "scripted";
+  const engine: "ai" | "scripted" = reply ? "ai" : "scripted";
   if (!reply) reply = scriptedReply(scenario, turnCount);
 
   // Target-phrase coaching: which scenario phrases did the learner attempt?

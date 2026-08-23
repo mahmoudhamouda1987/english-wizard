@@ -33,7 +33,7 @@ export default function PricingPage() {
       <header className="site-header">
         <Link className="site-brand" href="/"><img src="/logo.png" alt="English Wizard logo" width={38} height={38} /> English Wizard</Link>
         <nav className="site-nav" aria-label="Site">
-          <a href="/#how">How it works</a>
+          <Link href="/#how">How it works</Link>
           <a className="primary" href="/onboarding">Start learning</a>
           <ThemeToggle />
         </nav>

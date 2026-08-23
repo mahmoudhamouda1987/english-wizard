@@ -40,9 +40,9 @@ describe("learning scenes (x20 expansion)", () => {
   });
 
   it("sceneForLesson prefers the exact lesson-bound scene", () => {
-    const lesson = MVP_LESSONS.find((l) => l.id === "lesson-b1-conversation")!;
+    const lesson = MVP_LESSONS.find((l) => l.id === "lesson-15-media-entertainment")!;
     const scene = sceneForLesson(lesson);
-    expect(scene.lessonIds).toContain("lesson-b1-conversation");
+    expect(scene.lessonIds).toContain("lesson-15-media-entertainment");
   });
 
   it("covers the full CEFR range with at least one scene per level", () => {
@@ -84,8 +84,8 @@ describe("learning scenes (x20 expansion)", () => {
   });
 
   it("each lesson draws its own distinct 20-item dictation round", () => {
-    const a = dictationForLevel("A2", 20, "lesson-a2-interactions").map((i) => i.text);
-    const b = dictationForLevel("A2", 20, "lesson-a2-past").map((i) => i.text);
+    const a = dictationForLevel("A2", 20, "lesson-06-people-social-life").map((i) => i.text);
+    const b = dictationForLevel("A2", 20, "lesson-07-past-experiences").map((i) => i.text);
     expect(a).toHaveLength(20);
     expect(b).toHaveLength(20);
     const overlap = a.filter((t) => b.includes(t)).length;

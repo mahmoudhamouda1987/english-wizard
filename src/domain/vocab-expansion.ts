@@ -7,39 +7,27 @@ import type { GlossEntry } from "./glossary-ar-1";
 import { GLOSSARY_AR_1 } from "./glossary-ar-1";
 import { GLOSSARY_AR_2 } from "./glossary-ar-2";
 import type { CEFRLevel } from "./learner";
+import { LESSON_TOPIC_MAP, LIFE_TOPICS } from "./topics";
 
 const GLOSSARIES: Record<string, GlossEntry> = { ...GLOSSARY_AR_1, ...GLOSSARY_AR_2 };
 
-const TOPICAL: Record<string, string[]> = {
-  "lesson-prea1-survival": ["water", "bread", "tea", "cake", "buy", "eat", "drink", "food"],
-  "lesson-prea1-sounds": ["pen", "book", "shop", "bus", "station", "cafe"],
-  "lesson-prea1-reading": ["book", "read", "school", "student", "english", "practice"],
-  "lesson-prea1-listening": ["listen", "speak", "hello", "name", "teacher", "question", "answer"],
-  "lesson-a1-self-introduction": ["name", "friend", "family", "speak", "meet", "hello", "welcome", "colleague"],
-  "lesson-a1-routines": ["wake", "sleep", "breakfast", "lunch", "dinner", "work", "school", "morning", "evening", "night"],
-  "lesson-a1-questions": ["question", "answer", "know", "think", "speak", "talk", "learn", "teach", "write", "read"],
-  "lesson-a1-listening": ["listen", "speak", "slow", "easy", "important", "practice", "understand"],
-  "lesson-a2-interactions": ["excuse", "sorry", "welcome", "help", "wait", "call", "meet", "talk", "invite"],
-  "lesson-a2-past": ["yesterday", "week", "month", "arrive", "start", "finish", "change", "choose"],
-  "lesson-a2-messages": ["send", "call", "email", "meet", "invite", "wait", "explain", "remember", "forget"],
-  "lesson-a2-listening": ["listen", "understand", "slow", "fast", "question", "example", "mistake", "practice"],
-  "lesson-b1-conversation": ["talk", "speak", "opinion", "idea", "think", "know", "recommend", "invite", "explain"],
-  "lesson-b1-writing": ["write", "email", "report", "example", "mistake", "improve", "plan"],
-  "lesson-b1-listening": ["listen", "understand", "explain", "example", "evidence", "progress"],
-  "lesson-b1-reading": ["read", "book", "english", "learn", "understand", "improve", "goal"],
-  "lesson-b2-argument": ["opinion", "reason", "evidence", "decide", "think", "important", "difficult"],
-  "lesson-b2-writing": ["write", "report", "deadline", "manager", "project", "team", "improve", "reliable"],
-  "lesson-b2-listening": ["listen", "understand", "explain", "evidence", "reason", "opinion"],
-  "lesson-b2-reading": ["read", "evidence", "understand", "important", "idea", "know"],
-  "lesson-c1-discussion": ["opinion", "reason", "evidence", "decide", "recommend", "confident", "reliable"],
-  "lesson-c1-writing": ["write", "report", "deadline", "project", "manager", "explain", "recommend", "apologise"],
-  "lesson-c1-listening": ["understand", "explain", "evidence", "opinion", "reason", "progress"],
-  "lesson-c1-reading": ["read", "evidence", "understand", "important", "difficult", "goal"],
-  "lesson-c2-speaking": ["opinion", "confident", "generous", "reliable", "convenient", "complain", "apologise"],
-  "lesson-c2-writing": ["write", "report", "deadline", "evidence", "explain", "recommend", "apologise"],
-  "lesson-c2-listening": ["understand", "explain", "evidence", "opinion", "reason"],
-  "lesson-c2-reading": ["read", "evidence", "understand", "know", "important"],
-};
+/** Topical top-up keys per lesson, derived live from each lesson's own topics' curated vocabulary. */
+const TOPICAL: Record<string, string[]> = Object.fromEntries(
+  Object.entries(LESSON_TOPIC_MAP).map(([lessonId, ids]) => {
+    const words = new Set<string>();
+    for (const id of ids) {
+      const topic = LIFE_TOPICS.find((t) => t.id === id);
+      if (!topic) continue;
+      for (const raw of topic.vocab) {
+        const key = raw.toLowerCase().replace(/[.!?]$/, "").trim();
+        if (key.length <= 24 && GLOSSARIES[key]) words.add(key);
+        if (words.size >= 12) break;
+      }
+      if (words.size >= 12) break;
+    }
+    return [lessonId, [...words]];
+  }),
+);
 
 const BAND_POOLS: Record<CEFRLevel, string[]> = {
   "Pre-A1": ["hello", "hi", "goodbye", "please", "thanks", "sorry", "yes", "no", "welcome", "excuse", "water", "bread", "tea", "cake", "food", "home", "family", "friend", "help", "eat", "drink", "buy", "morning", "night", "day", "today"],

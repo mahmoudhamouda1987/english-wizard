@@ -4,7 +4,7 @@ import type { LearningScene } from "./scenes-types";
 export const SCENES_C: LearningScene[] = [
   {
     id: "prea1-survival-hello",
-    lessonIds: ["lesson-prea1-survival"],
+    lessonIds: ["lesson-01-me-my-world"],
     title: "First words at school",
     levels: ["Pre-A1"],
     topics: ["greetings", "survival", "numbers", "classroom"],
@@ -31,7 +31,7 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "prea1-sounds-sounds",
-    lessonIds: ["lesson-prea1-sounds"],
+    lessonIds: [],
     title: "Listening for sounds",
     levels: ["Pre-A1"],
     topics: ["sounds", "pronunciation", "letters", "listening"],
@@ -57,7 +57,7 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "prea1-reading-signs",
-    lessonIds: ["lesson-prea1-reading"],
+    lessonIds: [],
     title: "Reading the street",
     levels: ["Pre-A1"],
     topics: ["reading", "signs", "labels", "city"],
@@ -82,9 +82,9 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "prea1-listening-cafe-word",
-    lessonIds: ["lesson-prea1-listening"],
+    lessonIds: ["lesson-03-food-shopping-services"],
     title: "Catch the key word",
-    levels: ["Pre-A1"],
+    levels: ["A1"],
     topics: ["listening", "numbers", "requests", "café"],
     setting: "Ordering at a busy market stall",
     prop: "🥤",
@@ -107,9 +107,9 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "a1-intro-first-day",
-    lessonIds: ["lesson-a1-self-introduction"],
+    lessonIds: ["lesson-10-work-careers"],
     title: "Your first introduction",
-    levels: ["A1"],
+    levels: ["A2"],
     topics: ["introduce yourself", "name", "job", "origin", "interests"],
     setting: "A new colleague's first day at the office",
     prop: "🪪",
@@ -134,7 +134,7 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "a1-routines-morning",
-    lessonIds: ["lesson-a1-routines"],
+    lessonIds: ["lesson-02-home-everyday-life"],
     title: "Talking about your day",
     levels: ["A1"],
     topics: ["routine", "present simple", "every day", "times"],
@@ -161,7 +161,7 @@ export const SCENES_C: LearningScene[] = [
   },
   {
     id: "a1-questions-smalltalk",
-    lessonIds: ["lesson-a1-questions"],
+    lessonIds: ["lesson-04-places-getting-around"],
     title: "Keeping the chat going",
     levels: ["A1"],
     topics: ["questions", "small talk", "who what where", "conversation"],

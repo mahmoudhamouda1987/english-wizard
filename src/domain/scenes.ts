@@ -6,6 +6,7 @@ import { SCENES_D } from "./scenes-d";
 import { SCENES_E } from "./scenes-e";
 import { SCENES_F } from "./scenes-f";
 import { SCENES_G } from "./scenes-g";
+import { SCENES_H } from "./scenes-h";
 import type { CEFRLevel } from "./learner";
 import type { LearningScene } from "./scenes-types";
 import { dictationItemsForLevel } from "./dictation-bank";
@@ -14,7 +15,7 @@ export type { LearningScene, SceneLine, SceneQuizItem } from "./scenes-types";
 
 const LEVEL_ORDER: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 
-export const LEARNING_SCENES = [...SCENES_A, ...SCENES_B, ...SCENES_C, ...SCENES_D, ...SCENES_E, ...SCENES_F, ...SCENES_G];
+export const LEARNING_SCENES = [...SCENES_A, ...SCENES_B, ...SCENES_C, ...SCENES_D, ...SCENES_E, ...SCENES_F, ...SCENES_G, ...SCENES_H];
 
 export function sceneById(id: string): import("./scenes-types").LearningScene | undefined {
   return LEARNING_SCENES.find((s) => s.id === id);

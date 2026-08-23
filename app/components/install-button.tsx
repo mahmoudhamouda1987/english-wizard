@@ -23,7 +23,9 @@ export function InstallButton() {
     }
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
-    if (window.matchMedia("(display-mode: standalone)").matches) setInstalled(true);
+    void Promise.resolve().then(() => {
+      if (window.matchMedia("(display-mode: standalone)").matches) setInstalled(true);
+    });
     return () => {
       window.removeEventListener("beforeinstallprompt", onPrompt);
       window.removeEventListener("appinstalled", onInstalled);

@@ -8,7 +8,7 @@ import { LESSON_BODIES } from "./lesson-bodies";
 import { LESSON_MATERIALS } from "./lesson-materials";
 import { sceneForLesson } from "./scenes";
 import { MVP_LESSONS } from "./curriculum";
-import type { MaterialExercise } from "./lesson-materials-a";
+import type { MaterialExercise } from "./lesson-materials";
 import type { CommunicationFunction } from "./chunks";
 
 const FUNCTION_LABELS: Record<CommunicationFunction, string> = {

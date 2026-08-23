@@ -19,7 +19,13 @@ export default function CheckpointsPage() {
     const r = await fetch("/api/checkpoints", { cache: "no-store" });
     if (r.ok) setData(await r.json());
   }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/checkpoints", { cache: "no-store" })
+      .then(async (r) => { if (alive && r.ok) setData((await r.json()) as Data); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   function toggleRubric(id: string) {
     setChecked((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));

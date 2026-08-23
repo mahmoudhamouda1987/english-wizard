@@ -4,7 +4,7 @@ import type { LearningScene } from "./scenes-types";
 export const SCENES_G: LearningScene[] = [
   {
     id: "c2-speaking-diplomacy",
-    lessonIds: ["lesson-c2-speaking"],
+    lessonIds: ["lesson-25-advanced-ideas"],
     title: "Precision in delicate company",
     levels: ["C2"],
     topics: ["speaking", "precision", "nuance", "diplomacy", "negotiation"],
@@ -29,7 +29,7 @@ export const SCENES_G: LearningScene[] = [
   },
   {
     id: "c2-writing-speech",
-    lessonIds: ["lesson-c2-writing"],
+    lessonIds: ["lesson-27-academic-professional-mastery"],
     title: "Register, rhythm, rhetoric",
     levels: ["C2"],
     topics: ["writing", "register", "rhetoric", "speech", "style"],
@@ -55,7 +55,7 @@ export const SCENES_G: LearningScene[] = [
   },
   {
     id: "c2-listening-spin-room",
-    lessonIds: ["lesson-c2-listening"],
+    lessonIds: ["lesson-26-advanced-argumentation"],
     title: "Everything that matters, at speed",
     levels: ["C2"],
     topics: ["listening", "fast speech", "idiom", "register shifts", "inference"],
@@ -81,7 +81,7 @@ export const SCENES_G: LearningScene[] = [
   },
   {
     id: "c2-reading-subtext",
-    lessonIds: ["lesson-c2-reading"],
+    lessonIds: ["lesson-28-real-world-mastery"],
     title: "Sophisticated texts, decoded",
     levels: ["C2"],
     topics: ["reading", "subtext", "rhetoric", "style", "interpretation"],

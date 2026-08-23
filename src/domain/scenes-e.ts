@@ -4,7 +4,7 @@ import type { LearningScene } from "./scenes-types";
 export const SCENES_E: LearningScene[] = [
   {
     id: "b1-writing-opinion",
-    lessonIds: ["lesson-b1-writing"],
+    lessonIds: [],
     title: "Drafting an opinion paragraph",
     levels: ["B1"],
     topics: ["writing", "opinion", "paragraphs", "linking words"],
@@ -31,7 +31,7 @@ export const SCENES_E: LearningScene[] = [
   },
   {
     id: "b1-listening-training-change",
-    lessonIds: ["lesson-b1-listening"],
+    lessonIds: [],
     title: "Catching real points in fast chat",
     levels: ["B1"],
     topics: ["listening", "authentic speech", "main points", "details"],
@@ -57,7 +57,7 @@ export const SCENES_E: LearningScene[] = [
   },
   {
     id: "b1-reading-article",
-    lessonIds: ["lesson-b1-reading"],
+    lessonIds: ["lesson-15-media-entertainment"],
     title: "Reading an article together",
     levels: ["B1"],
     topics: ["reading", "articles", "main idea", "details", "purpose"],
@@ -84,7 +84,7 @@ export const SCENES_E: LearningScene[] = [
   },
   {
     id: "b2-argument-debate",
-    lessonIds: ["lesson-b2-argument"],
+    lessonIds: ["lesson-19-problem-solving-decisions"],
     title: "Defending your position",
     levels: ["B2"],
     topics: ["argumentation", "debate", "counterpoints", "evidence"],
@@ -111,7 +111,7 @@ export const SCENES_E: LearningScene[] = [
   },
   {
     id: "b2-writing-report",
-    lessonIds: ["lesson-b2-writing"],
+    lessonIds: ["lesson-18-professional-communication"],
     title: "Structuring a professional report",
     levels: ["B2"],
     topics: ["writing", "report", "structure", "tone", "evidence"],
@@ -138,7 +138,7 @@ export const SCENES_E: LearningScene[] = [
   },
   {
     id: "b2-listening-meeting-flow",
-    lessonIds: ["lesson-b2-listening"],
+    lessonIds: ["lesson-17-business-economy"],
     title: "Keeping up with the discussion",
     levels: ["B2"],
     topics: ["listening", "extended speech", "arguments", "implication"],

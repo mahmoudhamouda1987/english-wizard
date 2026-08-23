@@ -28,18 +28,18 @@ export interface AdaptiveDiagnosticState {
 }
 
 export const DEFAULT_ADAPTIVE_ITEMS: DiagnosticItem[] = [
-  { id: "q1", skill: "grammar", difficulty: 1, objectiveId: "a1-present-simple-routines", correct: "am" },
-  { id: "q2", skill: "vocabulary", difficulty: 1, objectiveId: "a1-self-introduction-speaking", correct: "appointment" },
-  { id: "q3", skill: "reading", difficulty: 1, objectiveId: "a1-self-introduction-speaking", correct: "meet him" },
-  { id: "q4", skill: "listening", difficulty: 1.5, objectiveId: "a1-basic-listening-intent", correct: "station" },
-  { id: "q5", skill: "speaking", difficulty: 1, objectiveId: "a1-self-introduction-speaking", correct: "my name is" },
-  { id: "q6", skill: "writing", difficulty: 1, objectiveId: "a1-present-simple-routines", correct: "work" },
-  { id: "q7", skill: "grammar", difficulty: 2, objectiveId: "a2-past-events", correct: "went" },
-  { id: "q8", skill: "vocabulary", difficulty: 2, objectiveId: "a2-daily-interactions", correct: "schedule" },
-  { id: "q9", skill: "reading", difficulty: 2, objectiveId: "a2-main-idea", correct: "because" },
-  { id: "q10", skill: "listening", difficulty: 2, objectiveId: "a2-main-idea", correct: "tomorrow" },
-  { id: "q11", skill: "grammar", difficulty: 3.5, objectiveId: "b1-authentic-listening", correct: "have been" },
-  { id: "q12", skill: "vocabulary", difficulty: 3.5, objectiveId: "b1-opinion-writing", correct: "although" },
+  { id: "q1", skill: "grammar", difficulty: 1, objectiveId: "obj-01", correct: "am" },
+  { id: "q2", skill: "vocabulary", difficulty: 1, objectiveId: "obj-05", correct: "appointment" },
+  { id: "q3", skill: "reading", difficulty: 1, objectiveId: "obj-01", correct: "meet him" },
+  { id: "q4", skill: "listening", difficulty: 1.5, objectiveId: "obj-04", correct: "station" },
+  { id: "q5", skill: "speaking", difficulty: 1, objectiveId: "obj-01", correct: "my name is" },
+  { id: "q6", skill: "writing", difficulty: 1, objectiveId: "obj-10", correct: "work" },
+  { id: "q7", skill: "grammar", difficulty: 2, objectiveId: "obj-07", correct: "went" },
+  { id: "q8", skill: "vocabulary", difficulty: 2, objectiveId: "obj-11", correct: "schedule" },
+  { id: "q9", skill: "reading", difficulty: 2, objectiveId: "obj-13", correct: "because" },
+  { id: "q10", skill: "listening", difficulty: 2, objectiveId: "obj-08", correct: "tomorrow" },
+  { id: "q11", skill: "grammar", difficulty: 3.5, objectiveId: "obj-07", correct: "have been" },
+  { id: "q12", skill: "vocabulary", difficulty: 3.5, objectiveId: "obj-26", correct: "although" },
 ];
 
 export function updateDiagnosticEvidence(state: AdaptiveDiagnosticState, item: DiagnosticItem, answer: DiagnosticAnswer): AdaptiveDiagnosticState {

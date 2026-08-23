@@ -5,18 +5,18 @@ export interface DiagnosticAnswer { id: string; answer: string; }
 export interface DiagnosticProduction { writingSample?: string; speakingTranscript?: string; }
 
 const QUESTION_BANK: Array<{ id: string; skill: Skill; correct: string; objectiveId: string }> = [
-  { id: "q1", skill: "grammar", correct: "am", objectiveId: "a1-present-simple-routines" },
-  { id: "q2", skill: "vocabulary", correct: "appointment", objectiveId: "a1-self-introduction-speaking" },
-  { id: "q3", skill: "reading", correct: "meet him", objectiveId: "a1-self-introduction-speaking" },
-  { id: "q4", skill: "listening", correct: "station", objectiveId: "a1-basic-listening-intent" },
-  { id: "q5", skill: "speaking", correct: "my name is", objectiveId: "a1-self-introduction-speaking" },
-  { id: "q6", skill: "writing", correct: "work", objectiveId: "a1-present-simple-routines" },
-  { id: "q7", skill: "grammar", correct: "went", objectiveId: "a2-past-events" },
-  { id: "q8", skill: "vocabulary", correct: "schedule", objectiveId: "a2-daily-interactions" },
-  { id: "q9", skill: "reading", correct: "because", objectiveId: "a2-main-idea" },
-  { id: "q10", skill: "listening", correct: "tomorrow", objectiveId: "a2-main-idea" },
-  { id: "q11", skill: "grammar", correct: "have been", objectiveId: "b1-authentic-listening" },
-  { id: "q12", skill: "vocabulary", correct: "although", objectiveId: "b1-opinion-writing" },
+  { id: "q1", skill: "grammar", correct: "am", objectiveId: "obj-01" },
+  { id: "q2", skill: "vocabulary", correct: "appointment", objectiveId: "obj-05" },
+  { id: "q3", skill: "reading", correct: "meet him", objectiveId: "obj-01" },
+  { id: "q4", skill: "listening", correct: "station", objectiveId: "obj-04" },
+  { id: "q5", skill: "speaking", correct: "my name is", objectiveId: "obj-01" },
+  { id: "q6", skill: "writing", correct: "work", objectiveId: "obj-10" },
+  { id: "q7", skill: "grammar", correct: "went", objectiveId: "obj-07" },
+  { id: "q8", skill: "vocabulary", correct: "schedule", objectiveId: "obj-11" },
+  { id: "q9", skill: "reading", correct: "because", objectiveId: "obj-13" },
+  { id: "q10", skill: "listening", correct: "tomorrow", objectiveId: "obj-08" },
+  { id: "q11", skill: "grammar", correct: "have been", objectiveId: "obj-07" },
+  { id: "q12", skill: "vocabulary", correct: "although", objectiveId: "obj-26" },
 ];
 
 export const diagnosticQuestions = [

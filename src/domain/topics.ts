@@ -1,72 +1,60 @@
 /**
- * 100-topic life simulation curriculum engine.
+ * 150-topic master curriculum engine.
  *
- * The master topic library feeds the 28-lesson progression: each lesson owns a
- * coherent cluster of real-life topics, and every topic evolves across CEFR
- * levels through its ladder. Topics may be revisited at higher difficulty in
- * later lessons (see REVISITS), turning the library into a progression engine
- * rather than a flat list.
+ * Every topic declares its home lesson via `lessonId`, so LESSON_TOPIC_MAP is
+ * derived directly from the library (5 primary topics per lesson; the lesson-28
+ * capstone integrates the final 15). Topics evolve across CEFR levels through
+ * their ladder, and deliberate REVISITS bring earlier topics back at higher
+ * difficulty in later lessons — a progression engine, not a flat list.
  */
-import { TOPICS_A, type LifeTopic, type TopicCategory, type LadderRung } from "./topics-a";
-import { TOPICS_B } from "./topics-b";
-import { TOPICS_C } from "./topics-c";
-import { TOPICS_D } from "./topics-d";
+import { TOPICS_150_A, type Topic150 } from "./topics150-a";
+import { TOPICS_150_B } from "./topics150-b";
+import { TOPICS_150_C } from "./topics150-c";
+import { TOPICS_150_D } from "./topics150-d";
+import { TOPICS_150_E } from "./topics150-e";
+import { TOPICS_150_F } from "./topics150-f";
 import type { CEFRLevel } from "./learner";
 
-export type { LifeTopic, TopicCategory, LadderRung };
+export type { Topic150 };
 
-export const LIFE_TOPICS: LifeTopic[] = [...TOPICS_A, ...TOPICS_B, ...TOPICS_C, ...TOPICS_D];
+export interface LadderRung { level: string; example: string }
+
+/** A life topic in the master library (full metadata superset). */
+export type LifeTopic = Topic150;
+
+export const LIFE_TOPICS: Topic150[] = [
+  ...TOPICS_150_A, ...TOPICS_150_B, ...TOPICS_150_C,
+  ...TOPICS_150_D, ...TOPICS_150_E, ...TOPICS_150_F,
+];
 
 const byId = new Map(LIFE_TOPICS.map((topic) => [topic.id, topic]));
 
-/** Primary topic cluster per lesson — coherent life domains, weighted toward professional/global themes at higher levels. */
-export const LESSON_TOPIC_MAP: Record<string, string[]> = {
-  // Pre-A1 — survive: immediate personal world
-  "lesson-prea1-survival": ["meeting-people", "weather-seasons"],
-  "lesson-prea1-sounds": ["family-relatives", "home-living"],
-  "lesson-prea1-reading": ["shopping-everyday", "clothes-style"],
-  "lesson-prea1-listening": ["food-meals", "neighborhood-community"],
-  // A1 — function: daily life and simple socialising
-  "lesson-a1-self-introduction": ["time-schedules", "personality-character"],
-  "lesson-a1-routines": ["daily-routines", "health-wellbeing"],
-  "lesson-a1-questions": ["hobbies-free-time", "entertainment-music"],
-  "lesson-a1-listening": ["restaurants-ordering", "invitations-plans"],
-  // A2 — connect: manage everyday life socially
-  "lesson-a2-interactions": ["transportation", "help-directions", "friends-socializing"],
-  "lesson-a2-past": ["travel-holidays", "celebrations-traditions", "culture-customs"],
-  "lesson-a2-messages": ["relationships-communication", "conflict-apologies", "hotels-accommodation"],
-  "lesson-a2-listening": ["doctor-healthcare", "emotions-feelings", "sports-activities"],
-  // B1 — study: independent adult life, money, information
-  "lesson-b1-conversation": ["school-university", "languages-study-skills", "decisions-problem-solving"],
-  "lesson-b1-writing": ["exams-goals-academic", "choosing-career", "goals-growth"],
-  "lesson-b1-listening": ["news-media-information", "jobs-workplace", "workplace-communication"],
-  "lesson-b1-reading": ["money-personal-finance", "banking-payments", "saving-budgeting"],
-  // B2 — work/advance: professional & business English
-  "lesson-b2-argument": ["job-interviews", "negotiation-persuasion", "customer-service", "communication-styles", "confidence-self-expression", "success-failure-resilience"],
-  "lesson-b2-writing": ["job-applications-cv", "starting-new-job", "marketing-branding", "time-management-productivity", "stress-balance", "ethics-values-choices"],
-  "lesson-b2-listening": ["meetings-presentations", "teamwork-collaboration", "performance-feedback", "remote-work-collaboration", "ai-future-work", "smartphones-apps"],
-  "lesson-b2-reading": ["leadership-management", "problem-solving-work", "sales-business-development", "starting-business", "entrepreneurship-innovation", "running-small-business"],
-  // C1 — think: complex professional, social and global discussion
-  "lesson-c1-discussion": ["loans-debt", "investing-wealth", "buying-home-property", "economy-cost-of-living", "business-ideas-opportunities"],
-  "lesson-c1-writing": ["business-finance-profit", "business-markets-trade", "globalization-international-business", "international-relations-challenges", "energy-resources-future"],
-  "lesson-c1-listening": ["environment-sustainability", "science-medicine-progress", "space-exploration-universe", "poverty-inequality-mobility", "migration-living-abroad"],
-  "lesson-c1-reading": ["government-politics-citizenship", "diversity-inclusion-perspectives", "critical-thinking-information", "online-safety-privacy", "social-media-influence"],
-  // C2 — debate/master: sophisticated abstract thought
-  "lesson-c2-speaking": ["freedom-responsibility-choice", "human-behavior-psychology", "leadership-power-influence", "big-ideas-arguments-debates"],
-  "lesson-c2-writing": ["philosophy-meaning-life", "happiness-good-life", "love-human-connection", "vision-future-your-place"],
-  "lesson-c2-listening": ["technology-everyday", "internet-social-media", "technology-vs-humanity", "future-of-humanity"],
-  "lesson-c2-reading": ["motivation-discipline-habits", "law-rules-rights", "cities-urban-life", "war-peace-resolution"],
-};
+/** Primary topic cluster per lesson — derived from each topic's declared home lesson, ordered by topic number. */
+export const LESSON_TOPIC_MAP: Record<string, string[]> = Object.fromEntries(
+  (() => {
+    const map = new Map<string, string[]>();
+    for (const topic of LIFE_TOPICS) {
+      const ids = map.get(topic.lessonId) ?? [];
+      ids.push(topic.id);
+      map.set(topic.lessonId, ids);
+    }
+    return map;
+  })(),
+);
 
-/** Deliberate spaced-retrieval revisits: topics reappearing later at higher difficulty. */
+/** Deliberate spaced-retrieval revisits: earlier topics reappearing later at higher difficulty. */
 export const REVISITS: Array<{ lessonId: string; topicId: string; angle: string }> = [
-  { lessonId: "lesson-a2-interactions", topicId: "shopping-everyday", angle: "returns, complaints and polite haggling" },
-  { lessonId: "lesson-b1-reading", topicId: "food-meals", angle: "food systems, labels and consumer choices" },
-  { lessonId: "lesson-b2-argument", topicId: "money-personal-finance", angle: "should I save this or invest it?" },
-  { lessonId: "lesson-b2-listening", topicId: "health-wellbeing", angle: "burnout, prevention and workplace wellbeing debates" },
-  { lessonId: "lesson-c1-discussion", topicId: "travel-holidays", angle: "overtourism vs economies that depend on it" },
-  { lessonId: "lesson-c1-listening", topicId: "technology-everyday", angle: "smart cities and algorithmic daily life" },
-  { lessonId: "lesson-c2-speaking", topicId: "ai-future-work", angle: "is machine creativity still creativity?" },
+  { lessonId: "lesson-05-health-body", topicId: "daily-routines", angle: "illness, rest and healthy daily habits" },
+  { lessonId: "lesson-08-future-plans", topicId: "prices-money-payment", angle: "planning and budgeting for future goals" },
+  { lessonId: "lesson-12-travel-international", topicId: "travel-basics", angle: "real trips: airports, hotels and problems abroad" },
+  { lessonId: "lesson-14-money-personal-finance", topicId: "shopping-everyday-items", angle: "consumer choices and spending discipline" },
+  { lessonId: "lesson-16-society-culture", topicId: "celebrations-special-occasions", angle: "festivals across cultures and what they reveal" },
+  { lessonId: "lesson-18-professional-communication", topicId: "workplace-communication", angle: "professional register and difficult messages" },
+  { lessonId: "lesson-19-problem-solving-decisions", topicId: "travel-problems", angle: "structured troubleshooting under time pressure" },
+  { lessonId: "lesson-22-psychology-human-mind", topicId: "basic-feelings-emotions", angle: "emotional granularity beyond happy and sad" },
+  { lessonId: "lesson-23-leadership-personal-development", topicId: "career-ambitions", angle: "turning ambition into systems" },
+  { lessonId: "lesson-26-advanced-argumentation", topicId: "conflict-disagreement", angle: "disagreement as structured debate" },
+  { lessonId: "lesson-28-real-world-mastery", topicId: "job-interviews", angle: "capstone interview performance integrating every skill" },
 ];
 
 export interface LessonTopicSet {
@@ -113,7 +101,7 @@ export function rungForLevel(topicId: string, level: CEFRLevel | string): Ladder
   return best ?? ladder[0];
 }
 
-// ---- Life progression stages (§16) -----------------------------------------
+// ---- Life progression stages ------------------------------------------------
 
 export interface LifeStage { name: string; claim: string }
 const STAGES: Array<{ levels: CEFRLevel[]; stage: LifeStage }> = [
@@ -133,7 +121,6 @@ export function stageForLevel(level: CEFRLevel | string): LifeStage {
 export function topicEngineStats() {
   const assigned = new Set<string>();
   for (const ids of Object.values(LESSON_TOPIC_MAP)) for (const id of ids) assigned.add(id);
-  for (const r of REVISITS) assigned.add(r.topicId);
   return {
     totalTopics: LIFE_TOPICS.length,
     assignedTopics: assigned.size,

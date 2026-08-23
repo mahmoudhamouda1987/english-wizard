@@ -13,11 +13,13 @@ export default function CommunityPage() {
   const [sentTo, setSentTo] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
-    const r = await fetch("/api/community/corrections", { cache: "no-store" });
-    if (r.ok) setData(await r.json());
-  }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/community/corrections", { cache: "no-store" })
+      .then(async (r) => { if (alive && r.ok) setData((await r.json()) as Data); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
 
   async function submit(item: QueueItem) {
     setError(null);
@@ -37,6 +39,11 @@ export default function CommunityPage() {
     }
   }
 
+  async function load() {
+    const r = await fetch("/api/community/corrections", { cache: "no-store" });
+    if (r.ok) setData(await r.json());
+  }
+
   return (
     <main id="main-content" className="dash-main">
       <PageHero icon="🤝" title="Help another learner" sub="Real people correcting real work is the one thing AI can't fake. Review a peer's reality-checkpoint response — and collect feedback on your own." />
@@ -47,7 +54,7 @@ export default function CommunityPage() {
       {data && (
         <>
           <section className="stat-strip">
-            <div className="stat-tile"><strong>{data.given}</strong><span>Feedback you've given</span></div>
+            <div className="stat-tile"><strong>{data.given}</strong><span>Feedback you&rsquo;ve given</span></div>
             <div className="stat-tile"><strong>{data.received}</strong><span>Feedback on your work</span></div>
             <div className="stat-tile"><strong>{data.queue.length}</strong><span>Waiting for review</span></div>
           </section>

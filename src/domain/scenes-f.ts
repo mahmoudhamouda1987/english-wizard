@@ -4,7 +4,7 @@ import type { LearningScene } from "./scenes-types";
 export const SCENES_F: LearningScene[] = [
   {
     id: "b2-reading-review",
-    lessonIds: ["lesson-b2-reading"],
+    lessonIds: [],
     title: "Reading between the lines",
     levels: ["B2"],
     topics: ["reading", "attitude", "inference", "tone", "review"],
@@ -31,7 +31,7 @@ export const SCENES_F: LearningScene[] = [
   },
   {
     id: "c1-discussion-moderating",
-    lessonIds: ["lesson-c1-discussion"],
+    lessonIds: ["lesson-24-society-politics-global"],
     title: "Leading a complex discussion",
     levels: ["C1"],
     topics: ["discussion", "moderating", "nuance", "turn-taking"],
@@ -57,7 +57,7 @@ export const SCENES_F: LearningScene[] = [
   },
   {
     id: "c1-writing-brief",
-    lessonIds: ["lesson-c1-writing"],
+    lessonIds: ["lesson-23-leadership-personal-development"],
     title: "Precision writing under review",
     levels: ["C1"],
     topics: ["writing", "precision", "register", "editing"],
@@ -84,7 +84,7 @@ export const SCENES_F: LearningScene[] = [
   },
   {
     id: "c1-listening-interview",
-    lessonIds: ["lesson-c1-listening"],
+    lessonIds: ["lesson-22-psychology-human-mind"],
     title: "The meaning behind the words",
     levels: ["C1"],
     topics: ["listening", "inference", "attitude", "interview"],
@@ -110,7 +110,7 @@ export const SCENES_F: LearningScene[] = [
   },
   {
     id: "c1-reading-critique",
-    lessonIds: ["lesson-c1-reading"],
+    lessonIds: [],
     title: "Evaluating claims critically",
     levels: ["C1"],
     topics: ["reading", "critical", "rhetoric", "assumptions", "evaluation"],

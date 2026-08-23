@@ -30,11 +30,18 @@ export default function TimeMachinePage() {
   const prompt = CALIBRATION_PROMPTS[promptIndex];
   const forPrompt = useMemo(() => samples.filter((s) => s.prompt === prompt).sort((a, b) => a.createdAt.localeCompare(b.createdAt)), [samples, prompt]);
 
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/voice-samples", { cache: "no-store" })
+      .then(async (r) => { if (alive && r.ok) setSamples(((await r.json()).samples ?? []) as Sample[]); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
   async function load() {
     const r = await fetch("/api/voice-samples", { cache: "no-store" });
     if (r.ok) setSamples((await r.json()).samples as Sample[]);
   }
-  useEffect(() => { void load(); }, []);
 
   async function startRecording() {
     try {

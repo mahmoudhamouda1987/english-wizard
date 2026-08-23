@@ -61,11 +61,18 @@ export default function ThinkingInEnglishPage() {
   }
 
   useEffect(() => {
-    void loadPrompt("A1");
-    try {
-      const savedLevel = localStorage.getItem("ew-think-level") as CEFRLevel | null;
-      if (savedLevel && levels.includes(savedLevel)) { setLevel(savedLevel); void loadPrompt(savedLevel); }
-    } catch { /* private mode */ }
+    const alive = { current: true };
+    void Promise.resolve().then(async () => {
+      let next: CEFRLevel | null = null;
+      try {
+        const savedLevel = localStorage.getItem("ew-think-level") as CEFRLevel | null;
+        if (savedLevel && levels.includes(savedLevel)) next = savedLevel;
+      } catch { /* private mode */ }
+      if (!alive.current) return;
+      if (next) setLevel(next);
+      await loadPrompt(next ?? "A1");
+    });
+    return () => { alive.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -104,7 +111,10 @@ export default function ThinkingInEnglishPage() {
   const doneKey = `ew-think-done-${level}`;
   const [doneStages, setDoneStages] = useState<string[]>([]);
   useEffect(() => {
-    try { setDoneStages(JSON.parse(localStorage.getItem(doneKey) ?? "[]") as string[]); } catch { setDoneStages([]); }
+    let next: string[] = [];
+    try { next = JSON.parse(localStorage.getItem(doneKey) ?? "[]") as string[]; } catch { next = []; }
+    const id = window.setTimeout(() => setDoneStages(next), 0);
+    return () => window.clearTimeout(id);
   }, [doneKey]);
 
   const words = answer.trim().split(/\s+/).filter(Boolean).length;
