@@ -230,7 +230,7 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
 }
 
 /** Hand-authored core exercises + generated expansion, de-duplicated by question text. */
-export function practiceForLesson(lessonId: string): MaterialExercise[] {
+export function practiceForLesson(lessonId: string, recycleFrom: string[] = []): MaterialExercise[] {
   const authored = LESSON_MATERIALS[lessonId]?.exercises ?? [];
   const generated = generatedExercises(lessonId);
   const seen = new Set(authored.map((e) => e.q.toLowerCase()));
@@ -241,5 +241,27 @@ export function practiceForLesson(lessonId: string): MaterialExercise[] {
     seen.add(key);
     merged.push(ex);
   }
-  return merged;
+  // Spaced retrieval: recycle vocabulary from previously completed lessons so
+  // earlier material resurfaces naturally instead of disappearing forever.
+  const recycled: MaterialExercise[] = [];
+  const seenQ = new Set(merged.map((e) => e.q.toLowerCase()));
+  for (const prevId of recycleFrom) {
+    if (recycled.length >= 3) break;
+    if (prevId === lessonId) continue;
+    const pool = LESSON_MATERIALS[prevId]?.vocab ?? [];
+    const current = LESSON_MATERIALS[lessonId]?.vocab ?? [];
+    for (const w of pool) {
+      if (recycled.length >= 3) break;
+      const q = `Review — which matches “${w.word}”?`;
+      if (seenQ.has(q.toLowerCase())) continue;
+      const mates = (current.length ? current : pool).filter((o) => o.word !== w.word && o.ar !== w.ar);
+      if (mates.length < 2) continue;
+      const r = rotateChoices(0, [w.ar, mates[0].ar, mates[1].ar], seeded("rev:" + prevId + w.word));
+      if (new Set(r.choices.map((c) => c.slice(0, 12))).size < 3) continue;
+      recycled.push({ q, choices: r.choices, answer: r.answer });
+      seenQ.add(q.toLowerCase());
+      break;
+    }
+  }
+  return [...recycled, ...merged];
 }

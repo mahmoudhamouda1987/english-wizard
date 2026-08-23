@@ -4,7 +4,8 @@
  * pairs so every generated dialogue is natural at the lesson's CEFR band.
  */
 import type { CEFRLevel } from "./learner";
-import { EXCHANGE_PAIRS, SCENE_SETTINGS, CHARACTER_DUOS, type ExchangePair, type PairKind } from "./dialogue-bank";
+import { EXCHANGE_PAIRS, SCENE_SETTINGS, type ExchangePair, type PairKind } from "./dialogue-bank";
+import { CHARACTER_UNIVERSE, castFor } from "./characters";
 import { MVP_LESSONS } from "./curriculum";
 import type { LearningScene, SceneLine, SceneQuizItem } from "./scenes-types";
 
@@ -69,7 +70,8 @@ export function composedScenesForLesson(lessonId: string): LearningScene[] {
     const seed = h32(`${lessonId}#${n}`);
     const recipe = recipesFor(lesson.level)[seed % recipesFor(lesson.level).length];
     const setting = SCENE_SETTINGS[h32(`${lessonId}set${n}`) % SCENE_SETTINGS.length];
-    const duo = CHARACTER_DUOS[h32(`${lessonId}duo${n}`) % CHARACTER_DUOS.length];
+    const [ca, cb] = castFor(`${lessonId}#scene${n}`);
+    const duo = { a: { name: ca.profile.name, emoji: ca.profile.emoji }, b: { name: cb.profile.name, emoji: cb.profile.emoji } };
     const used = new Set<ExchangePair>();
     const pairs: ExchangePair[] = [];
     let fallbackSeed = seed;
@@ -95,7 +97,7 @@ export function composedScenesForLesson(lessonId: string): LearningScene[] {
     const quiz: SceneQuizItem[] = [];
     const mid = Math.floor(lines.length / 2);
     const midSpeakerName = lines[mid].speaker === "a" ? duo.a.name : duo.b.name;
-    const namePool = CHARACTER_DUOS.flatMap((d) => [d.a.name, d.b.name]).filter((n) => n !== duo.a.name && n !== duo.b.name);
+    const namePool = CHARACTER_UNIVERSE.map((c) => c.name).filter((n) => n !== duo.a.name && n !== duo.b.name);
     const decoy = namePool[h32(`${lessonId}dn${n}`) % namePool.length];
     quiz.push({ q: `Who says: “${lines[mid].text}”?`, choices: [duo.a.name, duo.b.name, decoy], answer: midSpeakerName === duo.a.name ? 0 : 1 });
     const otherTexts = lines.map((l) => l.text).filter((t) => t !== lines[1].text && t !== lines[0].text);

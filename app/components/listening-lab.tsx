@@ -21,8 +21,31 @@ export function ListeningLab({ items }: { items: Item[] }) {
     if (!item || !checked) return null;
     const target = normalise(item.text).split(" ");
     const given = normalise(input).split(" ").filter(Boolean);
-    return target.map((word, wi) => ({ word, ok: given[wi] === word }));
+    return target.map((word, wi) => {
+      const got = given[wi];
+      let ok = false;
+      let kind: "spelling" | "missing" | "wrong" | undefined;
+      if (got === word) ok = true;
+      else if (got === undefined) kind = "missing";
+      else if (similar(got, word)) kind = "spelling";
+      else kind = "wrong";
+      return { word, ok, kind };
+    });
   }, [item, checked, input]);
+  const explanations = useMemo(() => {
+    if (!diff) return [] as string[];
+    const out: string[] = [];
+    for (const w of diff) {
+      if (w.ok) continue;
+      if (w.kind === "missing") out.push(`You missed the word “${w.word}” — listen once more and count the words in that part.`);
+      else if (w.kind === "spelling") out.push(`You heard “${w.word}” right in sound — check its spelling.`);
+      else out.push(`You wrote a different word where the speaker said “${w.word}” — replay at slow speed.`);
+    }
+    if (normalise(input).split(" ").filter(Boolean).length > normalise(item.text).split(" ").length) {
+      out.push("You typed extra words — the speaker says fewer words than you wrote.");
+    }
+    return out.slice(0, 3);
+  }, [diff, input]);
 
   if (!items.length) {
     return <div className="state-card">Dictation for your level is being expanded — check back after the next curriculum update.</div>;
@@ -90,7 +113,12 @@ export function ListeningLab({ items }: { items: Item[] }) {
             ))}
           </p>
           {!diff!.every((w) => w.ok) && (
-            <p style={{ margin: 0 }}><em>Target sentence:</em> “{item.text}”</p>
+            <>
+              <ul style={{ margin: "0 0 8px", paddingLeft: 20, lineHeight: 1.7 }}>
+                {explanations.map((ex, ei) => <li key={ei}>{ex}</li>)}
+              </ul>
+              <p style={{ margin: 0 }}><em>Target sentence:</em> “{item.text}”</p>
+            </>
           )}
           <p style={{ margin: "6px 0 10px" }} className="subtle">💡 Meaning: {item.meaning}</p>
           <div style={{ display: "flex", gap: 8 }}>
@@ -102,3 +130,15 @@ export function ListeningLab({ items }: { items: Item[] }) {
     </section>
   );
 }
+
+function similar(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (Math.abs(a.length - b.length) > 2) return false;
+  let edits = 0;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if (a[i] !== b[i]) edits++;
+    if (edits > 2) return false;
+  }
+  return true;
+}
+
