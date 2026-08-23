@@ -7,7 +7,9 @@ import { SCENES_E } from "./scenes-e";
 import { SCENES_F } from "./scenes-f";
 import { SCENES_G } from "./scenes-g";
 import type { CEFRLevel } from "./learner";
+import type { LearningScene } from "./scenes-types";
 import { dictationItemsForLevel } from "./dictation-bank";
+import { composedScenesForLesson } from "./scene-generator";
 export type { LearningScene, SceneLine, SceneQuizItem } from "./scenes-types";
 
 const LEVEL_ORDER: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
@@ -33,7 +35,19 @@ export function sceneForLesson(lesson: { id?: string; title: string; mission?: s
   return scored[0].scene;
 }
 
-/** Dictation items for a level, sourced from the full in-platform sentence bank (x20 scale). */
-export function dictationForLevel(level: string, count = 20): Array<{ text: string; meaning: string }> {
-  return dictationItemsForLevel(level, count);
+/** Dictation items for a lesson: 20 per round, drawn differently per lesson via its id as seed. */
+export function dictationForLevel(level: string, count = 20, seedKey = ""): Array<{ text: string; meaning: string }> {
+  return dictationItemsForLevel(level, count, seedKey);
+}
+
+/**
+ * The full 20-scene set for a lesson: the hand-written flagship scene bound to
+ * this exact lesson first, then deterministic composed scenes to fill the
+ * quota — every lesson always surfaces exactly 20 playable scenes.
+ */
+export function fullSceneSetForLesson(lessonId: string): LearningScene[] {
+  const flagship = LEARNING_SCENES.find((s) => s.lessonIds?.includes(lessonId));
+  const composed = composedScenesForLesson(lessonId);
+  const merged = flagship ? [flagship, ...composed] : composed;
+  return merged.slice(0, 20);
 }

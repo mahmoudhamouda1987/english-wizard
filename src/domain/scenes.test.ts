@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LEARNING_SCENES, sceneById, sceneForLesson, dictationForLevel } from "./scenes";
+import { LEARNING_SCENES, sceneById, sceneForLesson, dictationForLevel, fullSceneSetForLesson } from "./scenes";
 import { LESSON_MATERIALS } from "./lesson-materials";
 import { MVP_LESSONS } from "./curriculum";
 import { dictationItemsForLevel, dictationBankSize } from "./dictation-bank";
@@ -16,6 +16,29 @@ describe("learning scenes (x20 expansion)", () => {
     }
   });
 
+  it("every lesson surfaces exactly 20 playable scenes, flagship first", () => {
+    for (const id of LESSON_IDS) {
+      const set = fullSceneSetForLesson(id);
+      expect(set.length, `${id} has only ${set.length} scenes`).toBe(20);
+      expect(new Set(set.map((s) => s.id)).size).toBe(20);
+      expect(set[0].lessonIds).toContain(id);
+      for (const scene of set) {
+        expect(scene.lines.length).toBeGreaterThanOrEqual(6);
+        for (const line of scene.lines) {
+          expect(line.text.length).toBeGreaterThan(0);
+          expect(line.ar.length).toBeGreaterThan(0);
+        }
+        expect(scene.quiz.length).toBeGreaterThanOrEqual(3);
+        for (const item of scene.quiz) {
+          expect(item.choices).toHaveLength(3);
+          expect(item.answer).toBeGreaterThanOrEqual(0);
+          expect(item.answer).toBeLessThan(3);
+          expect(new Set(item.choices).size).toBe(3);
+        }
+      }
+    }
+  });
+
   it("sceneForLesson prefers the exact lesson-bound scene", () => {
     const lesson = MVP_LESSONS.find((l) => l.id === "lesson-b1-conversation")!;
     const scene = sceneForLesson(lesson);
@@ -29,7 +52,7 @@ describe("learning scenes (x20 expansion)", () => {
     }
   });
 
-  it("every scene is well-formed: lines, Arabic and quiz answers in range", () => {
+  it("every authored scene is well-formed: lines, Arabic and quiz answers in range", () => {
     for (const scene of LEARNING_SCENES) {
       expect(scene.lines.length).toBeGreaterThanOrEqual(6);
       for (const line of scene.lines) {
@@ -60,10 +83,30 @@ describe("learning scenes (x20 expansion)", () => {
     }
   });
 
-  it("every lesson gets at least 15 generated-or-authored practice exercises with valid answers", () => {
+  it("each lesson draws its own distinct 20-item dictation round", () => {
+    const a = dictationForLevel("A2", 20, "lesson-a2-interactions").map((i) => i.text);
+    const b = dictationForLevel("A2", 20, "lesson-a2-past").map((i) => i.text);
+    expect(a).toHaveLength(20);
+    expect(b).toHaveLength(20);
+    const overlap = a.filter((t) => b.includes(t)).length;
+    expect(overlap, "two same-level lessons drew identical rounds").toBeLessThan(20);
+  });
+
+  it("every lesson exposes at least 20 audio words with Arabic", () => {
+    for (const id of LESSON_IDS) {
+      const vocab = LESSON_MATERIALS[id]?.vocab ?? [];
+      expect(vocab.length, `${id} has only ${vocab.length} words`).toBeGreaterThanOrEqual(20);
+      for (const v of vocab) {
+        expect(v.word.length).toBeGreaterThan(0);
+        expect(v.ar.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("every lesson gets at least 20 generated-or-authored practice exercises with valid answers", () => {
     for (const id of LESSON_IDS) {
       const set = practiceForLesson(id);
-      expect(set.length, `${id} has only ${set.length}`).toBeGreaterThanOrEqual(15);
+      expect(set.length, `${id} has only ${set.length}`).toBeGreaterThanOrEqual(20);
       for (const ex of set) {
         expect(ex.choices.length).toBe(3);
         expect(ex.answer).toBeGreaterThanOrEqual(0);

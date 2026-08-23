@@ -7,7 +7,7 @@ import { materialsFor } from "@/src/domain/lesson-materials";
 import { speakText } from "@/src/domain/tts";
 import { ScenePlayer } from "@/app/components/scene-player";
 import { ListeningLab } from "@/app/components/listening-lab";
-import { sceneForLesson, dictationForLevel } from "@/src/domain/scenes";
+import { fullSceneSetForLesson, dictationForLevel } from "@/src/domain/scenes";
 import { practiceForLesson } from "@/src/domain/practice-generator";
 import { UpgradePrompt, parseUpgradePayload } from "@/app/components/upgrade-prompt";
 interface LearnerState{currentLessonId:string|null;completedLessonIds:string[];nextAction:{type:string;id:string;reason?:string;priority?:string}|null}
@@ -39,9 +39,12 @@ function QuickPractice({ exercises }: { exercises: Array<{ q: string; choices: s
 }
 function MaterialsTabs({lesson}:{lesson:Lesson}){
  const[tab,setTab]=useState<"words"|"scene"|"listen"|"practice">("words");
+ const[sceneIdx,setSceneIdx]=useState(0);
  const mats=materialsFor(lesson.id);
- const scene=sceneForLesson(lesson);
- const tabs:Array<[typeof tab,string,string]>=[["words","🔑","Key words"],["scene","🎬","Scene"],["listen","🎧","Listening lab"],["practice","🧠","Practice"]];
+ const sceneSet=useMemo(()=>fullSceneSetForLesson(lesson.id),[lesson.id]);
+ const practiceSet=useMemo(()=>practiceForLesson(lesson.id),[lesson.id]);
+ const scene=sceneSet[Math.min(sceneIdx,sceneSet.length-1)]??sceneSet[0];
+ const tabs:Array<[typeof tab,string,string]>=[["words","🔑","Key words"],["scene",`🎬 Scenes (${sceneSet.length})`,"Scenes"],["listen",`🎧 Listening (${dictationForLevel(lesson.level,20,lesson.id).length})`,"Listening lab"],["practice","🧠","Practice"]];
  return (
   <section aria-label="Interactive lesson materials" style={{marginTop:18,padding:"16px 20px",background:"var(--surface)",borderRadius:14,border:"1px solid var(--border)"}}>
    <h2 style={{fontSize:17,margin:"0 0 10px"}}>Immersive studio — audio, scenes and drills generated inside the platform</h2>
@@ -52,7 +55,7 @@ function MaterialsTabs({lesson}:{lesson:Lesson}){
    </div>
    {tab==="words"&&(mats?(
     <>
-     <p className="subtle" style={{margin:"0 0 10px"}}>Tap 🔊 to hear each word in British audio.</p>
+     <p className="subtle" style={{margin:"0 0 10px"}}>{mats.vocab.length} words with British audio — tap 🔊 to listen.</p>
      <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
       {mats.vocab.map(w=>(
        <span key={w.word} className="chip" style={{fontSize:14,padding:"6px 10px"}}>
@@ -63,13 +66,19 @@ function MaterialsTabs({lesson}:{lesson:Lesson}){
      </div>
     </>
    ):<p>No word list for this lesson yet.</p>)}
-   {tab==="scene"&&(
+   {tab==="scene"&&scene&&(
     <>
+     <div role="tablist" aria-label="Scene picker" style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
+      {sceneSet.map((s,i)=>(
+       <button key={s.id} type="button" role="tab" aria-selected={i===sceneIdx} className={i===sceneIdx?"button":"button secondary"} onClick={()=>setSceneIdx(i)} title={s.title}>{i+1}</button>
+      ))}
+     </div>
      <ScenePlayer scene={scene} />
-     <p className="subtle" style={{marginTop:8,marginBottom:0}}>Every scene, voice and visual is produced inside the platform — nothing links out.</p>
+     <p className="subtle" style={{marginTop:8,marginBottom:0}}>Scene {Math.min(sceneIdx+1,sceneSet.length)} of {sceneSet.length} — every scene, voice and visual is produced inside the platform — nothing links out.</p>
     </>
    )}
-   {tab==="listen"&&<ListeningLab items={dictationForLevel(lesson.level)} />}
+   {tab==="listen"&&<ListeningLab items={dictationForLevel(lesson.level,20,lesson.id)} />}
+   {tab==="practice"&&(<><QuickPractice exercises={practiceSet} /><p className="subtle" style={{marginBottom:0}}>{practiceSet.length} exercises generated for your level — every set is drawn from this lesson level band.</p></>)}
    {tab==="practice"&&(<><QuickPractice exercises={practiceForLesson(lesson.id)} /><p className="subtle" style={{marginBottom:0}}>{practiceForLesson(lesson.id).length} exercises generated for your level — every set is drawn from this lesson level band.</p></>)}
   </section>
  );

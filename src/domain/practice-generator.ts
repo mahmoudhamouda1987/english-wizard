@@ -116,8 +116,9 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
     const v = mats.vocab;
     for (let i = 0; i < Math.min(v.length, 3); i++) {
       const w = v[(i * 3 + 1) % v.length];
-      const others = [v[(i * 3 + 2) % v.length], v[(i * 3 + 3) % v.length]];
-      if (others.some((o) => o.word === w.word)) continue;
+      const uniqArs = [...new Map(v.filter((o) => o.word !== w.word && o.ar !== w.ar).map((o) => [o.ar, o])).values()];
+      const others = [uniqArs[(i + 1) % Math.max(1, uniqArs.length)], uniqArs[(i + 5) % Math.max(1, uniqArs.length)]];
+      if (!others[0] || !others[1] || others[0].ar === others[1].ar) continue;
       const r = rotateChoices(0, [w.ar, others[0].ar, others[1].ar], seeded(w.word));
       pushEx({ q: `Which word means “${w.ar}” in English?`, choices: r.choices.map((c) => {
         const found = v.find((x) => x.ar === c);
@@ -135,9 +136,11 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
     // Word → Arabic direction.
     for (let i = 0; i < Math.min(v.length, 3); i++) {
       const w = v[i];
-      const o1 = v[(i + 1) % v.length];
-      const o2 = v[(i + 2) % v.length];
-      if (o1.ar === w.ar || o2.ar === w.ar) continue;
+      const uniqArs = [...new Map(v.filter((o) => o.word !== w.word).map((o) => [o.ar, o])).values()];
+      if (uniqArs.length < 2) continue;
+      const o1 = uniqArs[(i + 1) % uniqArs.length];
+      const o2 = uniqArs[(i + 3) % uniqArs.length];
+      if (o1.ar === w.ar || o2.ar === w.ar || o1.ar === o2.ar) continue;
       const r = rotateChoices(0, [w.ar, o1.ar, o2.ar], seeded("w2a:" + w.word));
       pushEx({ q: `Which matches “${w.word}”?`, choices: r.choices, answer: r.answer });
     }
@@ -193,14 +196,14 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
   // 9. Floor guarantee: keep the set rich even when pools are small.
   const vAll = LESSON_MATERIALS[lessonId]?.vocab ?? [];
   const authoredCount = LESSON_MATERIALS[lessonId]?.exercises.length ?? 0;
-  const floorTarget = Math.max(12, 15 - authoredCount);
+  const floorTarget = Math.max(16, 21 - authoredCount);
   if (vAll.length >= 3) {
     for (let k = 0; k < vAll.length * 3 && out.length < floorTarget; k++) {
       const w = vAll[k % vAll.length];
       const o1 = vAll[(k + 1) % vAll.length];
       const o2 = vAll[(k + 2) % vAll.length];
       const q = `Which matches “${w.word}”?`;
-      if (seenQ.has(q) || o1.ar === w.ar || o2.ar === w.ar) continue;
+      if (seenQ.has(q) || new Set([w.ar, o1.ar, o2.ar]).size !== 3) continue;
       const r = rotateChoices(0, [w.ar, o1.ar, o2.ar], seeded("floor:" + w.word + k));
       out.push({ q, choices: r.choices, answer: r.answer });
       seenQ.add(q);

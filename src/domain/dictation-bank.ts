@@ -64,13 +64,13 @@ function hash(s: string): number {
   return h >>> 0;
 }
 
-/** Deterministic per-level ordering keeps rounds stable while feeling shuffled. */
-export function dictationItemsForLevel(level: string, count = 20): Array<{ text: string; meaning: string }> {
+/** Deterministic per-(level,seed) ordering: different lessons of one level draw different rounds. */
+export function dictationItemsForLevel(level: string, count = 20, seedKey = ""): Array<{ text: string; meaning: string }> {
   const idx = LEVELS.indexOf(level as CEFRLevel);
   const near = [LEVELS[idx], LEVELS[idx - 1], LEVELS[idx + 1]].filter(Boolean);
   const pool = bank().filter((item) => near.includes((LESSON_LEVEL[item.source.split(":")[1]] ?? inferLevel(item)) as CEFRLevel));
   const ranked = pool
-    .map((item) => ({ item, k: hash(level + "|" + item.text) }))
+    .map((item) => ({ item, k: hash(seedKey + "|" + level + "|" + item.text) }))
     .sort((a, b) => a.k - b.k)
     .map(({ item }) => item);
   return ranked.slice(0, count).map(({ text, meaning }) => ({ text, meaning }));
