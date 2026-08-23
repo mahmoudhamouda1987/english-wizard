@@ -11,7 +11,7 @@ test("Say It Better presents all five structured variants", async ({ page }) => 
   await register(page, "sib");
   await page.goto("/say-it-better");
   await expect(page.locator("main")).toBeVisible();
-  for (const variant of ["Your version", "Correction", "Natural", "Advanced", "Professional"]) {
+  for (const variant of ["Your version", "Corrected", "Natural", "Advanced", "Professional"]) {
     await expect(page.getByText(variant, { exact: true })).toBeVisible();
   }
 });

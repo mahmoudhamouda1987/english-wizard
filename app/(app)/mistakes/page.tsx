@@ -33,9 +33,9 @@ export default function MistakesPage() {
       ) : (
         <div style={{ display: "grid", gap: 12, marginTop: 22 }}>
           {errors.map((e) => (
-            <section className="panel" key={e.id}>
+            <section className="panel" key={e.id} style={{ borderLeft: `4px solid ${String(e.severity).toLowerCase() === "high" ? "#ef4444" : String(e.severity).toLowerCase() === "medium" ? "#f59e0b" : "#10b981"}` }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <h2>{e.description}</h2>
+                <h2>{String(e.severity).toLowerCase() === "high" ? "🔥 " : String(e.severity).toLowerCase() === "medium" ? "⚡ " : "🌱 "}{e.description}</h2>
                 <b>{e.severity}</b>
               </div>
               <p>{e.skill} · {e.occurrences} occurrence(s)</p>
