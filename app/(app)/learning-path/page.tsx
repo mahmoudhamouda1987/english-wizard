@@ -4,11 +4,14 @@ import { ALL_LESSONS } from "@/src/domain/all-lessons";
 import { PageHero } from "@/app/components/page-hero";
 
 const LEVEL_COLORS: Record<string, string> = { "Pre-A1": "#94a3b8", A1: "#38bdf8", A2: "#34d399", B1: "#fbbf24", B2: "#fb923c", C1: "#f87171", C2: "#a855f7" };
+const LEVEL_RANK: Record<string, number> = { "Pre-A1": 0, A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
 
 export default function LearningPathPage() {
   const [done, setDone] = useState<string[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  const ordered = useMemo(() => [...ALL_LESSONS].sort((a, b) => (LEVEL_RANK[a.level] ?? 9) - (LEVEL_RANK[b.level] ?? 9)), []);
 
   useEffect(() => {
     fetch("/api/learner-state", { cache: "no-store" }).then(async r => {
@@ -20,9 +23,9 @@ export default function LearningPathPage() {
   }, []);
 
   const stats = useMemo(() => ({
-    completed: ALL_LESSONS.filter(l => done.includes(l.id)).length,
-    total: ALL_LESSONS.length,
-    percent: Math.round((ALL_LESSONS.filter(l => done.includes(l.id)).length / ALL_LESSONS.length) * 100),
+    completed: ordered.filter(l => done.includes(l.id)).length,
+    total: ordered.length,
+    percent: Math.round((ordered.filter(l => done.includes(l.id)).length / Math.max(1, ordered.length)) * 100),
   }), [done]);
 
   return (
@@ -40,7 +43,7 @@ export default function LearningPathPage() {
       {error && <p role="alert">{error}</p>}
 
       <div className="journey">
-        {ALL_LESSONS.map((l, i) => {
+        {ordered.map((l, i) => {
           const completed = done.includes(l.id);
           const isCurrent = l.id === current;
           const unlocked = isCurrent || completed || (!current && i === 0);

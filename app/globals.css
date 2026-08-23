@@ -409,3 +409,25 @@ html[data-theme="dark"] .cc-badge { background:rgba(10,15,30,.85); color:#fff; }
 .bubble-user, .bubble-tutor { max-width: 88%; padding: 12px 15px; border-radius: 16px; line-height: 1.6; }
 .bubble-user { justify-self: end; background: #efeafd; border: 1px solid #ddd0fa; }
 .bubble-tutor { justify-self: start; background: white; border: 1px solid var(--border); }
+
+/* ===== Dark-mode fixes for dashboard components with hardcoded light colours ===== */
+html[data-theme="dark"] .subtle { color: var(--muted); }
+html[data-theme="dark"] .muted { color: var(--faint); }
+html[data-theme="dark"] .stat-tile { background: var(--surface); border-color: var(--border); }
+html[data-theme="dark"] .stat-tile strong small,
+html[data-theme="dark"] .stat-tile span { color: var(--muted); }
+html[data-theme="dark"] a.stat-tile:hover { border-color: var(--brand); box-shadow: 0 8px 22px rgba(138,99,255,.18); }
+html[data-theme="dark"] .quest-head strong { color: var(--text); }
+html[data-theme="dark"] .quest-tile.done { background: var(--green-soft); border-color: #166534; }
+html[data-theme="dark"] .goal-stats span,
+html[data-theme="dark"] .plan-list li small,
+html[data-theme="dark"] .level-step small { color: var(--muted); }
+html[data-theme="dark"] .wdot { color: var(--muted); background: var(--surface-2); border-color: var(--border); }
+html[data-theme="dark"] .wdot.done { background: var(--green-soft); color: var(--green); border-color: transparent; }
+html[data-theme="dark"] .sc-time { color: var(--brand-text); }
+html[data-theme="dark"] .level-step::before { background: var(--border); }
+html[data-theme="dark"] .level-step.reached .lv-dot { background: var(--green); color: #052e16; }
+html[data-theme="dark"] .level-step.current .lv-dot { background: var(--brand); color: white; }
+html[data-theme="dark"] .ach-row small,
+html[data-theme="dark"] .vocab-card span,
+html[data-theme="dark"] .milestone-card p { color: var(--muted); }
