@@ -47,6 +47,37 @@ export function completeLesson(
   };
 }
 
+/**
+ * Records a retry attempt when the production score does not meet the lesson's
+ * mastery threshold. The lesson stays current, evidence is kept, and the next
+ * action tells the learner exactly what score is still needed.
+ */
+export function recordLessonRetry(
+  state: LearnerState,
+  outcome: Pick<LessonOutcome, "lessonId" | "evidenceIds" | "completedAt">,
+  requiredScore: number,
+): LearnerState {
+  const history = state.lessonHistory.map((lesson) => {
+    if (lesson.lessonId !== outcome.lessonId) return lesson;
+    return {
+      ...lesson,
+      status: lesson.status === "completed" ? lesson.status : ("in_progress" as const),
+      startedAt: lesson.startedAt ?? outcome.completedAt,
+      attemptCount: lesson.attemptCount + 1,
+      evidenceIds: [...lesson.evidenceIds, ...outcome.evidenceIds].slice(0, 50),
+    };
+  });
+  const hasRecord = history.some((lesson) => lesson.lessonId === outcome.lessonId);
+  return {
+    ...state,
+    currentLessonId: state.currentLessonId ?? outcome.lessonId,
+    lessonHistory: hasRecord ? history : [...history, { lessonId: outcome.lessonId, objectiveId: "", status: "in_progress" as const, startedAt: outcome.completedAt, attemptCount: 1, evidenceIds: [...outcome.evidenceIds] }],
+    nextAction: { type: "lesson", id: outcome.lessonId, reason: `Not cleared yet — reach ${requiredScore}% on this lesson's production task to advance.`, priority: "MEDIUM" },
+    version: state.version + 1,
+    updatedAt: outcome.completedAt,
+  };
+}
+
 function mergeMastery(current: LearnerState["mastery"], updates: LearnerState["mastery"]) {
   const bySkill = new Map(current.map((item) => [item.skill, item]));
   for (const update of updates) bySkill.set(update.skill, update);

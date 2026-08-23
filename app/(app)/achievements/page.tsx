@@ -39,12 +39,10 @@ export default function AchievementsPage() {
   }
 
   useEffect(() => {
-    const id = localStorage.getItem("english-wizard-learner-id");
-    if (!id) return;
     let cancelled = false;
     Promise.all([
-      fetch(`/api/learner-state?learnerId=${id}`).then((r) => r.json()),
-      fetch(`/api/profile?learnerId=${id}`).then((r) => r.json()),
+      fetch("/api/learner-state").then((r) => r.json()),
+      fetch("/api/profile").then((r) => r.json()),
     ]).then(([s, p]) => {
       if (cancelled) return;
       setState(s.state);

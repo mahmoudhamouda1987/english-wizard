@@ -40,7 +40,11 @@ export async function POST(request: Request) {
   const errorId = `${skill}:${objectiveId}`;
   const existing = state.errors.find((item) => item.id === errorId);
   const errors = body.correct
-    ? state.errors.map((item) => item.id === errorId ? { ...item, status: "improving" as const, lastSeenAt: now } : item)
+    ? state.errors.map((item) => {
+        if (item.id !== errorId) return item;
+        if (item.status === "improving") return { ...item, status: "resolved" as const, lastSeenAt: now, reviewAt: undefined, intervention: undefined };
+        return { ...item, status: "improving" as const, lastSeenAt: now };
+      })
     : [...state.errors.filter((item) => item.id !== errorId), {
         id: errorId,
         skill,
@@ -48,6 +52,7 @@ export async function POST(request: Request) {
         description: "Practice response needs reinforcement.",
         occurrences: (existing?.occurrences ?? 0) + 1,
         severity: score < 40 ? "high" as const : score < 70 ? "medium" as const : "low" as const,
+        status: existing?.status === "resolved" || existing?.status === "improving" ? ("recurring" as const) : ("new" as const),
         lastSeenAt: now,
       }];
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { completeLesson } from "./progression";
+import { completeLesson, recordLessonRetry } from "./progression";
 import type { LearnerState } from "./learner";
 
 const baseState: LearnerState = {
@@ -49,5 +49,30 @@ describe("lesson progression", () => {
 
     expect(result.currentLessonId).toBeNull();
     expect(result.nextAction).toBeNull();
+  });
+});
+
+describe("mastery-gated retries", () => {
+  it("keeps the lesson current and records the attempt without completing it", () => {
+    const result = recordLessonRetry(
+      baseState,
+      { lessonId: "lesson-1", evidenceIds: ["ev-weak"], completedAt: "2026-08-15T02:00:00.000Z" },
+      75,
+    );
+
+    expect(result.currentLessonId).toBe("lesson-1");
+    expect(result.completedLessonIds).not.toContain("lesson-1");
+    expect(result.lessonHistory[0]).toMatchObject({ lessonId: "lesson-1", status: "in_progress", attemptCount: 2, evidenceIds: ["ev-weak"] });
+    expect(result.nextAction).toMatchObject({ type: "lesson", id: "lesson-1", priority: "MEDIUM" });
+    expect(result.nextAction?.reason).toContain("75%");
+    expect(result.version).toBe(2);
+  });
+
+  it("creates a history record when none exists yet", () => {
+    const empty = { ...baseState, lessonHistory: [] };
+    const result = recordLessonRetry(empty, { lessonId: "lesson-9", evidenceIds: ["e1"], completedAt: "2026-08-15T02:00:00.000Z" }, 80);
+
+    expect(result.lessonHistory).toHaveLength(1);
+    expect(result.lessonHistory[0]).toMatchObject({ lessonId: "lesson-9", status: "in_progress", attemptCount: 1 });
   });
 });

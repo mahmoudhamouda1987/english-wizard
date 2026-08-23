@@ -10,10 +10,8 @@ export default function MistakesPage() {
   const [errors, setErrors] = useState<ErrorRecord[]>([]);
 
   useEffect(() => {
-    const id = localStorage.getItem("english-wizard-learner-id");
-    if (!id) return;
     let cancelled = false;
-    fetch(`/api/learner-state?learnerId=${id}`, { cache: "no-store" })
+    fetch("/api/learner-state", { cache: "no-store" })
       .then((r) => r.json())
       .then((p) => {
         if (!cancelled) setErrors(p.state?.errors ?? []);

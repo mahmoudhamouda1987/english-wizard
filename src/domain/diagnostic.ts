@@ -34,7 +34,7 @@ export const diagnosticQuestions = [
   { id: "q12", skill: "vocabulary", prompt: "Which connector shows contrast?", options: ["although", "because", "therefore"] },
 ];
 
-function levelFor(score: number): CEFRLevel { if (score >= 90) return "C1"; if (score >= 78) return "B2"; if (score >= 62) return "B1"; if (score >= 45) return "A2"; if (score >= 25) return "A1"; return "Pre-A1"; }
+function levelFor(score: number): CEFRLevel { if (score >= 96) return "C2"; if (score >= 90) return "C1"; if (score >= 78) return "B2"; if (score >= 62) return "B1"; if (score >= 45) return "A2"; if (score >= 25) return "A1"; return "Pre-A1"; }
 function productionScore(text: string | undefined, minimumWords: number): number { const normalized = text?.trim() ?? ""; if (!normalized) return 0; const words = normalized.split(/\s+/).filter(Boolean).length; const sentences = normalized.split(/[.!?]+/).filter(Boolean).length; return Math.min(100, Math.round((Math.min(words / minimumWords, 1) * 70) + (Math.min(sentences / 3, 1) * 30))); }
 
 export function scoreDiagnostic(answers: DiagnosticAnswer[], now = new Date().toISOString(), production: DiagnosticProduction = {}) {

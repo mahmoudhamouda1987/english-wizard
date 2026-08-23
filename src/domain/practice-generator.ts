@@ -73,7 +73,9 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
     pushEx({ q: `Which phrase means the same as “${c.text}”?`, choices: r.choices, answer: r.answer });
   }
 
-  // 2. Gap-fill — blank the key word of a chunk.
+  // 2. Gap-fill — blank the key word of a chunk. From A2 upward the first
+  // gap-fill becomes free-typed recall instead of another multiple choice.
+  let gapFillsAdded = 0;
   for (let i = 0; i < Math.min(chunks.length, 3); i++) {
     const c = chunks[(i * 11 + 3) % chunks.length];
     const words = c.text.replace(/[.,!?…]/g, "").split(" ").filter((w) => w.length >= 4 && /^[A-Za-z']+$/.test(w));
@@ -86,14 +88,31 @@ export function generatedExercises(lessonId: string): MaterialExercise[] {
       .flat()
       .filter((w) => /^[A-Za-z']+$/.test(w) && w !== key && Math.abs(w.length - key.length) <= 2);
     const uniq = [...new Set(otherWords)];
+    const gapped = c.text.replace(key, "______");
+    if (li >= 2 && gapFillsAdded === 0 && uniq.length >= 2) {
+      pushEx({ q: `Type the missing word: “${gapped}”`, choices: [], answer: 0, typed: true, accept: [key, key.toLowerCase()] });
+      gapFillsAdded += 1;
+      continue;
+    }
     if (uniq.length < 2) continue;
     const s = seeded(key + c.id);
     const d1 = uniq[s % uniq.length];
     const d2 = uniq[(s * 7 + 3) % uniq.length];
     if (d1 === d2) continue;
-    const gapped = c.text.replace(key, "______");
     const r = rotateChoices(0, [key, d1, d2], s);
     pushEx({ q: `Complete the chunk: “${gapped}”`, choices: r.choices, answer: r.answer });
+  }
+
+  // 2b. Typed-cloze fallback — guarantee free-typed recall from A2 upward even
+  // when the chunk pool cannot produce distractors, using lesson body examples.
+  if (li >= 2 && gapFillsAdded === 0) {
+    const example = LESSON_BODIES[lessonId]?.examples.find((e) => e.split(" ").length >= 5);
+    const words = (example ?? "").replace(/[.,!?…"]/g, "").split(" ").filter((w) => w.length >= 4 && /^[A-Za-z']+$/.test(w));
+    if (example && words.length) {
+      const key = words.sort((a, b) => b.length - a.length)[0];
+      const gapped = example.replace(key, "______");
+      pushEx({ q: `Type the missing word: “${gapped}”`, choices: [], answer: 0, typed: true, accept: [key, key.toLowerCase()] });
+    }
   }
 
   // 3. Function match — when do you say this?

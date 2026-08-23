@@ -21,7 +21,7 @@ export async function GET() {
   const session = await currentUser();
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const state = await currentState(session.learnerId);
-  return NextResponse.json({ state: { ...state, nextAction: recommendNextAction(state) } });
+  return NextResponse.json({ state: { ...state, nextAction: recommendNextAction(state) } }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST() {
@@ -29,8 +29,8 @@ export async function POST() {
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const existing = await getLearnerState(session.learnerId);
   if (existing && !healLearnerStateForCurriculum(existing, CURRICULUM)) {
-    return NextResponse.json({ state: { ...existing, nextAction: recommendNextAction(existing) }, created: false });
+    return NextResponse.json({ state: { ...existing, nextAction: recommendNextAction(existing) }, created: false }, { headers: { "Cache-Control": "no-store" } });
   }
   const state = await currentState(session.learnerId);
-  return NextResponse.json({ state: { ...state, nextAction: recommendNextAction(state) }, created: !existing }, { status: existing ? 200 : 201 });
+  return NextResponse.json({ state: { ...state, nextAction: recommendNextAction(state) }, created: !existing }, { headers: { "Cache-Control": "no-store" }, status: existing ? 200 : 201 });
 }

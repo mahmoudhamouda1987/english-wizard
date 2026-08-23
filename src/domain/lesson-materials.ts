@@ -12,7 +12,7 @@ import { MVP_LESSONS } from "./curriculum";
 import { expandVocab } from "./vocab-expansion";
 import type { Topic150 } from "./topics150-a";
 
-export interface MaterialExercise { q: string; choices: string[]; answer: number }
+export interface MaterialExercise { q: string; choices: string[]; answer: number; typed?: boolean; accept?: string[] }
 export interface LessonMaterials {
   vocab: Array<GlossEntry & { word: string }>;
   exercises: MaterialExercise[];

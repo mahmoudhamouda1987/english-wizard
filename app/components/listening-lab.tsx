@@ -17,8 +17,21 @@ export function ListeningLab({ items }: { items: Item[] }) {
   const [done, setDone] = useState(false);
 
   const item = items[i];
+  const cloze = useMemo(() => {
+    if (!item) return null;
+    const words = item.text.split(" ");
+    let best = -1;
+    let bestLen = 3;
+    for (let w = 0; w < words.length; w++) {
+      const clean = words[w].replace(/[^A-Za-z']/g, "");
+      if (clean.length > bestLen && /^[A-Za-z']+$/.test(clean)) { best = w; bestLen = clean.length; }
+    }
+    if (best < 0) return null;
+    return { word: words[best].replace(/[^A-Za-z']/g, ""), gapped: words.map((w, wi) => (wi === best ? "______" : w)).join(" ") };
+  }, [item]);
+  const isClozeMode = Boolean(cloze) && i % 4 === 3;
   const diff = useMemo(() => {
-    if (!item || !checked) return null;
+    if (!item || !checked || isClozeMode) return null;
     const target = normalise(item.text).split(" ");
     const given = normalise(input).split(" ").filter(Boolean);
     return target.map((word, wi) => {
@@ -31,7 +44,7 @@ export function ListeningLab({ items }: { items: Item[] }) {
       else kind = "wrong";
       return { word, ok, kind };
     });
-  }, [item, checked, input]);
+  }, [item, checked, input, isClozeMode]);
   const explanations = useMemo(() => {
     if (!diff) return [] as string[];
     const out: string[] = [];
@@ -57,6 +70,10 @@ export function ListeningLab({ items }: { items: Item[] }) {
 
   function check() {
     setChecked(true);
+    if (isClozeMode) {
+      if (cloze && normalise(input) === normalise(cloze.word)) setScore((s) => s + 1);
+      return;
+    }
     const exact = normalise(input) === normalise(item.text);
     if (exact) setScore((s) => s + 1);
   }
@@ -89,14 +106,30 @@ export function ListeningLab({ items }: { items: Item[] }) {
 
       <div aria-hidden="true" style={{ fontSize: 40, textAlign: "center", letterSpacing: 4 }}>🎧 🔊 🎧</div>
 
+      {isClozeMode && cloze && (
+        <p style={{ margin: 0, fontSize: 18, lineHeight: 1.8 }} dir="ltr">{cloze.gapped}</p>
+      )}
+
       <label style={{ display: "grid", gap: 6 }}>
-        <span><strong>Type exactly what you hear:</strong></span>
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Listen, then type here…" disabled={checked}
+        <span><strong>{isClozeMode ? "Type the missing word you hear:" : "Type exactly what you hear:"}</strong></span>
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={isClozeMode ? "One word…" : "Listen, then type here…"} disabled={checked}
           onKeyDown={(e) => { if (e.key === "Enter" && !checked && input.trim()) check(); }} />
       </label>
 
       {!checked ? (
         <div><button type="button" className="button" onClick={check} disabled={!input.trim()}>Check answer</button></div>
+      ) : isClozeMode && cloze ? (
+        <div role="status" aria-live="polite" className={normalise(input) === normalise(cloze.word) ? "state-card" : "state-card warning"}>
+          <p style={{ margin: "0 0 6px" }}>
+            <strong>{normalise(input) === normalise(cloze.word) ? "✓ Perfect!" : `Almost — the missing word was “${cloze.word}”:`}</strong>
+          </p>
+          <p style={{ margin: "0 0 6px" }} dir="ltr">{item.text}</p>
+          <p style={{ margin: "6px 0 10px" }} className="subtle">💡 Meaning: {item.meaning}</p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button type="button" className="button secondary" onClick={() => play(0.75)}>🔊 Hear it again</button>
+            <button type="button" className="button" onClick={next}>{i + 1 >= items.length ? "Finish round →" : "Next item →"}</button>
+          </div>
+        </div>
       ) : (
         <div role="status" aria-live="polite" className={diff!.every((w) => w.ok) ? "state-card" : "state-card warning"}>
           <p style={{ margin: "0 0 8px" }}>

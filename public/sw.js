@@ -1,4 +1,4 @@
-const CACHE = "english-wizard-shell-v2";
+const CACHE = "english-wizard-shell-v3";
 const SHELL = ["/dashboard", "/offline", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 const ASSET_PATTERN = /\/_next\/static\/|\/icon-\d+\.png$|\/logo\.png$/;
 

@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
-import { completeLesson } from "@/src/domain/progression";
+import { completeLesson, recordLessonRetry } from "@/src/domain/progression";
+import { MVP_OBJECTIVES } from "@/src/domain/curriculum";
 import { getLearnerState, saveLearnerState } from "@/src/infrastructure/learner-repository";
 import { query } from "@/src/infrastructure/database";
 import { currentUser } from "@/src/infrastructure/auth";
@@ -28,8 +29,16 @@ export async function POST(request: Request) {
   const confidence = Math.min(1, (previous?.confidence ?? 0.4) + 0.05);
   const now = new Date().toISOString();
   const masteryUpdate = { skill, level: previous?.level ?? ("A1" as const), score, confidence, updatedAt: now };
-  const updated = completeLesson(state, { lessonId: lesson.id, objectiveId: lesson.objectiveId, evidenceIds, masteryUpdates: [masteryUpdate], errors: [], completedAt: now }, [...ALL_LESSONS].sort((a, b) => a.sequence - b.sequence).map((item) => item.id));
+  const orderedIds = [...ALL_LESSONS].sort((a, b) => a.sequence - b.sequence).map((item) => item.id);
+  const threshold = MVP_OBJECTIVES.find((o) => o.id === lesson.objectiveId)?.masteryThreshold ?? 0.75;
+  const requiredScore = Math.round(threshold * 100);
+  if (score < requiredScore) {
+    const gated = await saveLearnerState(recordLessonRetry(state, { lessonId: lesson.id, evidenceIds, completedAt: now }, requiredScore));
+    await query("INSERT INTO learning_events (id, learner_id, event_type, payload) VALUES ($1, $2, $3, $4::jsonb)", [randomUUID(), session.learnerId, "lesson.retry", JSON.stringify({ lessonId, objectiveId: lesson.objectiveId, performanceScore: score, requiredScore })]);
+    return NextResponse.json({ state: gated, gated: true, performance: { skill: masteryUpdate.skill, score, confidence }, requiredScore, nextAction: gated.nextAction }, { headers: { "Cache-Control": "no-store" } });
+  }
+  const updated = completeLesson(state, { lessonId: lesson.id, objectiveId: lesson.objectiveId, evidenceIds, masteryUpdates: [masteryUpdate], errors: [], completedAt: now }, orderedIds);
   const saved = await saveLearnerState(updated);
   await query("INSERT INTO learning_events (id, learner_id, event_type, payload) VALUES ($1, $2, $3, $4::jsonb)", [randomUUID(), session.learnerId, "lesson.completed", JSON.stringify({ lessonId, objectiveId: lesson.objectiveId, evidenceIds, performanceScore: score, nextAction: saved.nextAction })]);
-  return NextResponse.json({ state: saved, performance: { skill: masteryUpdate.skill, score, confidence }, nextAction: saved.nextAction });
+  return NextResponse.json({ state: saved, performance: { skill: masteryUpdate.skill, score, confidence }, nextAction: saved.nextAction }, { headers: { "Cache-Control": "no-store" } });
 }

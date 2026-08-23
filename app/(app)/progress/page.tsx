@@ -9,10 +9,8 @@ export default function ProgressPage() {
   const [state, setState] = useState<ProgressState | null>(null);
 
   useEffect(() => {
-    const id = localStorage.getItem("english-wizard-learner-id");
-    if (!id) return;
     let cancelled = false;
-    fetch(`/api/learner-state?learnerId=${id}`, { cache: "no-store" })
+    fetch("/api/learner-state", { cache: "no-store" })
       .then((r) => r.json())
       .then((p) => {
         if (!cancelled) setState(p.state);

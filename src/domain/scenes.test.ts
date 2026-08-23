@@ -108,11 +108,25 @@ describe("learning scenes (x20 expansion)", () => {
       const set = practiceForLesson(id);
       expect(set.length, `${id} has only ${set.length}`).toBeGreaterThanOrEqual(20);
       for (const ex of set) {
+        if (ex.typed) {
+          expect((ex.accept ?? []).length, `${id} typed exercise without accepted answers`).toBeGreaterThan(0);
+          continue;
+        }
         expect(ex.choices.length).toBe(3);
         expect(ex.answer).toBeGreaterThanOrEqual(0);
         expect(ex.answer).toBeLessThan(3);
         expect(new Set(ex.choices.map((c) => c.toLowerCase())).size).toBe(3);
       }
+    }
+  });
+
+  it("lessons at A2 and above include at least one free-typed recall exercise", () => {
+    const order = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
+    for (const id of LESSON_IDS) {
+      const lesson = MVP_LESSONS.find((l) => l.id === id)!;
+      if (order.indexOf(lesson.level) < 2) continue;
+      const set = practiceForLesson(id);
+      expect(set.some((ex) => ex.typed && (ex.accept?.length ?? 0) > 0), `${id} lacks a typed exercise`).toBe(true);
     }
   });
 });

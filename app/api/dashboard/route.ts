@@ -161,5 +161,5 @@ export async function GET() {
     totalLessons: state?.lessonHistory.length ?? 0,
     vocabularyWords: rows.filter((r) => String(r.payload?.skill).toLowerCase() === "vocabulary").length * 3,
     notifications: Number(reviewsRes.rows[0]?.count ?? 0),
-  });
+  }, { headers: { "Cache-Control": "no-store" } });
 }
