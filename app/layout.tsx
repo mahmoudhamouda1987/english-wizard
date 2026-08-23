@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ServiceWorkerRegister } from "./components/service-worker-register";
 import { TextSizeControl } from "./components/text-size-control";
+import { ThemeApply } from "./components/theme-apply";
 
 export const metadata: Metadata = {
   title: { default: "English Wizard — Prove your progress", template: "%s · English Wizard" },
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <ServiceWorkerRegister />
+        <ThemeApply />
         <div style={{ position: "fixed", bottom: 12, right: 12, zIndex: 900 }}><TextSizeControl /></div>
         {children}
       </body>
