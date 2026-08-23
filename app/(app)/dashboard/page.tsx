@@ -152,8 +152,10 @@ export default function DashboardPage() {
   const flatNav = useMemo(() => NAV.flatMap((g) => g.items.map((i) => ({ ...i }))), []);
   function search(e: React.FormEvent) {
     e.preventDefault();
-    const hit = flatNav.find((item) => item.label.toLowerCase().includes(query.trim().toLowerCase()));
-    if (hit && query.trim()) router.push(hit.href);
+    const q = query.trim();
+    if (!q) return;
+    const hit = flatNav.find((item) => item.label.toLowerCase().includes(q.toLowerCase()));
+    router.push(hit && hit.href === "/dashboard" ? `/search?q=${encodeURIComponent(q)}` : (hit ? hit.href : `/search?q=${encodeURIComponent(q)}`));
   }
 
   const planItems = [
