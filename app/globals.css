@@ -377,3 +377,10 @@ html[data-theme="dark"] .cc-badge { background:rgba(10,15,30,.85); color:#fff; }
 .session-card:hover { transform: translateY(-4px) scale(1.02); }
 .continue-card:hover { transform: translateY(-3px); }
 .button:active { transform: scale(.96); }
+
+.mind-stage { transition: all .25s ease; opacity: .45; filter: grayscale(.6); }
+.mind-stage.done { opacity: .9; filter: none; }
+.mind-stage.active { opacity: 1; filter: none; transform: translateY(-3px) scale(1.04); box-shadow: 0 0 0 2px #a855f7, 0 10px 26px rgba(168,85,247,.35); animation: mind-pulse 2.2s ease-in-out infinite; }
+@keyframes mind-pulse { 50% { box-shadow: 0 0 0 5px rgba(168,85,247,.18), 0 14px 34px rgba(168,85,247,.28); } }
+.think-ring { display: grid; place-items: center; width: 92px; height: 92px; border-radius: 999px; background: conic-gradient(#a855f7 var(--pct, 0%), #efeafd 0); margin: 0 auto; }
+.think-ring > span { grid-area: 1 / 1; width: 74px; height: 74px; border-radius: 999px; background: white; display: grid; place-items: center; font-weight: 800; font-size: 20px; color: #4626b8; }

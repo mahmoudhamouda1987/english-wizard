@@ -38,7 +38,8 @@ test("Thinking in English exposes a level-based progression with prompts", async
   await register(page, "think");
   await page.goto("/thinking-in-english");
   await expect(page.locator("main")).toBeVisible();
-  await expect(page.getByRole("combobox").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "A1", exact: true }).first()).toBeVisible();
+  await expect(page.getByText("you are here")).toBeVisible();
 });
 
 test("session planner supports every contract session type", async ({ request }) => {
