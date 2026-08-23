@@ -72,7 +72,7 @@ export default function PathwaysPage() {
   }
 
   return (
-    <main id="main-content" style={{ maxWidth: 980, margin: "0 auto", padding: 40 }}>
+    <main id="main-content" style={{ maxWidth: 980, margin: "0 auto", padding: 40 }}><section className="panel" style={{marginBottom:24,padding:22,display:"flex",justifyContent:"space-between",gap:14,alignItems:"center",flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 4px"}}>📝 Take the mock exam</h2><p className="subtle" style={{margin:0}}>Reading, writing and speaking in ten minutes — transparent band estimate against CEFR descriptors.</p></div><a className="button" href="/pathways/mock">Start mock →</a></section>
       <p className="eyebrow">Learning pathways</p>
       <h1>Choose the English path that fits your life</h1>
       <p className="muted">
