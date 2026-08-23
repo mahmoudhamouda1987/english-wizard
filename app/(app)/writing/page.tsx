@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PageHero } from "@/app/components/page-hero";
 
 const TASKS = [
   { id: "w-prea1-form", title: "Fill in a form", prompt: "Write your name, country, and one thing you like. Three short lines.", level: "Pre-A1" },
@@ -46,9 +47,7 @@ export default function WritingPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <p className="eyebrow">Writing</p>
-      <h1>Build real writing skill</h1>
-      <p style={{ marginTop: 8, opacity: .75 }}>Choose a task, write your response, and it becomes part of your learning evidence.</p>
+      <PageHero icon="✍️" title="Writing Lab" sub="Pick a task, write, and watch your strength build live. Every submission becomes graded learning evidence." />
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
         {TASKS.map((t) => (
           <button key={t.id} className={t.id === taskId ? "button" : "button secondary"} onClick={() => { setTaskId(t.id); setText(""); setState("idle"); }}>
@@ -57,7 +56,12 @@ export default function WritingPage() {
         ))}
       </div>
       <section className="panel" style={{ marginTop: 18 }}>
-        <h2>{task.title}</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <h2 style={{ margin: 0 }}>{task.title} <span className="chip">{task.level}</span></h2>
+          <small className="subtle">{words} words · {sentences} sentences</small>
+        </div>
+        <div className="meter" aria-hidden="true" style={{ margin: "12px 0 4px" }}><span style={{ width: `${strength}%` }} /></div>
+        <small className="subtle">Strength {strength}% — aim for 70+ to clear the task.</small>
         <p>{task.prompt}</p>
         <textarea aria-label="Your writing response" rows={9} value={text} onChange={(e) => { setText(e.target.value.slice(0, 4000)); setState("idle"); }} placeholder="Write here…" style={{ width: "100%", marginTop: 12 }} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, gap: 12 }}>

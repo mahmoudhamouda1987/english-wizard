@@ -399,3 +399,13 @@ html[data-theme="dark"] .cc-badge { background:rgba(10,15,30,.85); color:#fff; }
 .speaking .wavebars i:nth-child(2n) { animation-delay: .12s; }
 .speaking .wavebars i:nth-child(3n) { animation-delay: .24s; }
 @keyframes wave-b { 50% { height: 100%; } }
+
+.flip-in { animation: flip-in .55s cubic-bezier(.2,.9,.35,1) both; transform-origin: top center; }
+@keyframes flip-in { from { transform: perspective(900px) rotateX(-65deg) translateY(-6px); opacity: 0; } }
+.chip { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #eef2ff; color: #4626b8; margin: 0 6px 6px 0; }
+.k-new { background:#e2e8f0;color:#475569 } .k-receptive{ background:#dbeafe;color:#1d4ed8 } .k-productive{ background:#d1fae5;color:#047857 }
+.meter { height: 12px; border-radius: 999px; background: #e9ecf5; overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg,#f59e0b,#10b981,#6840d6); transition: width .45s ease; }
+.bubble-user, .bubble-tutor { max-width: 88%; padding: 12px 15px; border-radius: 16px; line-height: 1.6; }
+.bubble-user { justify-self: end; background: #efeafd; border: 1px solid #ddd0fa; }
+.bubble-tutor { justify-self: start; background: white; border: 1px solid var(--border); }

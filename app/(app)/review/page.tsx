@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PageHero } from "@/app/components/page-hero";
+import { Celebration } from "@/app/components/celebration";
 
 type ReviewCard = { id: string; skill: string; prompt: string; answer: string | null; interval_days: number; repetitions: number };
 
@@ -48,6 +50,7 @@ export default function ReviewPage() {
   if (!card) return <main id="main-content" style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}><p className="eyebrow">Review</p><h1>{cards.length === 0 ? "Nothing is due right now." : "Review complete."}</h1><p className="subtle">Your recall schedule is persisted and will surface the next due items automatically.</p>{message && <p>{message}</p>}<div style={{ display: "flex", gap: 10, marginTop: 8, flexWrap: "wrap" }}><a className="button" href="/dashboard">Back to dashboard →</a><a className="button secondary" href="/api/review/export">Export deck (Anki CSV)</a></div></main>;
 
   return <main id="main-content" style={{ maxWidth: 760, margin: "0 auto", padding: "56px 24px" }}>
+    <PageHero icon="🔁" title={`Card ${index + 1} of ${cards.length}`} sub={`Spaced review · ${card.skill}. Recall first — reveal only after you commit.`} />
     <p className="eyebrow">Spaced Review · {card.skill}</p>
     <h1>{card.prompt}</h1>
     {showAnswer ? <section className="panel" style={{ marginTop: 20 }}><h2>Answer</h2><p>{card.answer ?? "No saved answer — use this item as a recall prompt."}</p></section> : <p className="subtle">Recall first. Reveal the answer only when you have committed to a response.</p>}

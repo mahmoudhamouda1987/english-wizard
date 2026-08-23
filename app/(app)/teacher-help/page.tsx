@@ -102,12 +102,14 @@ export default function TeacherHelpPage() {
 
       {response?.error && <section className="panel"><strong>{response.error}</strong></section>}
       {response?.adaptation && (
-        <section className="panel" style={{ marginTop: 16 }}>
-          <p className="eyebrow">Teacher decision</p>
-          <h2>{response.adaptation.move.replaceAll("_", " ")}</h2>
-          <p><strong>Why:</strong> {response.adaptation.rationale}</p>
-          {response.help && <p><strong>New explanation:</strong> {response.help}</p>}
-          <p><strong>Next prompt:</strong> {response.adaptation.nextPrompt}</p>
+        <section aria-label="Conversation" style={{ display: "grid", gap: 10, marginTop: 16 }}>
+          <div className="bubble-user">{target}</div>
+          <div className="bubble-tutor flip-in">
+            <small className="eyebrow" style={{ margin: 0 }}>🧙 Tutor · move: {response.adaptation.move.replaceAll("_", " ")}</small>
+            {response.help && <p style={{ margin: "8px 0 4px", fontSize: 17 }}>{response.help}</p>}
+            <p style={{ margin: response.help ? "0 0 4px" : "8px 0 4px" }}><strong>Why this approach:</strong> {response.adaptation.rationale}</p>
+            <p style={{ margin: 0 }} className="subtle"><strong>Try next:</strong> {response.adaptation.nextPrompt}</p>
+          </div>
         </section>
       )}
     </main>
