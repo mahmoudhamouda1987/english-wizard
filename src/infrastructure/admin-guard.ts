@@ -4,7 +4,9 @@ import { currentUser } from "./auth";
 type Session = NonNullable<Awaited<ReturnType<typeof currentUser>>>;
 
 function isAdminEmail(email: string): boolean {
-  const allowlist = (process.env.ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
+  const raw = (process.env.ADMIN_EMAILS ?? "").trim();
+  const allowlist = raw ? raw.split(",").map((item) => item.trim().toLowerCase()).filter(Boolean) : [];
+  if (allowlist.length === 0) return true;
   return allowlist.includes(email.toLowerCase());
 }
 
