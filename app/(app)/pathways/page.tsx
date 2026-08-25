@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 
 type Readiness = { ready: boolean; missing: string[] };
-type ProfessionalModule = { domain: string; track: string; targetRole?: string; readiness: Readiness };
+type DomainSummary = { id: string; label: string; blurb: string; trackCount: number; tracks: Array<{ id: string; label: string }> };
 type Catalog = {
   generalEnglish: { pathway: string; description: string };
   ielts: ExamPathwayView;
   cambridge: ExamPathwayView;
-  professional: ProfessionalModule[];
-  options: { domains: string[]; tracks: string[] };
+  professional: { domains: DomainSummary[] };
 };
 type ExamPathwayView = {
   exam: string;
@@ -19,6 +18,9 @@ type ExamPathwayView = {
   disclaimer: string;
   readinessCriteria: string[];
   readiness: Readiness;
+  variants?: string[];
+  bands?: number[];
+  qualifications?: string[];
 };
 type Selection = { pathway: string; domain?: string; track?: string; target?: string; selectedAt: string };
 
@@ -97,10 +99,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
             <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
             <p className="muted">{catalog.ielts.scoreModel}</p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-              <input aria-label="IELTS band target" placeholder="Band target, e.g. 7.0" value={target} onChange={(event) => setTarget(event.target.value)} />
-              <button className="button" disabled={busy} onClick={() => select("IELTS", target.trim() ? { target: target.trim() } : {})}>Start IELTS preparation</button>
-            </div>
+            <a className="button" href="/pathways/ielts">Open IELTS pathway →</a>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
           </section>
 
@@ -108,28 +107,14 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
             <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
             <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <button className="button" disabled={busy} onClick={() => select("CAMBRIDGE")}>Start Cambridge preparation</button>
+            <a className="button" href="/pathways/cambridge">Open Cambridge pathway →</a>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
           </section>
 
           <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>Professional English</h2><span>{catalog.options.domains.length} domains</span></div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-              <label htmlFor="pathway-domain">Domain</label>
-              <select id="pathway-domain" value={domain} onChange={(event) => setDomain(event.target.value)}>
-                {catalog.options.domains.map((item) => <option key={item} value={item}>{item.replaceAll("_", " ")}</option>)}
-              </select>
-              <label htmlFor="pathway-track">Track</label>
-              <select id="pathway-track" value={track} onChange={(event) => setTrack(event.target.value)}>
-                {catalog.options.tracks.map((item) => <option key={item} value={item}>{item.replaceAll("_", " ")}</option>)}
-              </select>
-              <button className="button" disabled={busy} onClick={() => select("PROFESSIONAL", { domain, track })}>Start professional pathway</button>
-            </div>
-            <ul>
-              {catalog.professional.map((module) => (
-                <li key={module.domain}>{module.domain.replaceAll("_", " ")} — {readinessLabel(module.readiness)}</li>
-              ))}
-            </ul>
+            <div className="panel-title"><h2>Professional English</h2><span>{catalog.professional.domains.length} domains</span></div>
+            <p className="subtle">Business, technology, healthcare, finance and {Math.max(0, catalog.professional.domains.length - 4)} more — each with real tracks, vocabulary and roleplays.</p>
+            <a className="button" href="/pathways/professional">Open Professional English →</a>
           </section>
         </>
       )}

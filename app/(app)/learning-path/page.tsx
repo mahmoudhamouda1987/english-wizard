@@ -9,6 +9,7 @@ const LEVEL_RANK: Record<string, number> = { "Pre-A1": 0, A1: 1, A2: 2, B1: 3, B
 export default function LearningPathPage() {
   const [done, setDone] = useState<string[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
 
   const ordered = useMemo(() => [...ALL_LESSONS].sort((a, b) => (LEVEL_RANK[a.level] ?? 9) - (LEVEL_RANK[b.level] ?? 9)), []);
@@ -21,6 +22,7 @@ export default function LearningPathPage() {
       const rawCurrent = p.state?.currentLessonId ?? null;
       setCurrent(rawCurrent && ordered.some(l => l.id === rawCurrent) ? rawCurrent : null);
     }).catch(() => setError("Sign in and complete onboarding to see your path."));
+    fetch("/api/admin/overview").then((r) => { if (r.ok) setIsAdmin(true); }).catch(() => {});
   }, []);
 
   const stats = useMemo(() => ({
@@ -31,7 +33,7 @@ export default function LearningPathPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 980, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="🧭" title="My journey" sub="Every lesson unlocks the next. Evidence, mastery and spaced review decide what comes after — never a fixed checklist." />
+      <PageHero icon="🧭" title="My journey" sub={isAdmin ? "Admin review mode active — all lessons unlocked for content inspection." : "Every lesson unlocks the next. Evidence, mastery and spaced review decide what comes after — never a fixed checklist."} />
 
       <section className="panel" style={{ padding: 22, marginBottom: 26 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
@@ -47,7 +49,7 @@ export default function LearningPathPage() {
         {ordered.map((l, i) => {
           const completed = done.includes(l.id);
           const isCurrent = l.id === current;
-          const unlocked = isCurrent || completed || (!current && i === 0);
+          const unlocked = isAdmin || isCurrent || completed || (!current && i === 0);
           const color = LEVEL_COLORS[l.level] ?? "#6840d6";
           return (
             <section key={l.id} className="panel" style={{ position: "relative", margin: "0 0 16px", padding: "18px 20px", opacity: unlocked ? 1 : 0.62, borderLeft: `4px solid ${color}` }}>

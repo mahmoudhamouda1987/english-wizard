@@ -1,6 +1,6 @@
 export type PathwayKind = 'GENERAL_ENGLISH' | 'PROFESSIONAL' | 'IELTS' | 'CAMBRIDGE';
-export type ProfessionalDomain = 'BUSINESS' | 'ACADEMIC' | 'TECHNOLOGY' | 'HEALTHCARE' | 'HOSPITALITY' | 'CUSTOMER_SERVICE' | 'LEADERSHIP';
-export type ProfessionalTrack = 'WORKPLACE_COMMUNICATION' | 'MEETINGS' | 'PRESENTATIONS' | 'MANAGEMENT' | 'ACADEMIC' | 'INTERVIEW';
+export type ProfessionalDomain = string;
+export type ProfessionalTrack = string;
 export type CambridgeQualification = 'A2_KEY' | 'B1_PRELIMINARY' | 'B2_FIRST' | 'C1_ADVANCED' | 'C2_PROFICIENCY';
 
 export interface PathwayModule {

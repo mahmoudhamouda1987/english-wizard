@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { speakText, stopSpeaking } from "@/src/domain/tts";
+import { genderForName } from "@/src/domain/characters";
 import type { LearningScene } from "@/src/domain/scenes";
 
 const SPEEDS = [0.7, 0.85, 1] as const;
@@ -22,8 +23,7 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
   const speakCurrent = useCallback((i: number, rate: number) => {
     const l = scene.lines[i];
     if (!l) return;
-    const pitch = l.speaker === "a" ? 0.9 : 1.2;
-    speakText(l.text, { lang: "en-GB", rate: rate * (l.speaker === "b" ? 1 : 0.96), pitch });
+    speakText(l.text, { lang: "en-GB", rate: rate * (l.speaker === "b" ? 1 : 0.96), gender: genderForName(scene.characters[l.speaker].name) });
   }, [scene]);
 
   const clearTimer = () => { if (timerRef.current !== null) { window.clearTimeout(timerRef.current); timerRef.current = null; } };
@@ -47,7 +47,7 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
     speakText(l.text, {
       lang: "en-GB",
       rate: speed * (l.speaker === "b" ? 1 : 0.96),
-      pitch: l.speaker === "a" ? 0.9 : 1.2,
+      gender: genderForName(scene.characters[l.speaker].name),
       onEnd: () => {
         if (tokenRef.current !== myToken || timerRef.current !== null) return;
         timerRef.current = window.setTimeout(() => advance(idx), 500);
