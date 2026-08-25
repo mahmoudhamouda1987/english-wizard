@@ -3,6 +3,8 @@
  * Internal preparation estimates only — never presents results as official Cambridge results.
  */
 
+import { EXPANDED_ITEM_POOL } from "./cambridge-items";
+
 export type CambridgeQualificationId = "A2_KEY" | "B1_PRELIMINARY" | "B2_FIRST" | "C1_ADVANCED" | "C2_PROFICIENCY";
 export type AssessmentKind = "vocabulary-benchmark" | "grammar-benchmark" | "reading-benchmark" | "listening-benchmark" | "writing-task" | "speaking-card" | "readiness-assessment";
 
@@ -129,13 +131,13 @@ export function buildCambridgeAssessment(qualificationId: CambridgeQualification
   const qualification = QUALIFICATIONS[qualificationId];
   if (!qualification || !(kind in ASSESSMENT_META)) return null;
   const meta = ASSESSMENT_META[kind as keyof typeof ASSESSMENT_META];
-  const objectiveItems = ITEM_POOL.filter((item) => item.kinds.includes(kind) && item.levels.includes(qualification.cefr));
+  const objectiveItems = EXPANDED_ITEM_POOL.filter((item) => item.kinds.includes(kind) && item.levels.includes(qualification.cefr));
   const set: AssessmentSet = { qualification, kind, title: `${qualification.name} — ${meta.title}`, minutes: meta.minutes, objectiveItems };
   if (kind === "readiness-assessment") {
     // Blend in adjacent-level items so the paper differentiates within the band.
     const index = listQualifications().findIndex((q) => q.id === qualification.id);
     const neighbours = [listQualifications()[index - 1]?.cefr, listQualifications()[index + 1]?.cefr].filter(Boolean) as string[];
-    set.objectiveItems = [...set.objectiveItems, ...ITEM_POOL.filter((item) => neighbours.some((n) => item.levels.includes(n) && item.kinds.includes("readiness-assessment")))];
+    set.objectiveItems = [...set.objectiveItems, ...EXPANDED_ITEM_POOL.filter((item) => neighbours.some((n) => item.levels.includes(n) && item.kinds.includes("readiness-assessment")))];
   }
   if (kind === "writing-task") {
     set.writingPrompt = `Write ${qualification.cefr === "A2" ? "a short note (25+ words) telling a friend about your weekend plans" : qualification.cefr === "B1" ? "an email (100+ words) inviting a colleague to a work event" : qualification.cefr === "B2" ? "an essay (140–190 words): 'Every teenager should learn to cook.' Do you agree?" : "a discursive response (220–260 words): 'Universities should fund practical skills over pure research.' To what extent do you agree?"}`;

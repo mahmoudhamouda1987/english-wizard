@@ -78,21 +78,23 @@ export default function LearningPathPage() {
           const level = l.level;
           const category = "category" in l ? (l as { category: string }).category : l.skill;
           return (
-            <section key={l.id} className="panel" style={{ position: "relative", margin: "0 0 16px", padding: "18px 20px", opacity: unlocked ? 1 : 0.62, borderLeft: `4px solid ${color}` }}>
-              <span aria-hidden="true" className={`j-node ${completed ? "done" : isCurrent ? "current" : ""}`}>
-                {completed ? "✓" : isCurrent ? "▶" : i + 1}
-              </span>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 220 }}>
-                  <span className="eyebrow">{i + 1} · <span style={{ color }}>{level}</span> · {category}</span>
-                  <h2 style={{ fontSize: 19, margin: "4px 0" }}>{unlocked ? l.title : "🔒 Locked lesson"}</h2>
-                  <p className="subtle" style={{ margin: 0 }}>{unlocked ? l.mission : "Clear earlier lessons to reveal this mission."}</p>
-                </div>
-                <span className={isCurrent ? "button" : completed ? "streak-pill" : "streak-pill"} style={{ alignSelf: "center" }}>
-                  {completed ? "✓ Cleared" : isCurrent ? "▶ Continue now" : unlocked ? "Available" : "Locked"}
+            <a key={l.id} href={unlocked ? `/learn/${l.id}` : undefined} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+              <section className="panel" style={{ position: "relative", margin: "0 0 12px", padding: "18px 20px", opacity: unlocked ? 1 : 0.62, borderLeft: `4px solid ${color}`, cursor: unlocked ? "pointer" : "default", transition: "transform .1s, box-shadow .1s" }} onMouseEnter={(e) => { if (unlocked) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,.08)"; } }} onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
+                <span aria-hidden="true" className={`j-node ${completed ? "done" : isCurrent ? "current" : ""}`}>
+                  {completed ? "✓" : isCurrent ? "▶" : i + 1}
                 </span>
-              </div>
-            </section>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+                  <div style={{ flex: 1, minWidth: 220 }}>
+                    <span className="eyebrow">{i + 1} · <span style={{ color }}>{level}</span> · {category}</span>
+                    <h2 style={{ fontSize: 19, margin: "4px 0" }}>{unlocked ? l.title : "🔒 Locked lesson"}</h2>
+                    <p className="subtle" style={{ margin: 0 }}>{unlocked ? l.mission : "Clear earlier lessons to reveal this mission."}</p>
+                  </div>
+                  <span className={isCurrent ? "button" : completed ? "streak-pill" : "streak-pill"} style={{ alignSelf: "center" }}>
+                    {completed ? "✓ Cleared" : isCurrent ? "▶ Continue now" : unlocked ? "Start lesson →" : "🔒 Locked"}
+                  </span>
+                </div>
+              </section>
+            </a>
           );
         })}
       </div>
