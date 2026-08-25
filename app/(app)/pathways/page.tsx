@@ -112,9 +112,9 @@ export default function PathwaysPage() {
           </section>
 
           <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>Professional English</h2><span>{catalog.professional.domains.length} domains</span></div>
-            <p className="subtle">Business, technology, healthcare, finance and {Math.max(0, catalog.professional.domains.length - 4)} more — each with real tracks, vocabulary and roleplays.</p>
-            <a className="button" href="/pathways/professional">Open Professional English →</a>
+            <div className="panel-title"><h2>Professional English</h2><span>28 lessons</span></div>
+            <p className="subtle">28 professional English lessons covering emails, meetings, presentations, negotiations, leadership, and executive communication — B1 through C2, each with scenes, exercises, and vocabulary.</p>
+            <a className="button" href="/learning-path">Open Professional English curriculum →</a>
           </section>
         </>
       )}
