@@ -3,9 +3,11 @@ import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
 import {
   paperForVariant,
+  adaptiveOrderForStart,
   variantForLearner,
   updateEstimate,
   estimateToLevel,
+  levelToEstimate,
   CEFR_ORDER,
   type LevelQuestItem,
   type SkillKey,
@@ -38,7 +40,13 @@ export async function GET() {
 
   try {
     const variant = variantForLearner(session.learnerId);
-    const paper = paperForVariant(variant);
+
+    // Start the adaptive ramp from the learner's known level when available, so a
+    // confident B2 learner is not given the same opening questions as an A1 learner.
+    const known = await query(`SELECT english_dna FROM learner_profiles WHERE learner_id = $1::uuid`, [session.learnerId]);
+    const knownLevel = (known.rows[0]?.english_dna as { overallLevel?: string } | undefined)?.overallLevel;
+    const startEstimate = levelToEstimate(knownLevel);
+    const paper = adaptiveOrderForStart(variant, startEstimate);
 
     // Resume in-progress session
     const resume = await query(
@@ -75,6 +83,8 @@ export async function GET() {
       answered: Object.fromEntries(Object.entries(state.answers).map(([k, v]) => [k, v.correct])),
       flags: state.flag,
       estimate: state.estimate,
+      startEstimate,
+      ...(knownLevel ? { startLevel: knownLevel } : {}),
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Unable to start LevelQuest." }, { status: 500 });
@@ -172,21 +182,23 @@ async function finalize(learnerId: string, state: SessionState) {
   state.status = "COMPLETE";
   await query(`UPDATE levelquest_sessions SET status = 'COMPLETE', payload = $2, completed_at = now() WHERE id = $1`, [state.sessionId, JSON.stringify(state)]);
 
-  await query(
-    `INSERT INTO diagnostic_attempts (id, learner_id, answers, scores, cefr_level, english_dna, created_at) VALUES ($1, $2::uuid, $3, $4, $5, $6, now())`,
-    [crypto.randomUUID(), learnerId, JSON.stringify(state.answers), JSON.stringify(skillScoreArray), overall.level,
-      JSON.stringify({ overallLevel: overall.level, confidence: overall.confidence, skillProfile, strengths, focusAreas: focus, variant: state.variant, generatedAt: new Date().toISOString() })],
-  );
-
-  await query(
-    `INSERT INTO placement_reports (learner_id, variant, level, confidence, skill_profile, report_json, created_at) VALUES ($1::uuid, $2, $3, $4, $5, $6, now())`,
-    [learnerId, state.variant, overall.level, overall.confidence, JSON.stringify(skillProfile), JSON.stringify(result)],
-  );
-
-  await query(
-    `INSERT INTO learning_events (id, learner_id, event_type, payload, occurred_at) VALUES ($1, $2::uuid, 'levelquest.completed', $3, now())`,
-    [crypto.randomUUID(), learnerId, JSON.stringify({ level: overall.level, confidence: overall.confidence, variant: state.variant })],
-  );
+  // Persistence below is best-effort: the report must always reach the learner even
+  // if a given table write fails, so each insert is isolated.
+  try {
+    await query(
+      `INSERT INTO diagnostic_attempts (id, learner_id, answers, scores, cefr_level, english_dna, created_at) VALUES ($1, $2::uuid, $3, $4, $5, $6, now())`,
+      [crypto.randomUUID(), learnerId, JSON.stringify(state.answers), JSON.stringify(skillScoreArray), overall.level,
+        JSON.stringify({ overallLevel: overall.level, confidence: overall.confidence, skillProfile, strengths, focusAreas: focus, variant: state.variant, generatedAt: new Date().toISOString() })],
+    );
+    await query(
+      `INSERT INTO placement_reports (id, learner_id, variant, level, confidence, skill_profile, report_json, created_at) VALUES ($1, $2::uuid, $3, $4, $5, $6, $7, now())`,
+      [crypto.randomUUID(), learnerId, state.variant, overall.level, overall.confidence, JSON.stringify(skillProfile), JSON.stringify(result)],
+    );
+    await query(
+      `INSERT INTO learning_events (id, learner_id, event_type, payload, occurred_at) VALUES ($1, $2::uuid, 'levelquest.completed', $3, now())`,
+      [crypto.randomUUID(), learnerId, JSON.stringify({ level: overall.level, confidence: overall.confidence, variant: state.variant })],
+    );
+  } catch { /* report is already computed; persistence failure is non-fatal */ }
 
   // Persist the placed level into the learner's profile so the dashboard reflects it.
   try {

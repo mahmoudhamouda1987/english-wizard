@@ -97,7 +97,8 @@ export default function LevelQuestPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, itemId, answer: given }),
       });
-      const p = await r.json();
+      const text = await r.text();
+      const p = text ? JSON.parse(text) : {};
       if (!r.ok) throw new Error(p.error ?? "Unable to save.");
       setAnsweredCorrect(p.answered ?? {});
     } catch (e) {
@@ -135,7 +136,8 @@ export default function LevelQuestPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, finalize: true }),
       });
-      const p = await r.json();
+      const text = await r.text();
+      const p = text ? JSON.parse(text) : {};
       if (!r.ok) throw new Error(p.error ?? "Unable to finalize.");
       setReport(p.result);
       localStorage.setItem("lq-result-v1", JSON.stringify({ ...p.result, date: new Date().toISOString() }));

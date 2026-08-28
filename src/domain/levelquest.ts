@@ -272,3 +272,47 @@ export function estimateToLevel(estimate: number): { level: CEFRLevel; confidenc
   const confidence = (fractional < 0.3 || fractional > 0.7) ? "High" : "Moderate";
   return { level: CEFR_ORDER[idx], confidence };
 }
+
+const clampEstimate = (e: number) => Math.max(0, Math.min(6, e));
+
+/** Convert a known CEFR level to a starting ability estimate (0..6). */
+export function levelToEstimate(level?: string | null): number {
+  if (!level) return 3; // unknown learner probes from the middle of the range
+  const idx = CEFR_ORDER.indexOf(level as CEFRLevel);
+  return idx >= 0 ? idx : 3;
+}
+
+/**
+ * Build a genuinely adaptive objective battery for a learner given their starting
+ * ability estimate. Selection uses `adaptiveNextItem` (difficulty closest to the
+ * live estimate), and the simulated learner is "correct" on items within reach and
+ * "wrong" on those that overshoot — so the path climbs toward, and converges near,
+ * the learner's true level. Listening items follow, then speaking is appended last.
+ */
+export function adaptiveOrderForStart(variant: number, startEstimate: number): LevelQuestItem[] {
+  const objective = LEVELQUEST_BANK.filter((i) => i.variant === variant && i.type !== "speaking");
+  const speaking = LEVELQUEST_BANK.filter((i) => i.variant === variant && i.type === "speaking");
+
+  const result: LevelQuestItem[] = [];
+  const asked: string[] = [];
+  let est = clampEstimate(startEstimate);
+
+  while (result.length < objective.length) {
+    const item = adaptiveNextItem(objective, asked, est);
+    if (!item) break;
+    result.push(item);
+    asked.push(item.id);
+    // Simulated learner performance: items at or below current estimate are answered
+    // correctly (estimate drifts up); items well above are missed (estimate drops back).
+    const difficulty = g(item);
+    est = clampEstimate(est + (difficulty <= est + 0.35 ? 0.14 : -0.18));
+  }
+
+  // Keep listening together after the adaptive objective battery (listening questions
+  // rely on audio already exposed and require sequential listening context).
+  const objectiveIds = new Set(asked);
+  const listeningItems = objective.filter((i) => !objectiveIds.has(i.id) && i.skill === "listening");
+  const leftoverObjective = objective.filter((i) => !objectiveIds.has(i.id) && i.skill !== "listening");
+  result.push(...leftoverObjective, ...listeningItems, ...speaking);
+  return result;
+}
