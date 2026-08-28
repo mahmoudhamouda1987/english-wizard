@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { UpgradeModal } from "@/app/components/upgrade-modal";
 
 type Readiness = { ready: boolean; missing: string[] };
 type DomainSummary = { id: string; label: string; blurb: string; trackCount: number; tracks: Array<{ id: string; label: string }> };
@@ -32,6 +33,12 @@ export default function PathwaysPage() {
   const [target, setTarget] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [premium, setPremium] = useState<boolean | null>(null);
+  const [gate, setGate] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/access", { cache: "no-store" }).then((r) => r.json()).then((a) => setPremium(Boolean(a.premium))).catch(() => setPremium(true));
+  }, []);
 
   useEffect(() => {
     fetch("/api/pathways", { cache: "no-store" })
@@ -99,7 +106,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
             <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
             <p className="muted">{catalog.ielts.scoreModel}</p>
-            <a className="button" href="/pathways/ielts">Open IELTS pathway →</a>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else window.location.href = "/pathways/ielts"; }}>Open IELTS pathway →</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
           </section>
 
@@ -107,7 +114,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
             <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
             <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <a className="button" href="/pathways/cambridge">Open Cambridge pathway →</a>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else window.location.href = "/pathways/cambridge"; }}>Open Cambridge pathway →</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
           </section>
 
@@ -118,6 +125,7 @@ export default function PathwaysPage() {
           </section>
         </>
       )}
+      <UpgradeModal open={Boolean(gate)} onClose={() => setGate(null)} feature="EXAM_PATHWAY" />
     </main>
   );
 }

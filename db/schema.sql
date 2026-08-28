@@ -66,3 +66,40 @@ CREATE TABLE IF NOT EXISTS rate_limits (key TEXT NOT NULL,action TEXT NOT NULL,c
 
 CREATE TABLE IF NOT EXISTS corrections (id UUID PRIMARY KEY,submission_id UUID NOT NULL REFERENCES evidence_records(id) ON DELETE CASCADE,reviewer_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,comment TEXT NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE INDEX IF NOT EXISTS corrections_submission_idx ON corrections(submission_id);
+
+-- LevelQuest adaptive placement assessment sessions
+CREATE TABLE IF NOT EXISTS levelquest_sessions (
+  id UUID PRIMARY KEY,
+  learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,
+  variant INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'IN_PROGRESS' CHECK (status IN ('IN_PROGRESS','COMPLETE')),
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS levelquest_sessions_learner_idx ON levelquest_sessions(learner_id,started_at DESC);
+
+-- Trial subscriptions (7-day guided trial)
+CREATE TABLE IF NOT EXISTS trial_subscriptions (
+  learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ends_at TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE','EXPIRED','CONVERTED'))
+);
+CREATE INDEX IF NOT EXISTS trial_subscriptions_status_idx ON trial_subscriptions(status);
+
+-- Placement report records (persisted premium report)
+CREATE TABLE IF NOT EXISTS placement_reports (
+  id UUID PRIMARY KEY,
+  learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,
+  variant INTEGER NOT NULL,
+  level TEXT NOT NULL,
+  confidence TEXT NOT NULL,
+  skill_profile JSONB NOT NULL,
+  report_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS placement_reports_learner_idx ON placement_reports(learner_id,created_at DESC);
+
+-- Student IDs
+ALTER TABLE learners ADD COLUMN IF NOT EXISTS student_id TEXT;

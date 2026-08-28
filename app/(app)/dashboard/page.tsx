@@ -125,6 +125,45 @@ function Donut({ percent }: { percent: number }) {
   );
 }
 
+interface AccessInfo {
+  premium: boolean;
+  inTrial: boolean;
+  trialExpired: boolean;
+  trial: { active: boolean; daysLeft: number; hoursLeft: number; fractionRemaining: number; endsAt?: string };
+}
+
+function TrialBanner() {
+  const router = useRouter();
+  const [access, setAccess] = useState<AccessInfo | null>(null);
+  useEffect(() => {
+    fetch("/api/access", { cache: "no-store" }).then((r) => r.json()).then(setAccess).catch(() => {});
+  }, []);
+  if (!access) return null;
+  if (access.inTrial) {
+    const days = Math.max(access.trial.daysLeft, 0);
+    return (
+      <section className="panel" style={{ margin: "18px 0 0", padding: 16, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 24 }}>🎁</span>
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <strong>7-day guided trial active</strong> — enjoy every premium feature free.
+          <div className="track" style={{ marginTop: 8, maxWidth: 320 }}><span style={{ width: `${Math.min(100, Math.max(0, (access.trial.fractionRemaining ?? 1) * 100))}%` }} /></div>
+        </div>
+        <span className="streak-pill" style={{ fontSize: 13 }}>{days} day{days === 1 ? "" : "s"} left</span>
+        <button onClick={() => router.push("/plan")} className="button secondary" style={{ fontSize: 12.5 }}>Manage plan</button>
+      </section>
+    );
+  }
+  if (access.trialExpired) {
+    return (
+      <section className="panel" style={{ margin: "18px 0 0", padding: 16, background: "#fff7ed", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 24 }}>⏳</span>
+        <div style={{ flex: 1, minWidth: 200 }}><strong>Your 7-day trial has ended.</strong> Premium features paused — your progress is safe. <a href="/plan" style={{ fontWeight: 700, color: "#6840d6" }}>See options →</a></div>
+      </section>
+    );
+  }
+  return null;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<Dash | null>(null);
@@ -210,6 +249,8 @@ export default function DashboardPage() {
           </a>
           <a className="stat-tile" href="/review"><strong>{data ? data.reviewDue : 0}</strong><span>Review cards due →</span></a>
         </section>
+
+        <TrialBanner />
 
         {data && (
           <section className="quest-strip" aria-label="Daily quests">

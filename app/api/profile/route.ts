@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { LearnerProfile } from "@/src/domain/profile";
 import { getProfile, upsertProfile } from "@/src/infrastructure/profile-repository";
 import { currentUser } from "@/src/infrastructure/auth";
+import { query } from "@/src/infrastructure/database";
+import { generateStudentId } from "@/src/domain/trial";
 
 function validTargetLevel(value: unknown): value is LearnerProfile["targetLevel"] {
   return typeof value === "string" && ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"].includes(value);
@@ -36,5 +38,18 @@ export async function POST(request: Request) {
     englishDna: existing?.englishDna ?? { overallLevel: "Not assessed", strengths: [], focusAreas: [], preferredSkills: [], confidence: 0 },
     updatedAt: new Date().toISOString(),
   });
-  return NextResponse.json({ profile });
+
+  // Assign an idempotent Student ID (EW-YYYY-NNNNNN) on first profile setup.
+  let studentId: string | null = null;
+  const idRow = await query<{ student_id: string | null }>(`SELECT student_id FROM learners WHERE id = $1::uuid`, [session.learnerId]);
+  if (idRow.rows.length) {
+    if (!idRow.rows[0].student_id) {
+      studentId = generateStudentId();
+      await query(`UPDATE learners SET student_id = $2, updated_at = NOW() WHERE id = $1::uuid`, [session.learnerId, studentId]);
+    } else {
+      studentId = idRow.rows[0].student_id;
+    }
+  }
+
+  return NextResponse.json({ profile, studentId });
 }
