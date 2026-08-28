@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Component, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
 import { track } from "@/app/lib/track";
 
 /* ── types ── */
-type ExposedItem = { id: string; cefr: string; difficulty: number; skill: string; subskill: string; type: "mcq" | "listening" | "speaking"; prompt: string; options: string[]; estimatedTime: number };
+type ExposedItem = { id: string; cefr: string; difficulty: number; skill: string; subskill: string; type: "mcq" | "listening" | "speaking"; prompt: string; options: string[]; estimatedTime: number; audioText?: string };
 type Report = { level: string; confidence: string; estimate: number; skillProfile: Record<string, string>; skillScores: Record<string, number>; strengths: string[]; focusAreas: string[]; variant: number; answeredCount: number; speakingSubmitted?: boolean; speakingResponses?: number };
 
 const LEVELS = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
@@ -119,9 +119,11 @@ export default function LevelQuestPage() {
 
   function playListening(item: ExposedItem) {
     if (!item || item.type !== "listening" || typeof window === "undefined") return;
+    const text = item.audioText ?? item.prompt;
+    if (!text) return;
     window.speechSynthesis.cancel();
     setListeningId(item.id);
-    speakText(item.prompt, { lang: "en-GB", rate: 0.9, onEnd: () => setListeningId(null) });
+    speakText(text, { lang: "en-GB", rate: 0.85, onEnd: () => setListeningId(null) });
   }
 
   async function finalize() {
@@ -189,11 +191,27 @@ export default function LevelQuestPage() {
     <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f7f8fb" }}>
       {!started && paper.length > 0 ? (
         <Centered>
-          <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto" }}>
-            <div style={{ fontSize: 56 }}>🚀</div>
-            <h1 style={{ fontSize: 28, margin: "12px 0 8px" }}>Ready to start LevelQuest?</h1>
-            <p className="subtle" style={{ margin: "0 0 20px" }}>You'll have 30 minutes. You can navigate back and forward, flag questions for review, and change answers before finishing. One of 15 versions is assigned to you at random.</p>
-            <button onClick={() => setStarted(true)} className="button" style={{ padding: "15px 36px" }}>Begin Assessment →</button>
+          <div style={{ textAlign: "center", maxWidth: 620, margin: "0 auto" }}>
+            <div style={{ fontSize: 60 }}>🚀</div>
+            <p className="eyebrow" style={{ color: "#6840d6", margin: "14px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Level Placement Assessment</p>
+            <h1 style={{ fontSize: "clamp(26px,4vw,34px)", margin: "0 0 14px", fontWeight: 800, color: "#172033", lineHeight: 1.2, letterSpacing: "-.01em" }}>Ready to start your placement assessment?</h1>
+            <p style={{ fontSize: 16, lineHeight: 1.75, color: "#334155", maxWidth: 540, margin: "0 auto 20px" }}>
+              You&rsquo;ll have <strong style={{ color: "#172033" }}>30 minutes</strong>. You can navigate back and forward, flag questions for review, and change your answers before finishing. One of 15 versions is assigned to you at random.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 10, maxWidth: 520, margin: "0 auto 26px" }}>
+              {[
+                { icon: "⏱️", t: "30:00 max" },
+                { icon: "🎚️", t: "Adaptive difficulty" },
+                { icon: "🎧", t: "Listening" },
+                { icon: "🗣️", t: "Speaking" },
+              ].map((c) => (
+                <div key={c.t} style={{ padding: "12px 10px", borderRadius: 12, background: "#f4f0ff", border: "1px solid #e5dcff", color: "#4338ca" }}>
+                  <div style={{ fontSize: 22 }}>{c.icon}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, marginTop: 4 }}>{c.t}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setStarted(true)} className="button" style={{ padding: "16px 40px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)", boxShadow: "0 10px 26px rgba(104,64,214,.35)" }}>Begin Assessment →</button>
           </div>
         </Centered>
       ) : (
@@ -222,8 +240,16 @@ export default function LevelQuestPage() {
               {flags.includes(currentItem.id) && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#fbbf2422", color: "#b45309", fontWeight: 700 }}>⚑ Flagged</span>}
             </div>
 
+            {error && (
+              <div role="alert" style={{ marginBottom: 14, padding: "12px 16px", borderRadius: 10, background: "#fee2e2", color: "#991b1b", fontSize: 13.5, border: "1px solid #fecaca" }}>
+                <strong>Something went wrong:</strong> {error}
+                <button onClick={() => setError(null)} style={{ marginLeft: 10, background: "transparent", border: "none", color: "#991b1b", cursor: "pointer", textDecoration: "underline", fontSize: 12.5 }}>Dismiss</button>
+              </div>
+            )}
+
             {currentItem && (
-              <section key={currentItem.id} className="panel" style={{ padding: 28, animation: "cardIn .25s ease" }}>
+              <QuestionBoundary key={currentItem.id}>
+              <section className="panel" style={{ padding: 28, animation: "cardIn .25s ease" }}>
                 {currentItem.type === "listening" && (
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
                     <button onClick={() => playListening(currentItem)} style={{ width: 52, height: 52, borderRadius: "50%", border: 0, background: "#6840d6", color: "white", fontSize: 20, cursor: "pointer", flexShrink: 0 }} aria-label="Play audio">{listeningId === currentItem.id ? "❚❚" : "▶"}</button>
@@ -250,6 +276,7 @@ export default function LevelQuestPage() {
                 {answered && <p className="subtle" style={{ marginTop: 14, fontSize: 12.5 }}>✓ Answer saved — you can change it anytime.</p>}
                 {currentItem.type === "speaking" && <p className="subtle" style={{ marginTop: 10, fontSize: 12 }}>Recording is optional — typing your response also works.</p>}
               </section>
+              </QuestionBoundary>
             )}
           </div>
 
@@ -291,6 +318,26 @@ function SkillChip({ skill }: { skill: string }) {
 
 function AdaptiveBadge() {
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#0891b2", fontWeight: 600 }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: "#0891b2" }} /> Adaptive Challenge</span>;
+}
+
+/** Keeps the assessment tappable (navigation, finish) even if a single item fails to render. */
+class QuestionBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { /* item render error is non-fatal */ }
+  render() {
+    if (this.state.failed) {
+      return (
+        <section className="panel" style={{ padding: 28, textAlign: "center" }}>
+          <div style={{ fontSize: 36 }}>😕</div>
+          <p style={{ margin: "8px 0 4px", fontWeight: 700 }}>This question didn&rsquo;t load properly.</p>
+          <p className="subtle" style={{ margin: "0 0 12px", fontSize: 13 }}>Use the navigator or Next to move on — your progress is saved.</p>
+          <button className="button secondary" onClick={() => this.setState({ failed: false })}>Try again</button>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 function NavGrid({ paper, answered, flags, idx, onGo }: { paper: ExposedItem[]; answered: Record<string, boolean>; flags: string[]; idx: number; onGo: (i: number) => void }) {

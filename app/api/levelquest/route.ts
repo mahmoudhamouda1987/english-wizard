@@ -63,8 +63,9 @@ export async function GET() {
       );
     }
 
-    const exposed = paper.map(({ id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime }) => ({
+    const exposed = paper.map(({ id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime, audioText }) => ({
       id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime,
+      ...(type === "listening" && audioText ? { audioText } : {}),
     }));
 
     return NextResponse.json({
@@ -172,8 +173,8 @@ async function finalize(learnerId: string, state: SessionState) {
   await query(`UPDATE levelquest_sessions SET status = 'COMPLETE', payload = $2, completed_at = now() WHERE id = $1`, [state.sessionId, JSON.stringify(state)]);
 
   await query(
-    `INSERT INTO diagnostic_attempts (answers, scores, cefr_level, english_dna, created_at) VALUES ($1, $2, $3, $4, now())`,
-    [JSON.stringify(state.answers), JSON.stringify(skillScores), overall.level,
+    `INSERT INTO diagnostic_attempts (id, learner_id, answers, scores, cefr_level, english_dna, created_at) VALUES ($1, $2::uuid, $3, $4, $5, $6, now())`,
+    [crypto.randomUUID(), learnerId, JSON.stringify(state.answers), JSON.stringify(skillScoreArray), overall.level,
       JSON.stringify({ overallLevel: overall.level, confidence: overall.confidence, skillProfile, strengths, focusAreas: focus, variant: state.variant, generatedAt: new Date().toISOString() })],
   );
 
