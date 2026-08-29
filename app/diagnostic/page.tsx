@@ -6,7 +6,7 @@ import { track } from "@/app/lib/track";
 
 /* ── types ── */
 type ExposedItem = { id: string; cefr: string; difficulty: number; skill: string; subskill: string; type: "mcq" | "listening" | "speaking"; prompt: string; options: string[]; estimatedTime: number; audioText?: string };
-type Report = { level: string; confidence: string; estimate: number; skillProfile: Record<string, string>; skillScores: Record<string, number>; strengths: string[]; focusAreas: string[]; variant: number; answeredCount: number; speakingSubmitted?: boolean; speakingResponses?: number };
+type Report = { level: string; confidence: string; estimate: number; skillProfile: Record<string, string>; skillScores: Record<string, number>; skillAnswered?: Record<string, number>; skillsAttempted?: string[]; strengths: string[]; focusAreas: string[]; variant: number; answeredCount: number; speakingSubmitted?: boolean; speakingResponses?: number };
 
 const LEVELS = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 const LEVEL_COLOR: Record<string, string> = { "Pre-A1": "#94a3b8", A1: "#38bdf8", A2: "#34d399", B1: "#fbbf24", B2: "#fb923c", C1: "#f87171", C2: "#a855f7" };
@@ -455,6 +455,7 @@ function ReportView({ report }: { report: Report }) {
             {skills.map((skill) => {
               const lv = report.skillProfile[skill];
               const score = report.skillScores[skill];
+              const attempted = report.skillAnswered ? (report.skillAnswered[skill] ?? 0) > 0 : (score ?? 0) > 0;
               // Speaking is reported honestly as submitted work, not a fabricated score.
               if (skill === "speaking") {
                 return (
@@ -463,6 +464,16 @@ function ReportView({ report }: { report: Report }) {
                     <strong style={{ textAlign: "center", color: "#a855f7", fontSize: 13 }}>{report.speakingSubmitted ? "Submitted" : "—"}</strong>
                     <div className="subtle" style={{ fontSize: 12 }}>Recorded &amp; typed responses — reviewed in guided conversation.</div>
                     <span style={{ fontSize: 12.5, opacity: .7, textAlign: "right" }}>{report.speakingSubmitted ? `${report.speakingResponses ?? 0} resp.` : "n/a"}</span>
+                  </div>
+                );
+              }
+              if (!attempted) {
+                return (
+                  <div key={skill} style={{ display: "grid", gridTemplateColumns: "120px 42px 1fr 56px", gap: 12, alignItems: "center" }}>
+                    <span style={{ fontWeight: 600, fontSize: 13.5 }}>{SKILL_ICON[skill]} {SKILL_LABEL[skill]}</span>
+                    <strong style={{ textAlign: "center", color: "#94a3b8", fontSize: 13 }}>—</strong>
+                    <div className="subtle" style={{ fontSize: 12 }}>Not attempted in this sitting.</div>
+                    <span style={{ fontSize: 12.5, opacity: .7, textAlign: "right" }}>n/a</span>
                   </div>
                 );
               }
@@ -496,7 +507,7 @@ function ReportView({ report }: { report: Report }) {
           <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{report.level}</strong>. Your path is personalized to reinforce focus areas while building on your strengths.</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button onClick={() => router.push("/learning-path")} className="button">Continue to English Wizard →</button>
-          <a href="/api/levelquest/report" target="_blank" rel="noopener" className="button secondary">⬇️ Download printable report</a>
+          <a href="/api/levelquest/report" className="button secondary">⬇️ Download official PDF report</a>
           <button onClick={() => router.push("/plan")} className="button secondary">🗂️ My plan</button>
           <button onClick={() => window.print()} className="button secondary">🖨️ Print</button>
           </div>

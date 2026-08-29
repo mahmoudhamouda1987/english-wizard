@@ -171,6 +171,8 @@ async function finalize(learnerId: string, state: SessionState) {
     estimate: Math.round(state.estimate * 10) / 10,
     skillProfile,
     skillScores,
+    skillAnswered: Object.fromEntries(objective.map((s) => [s, state.skillTotal[s] ?? 0])),
+    skillsAttempted: objective.filter((s) => (state.skillTotal[s] ?? 0) > 0),
     strengths,
     focusAreas: focus,
     variant: state.variant,
