@@ -10,7 +10,10 @@ test("core learning surfaces pass automated WCAG checks (axe)", async ({ page })
     await page.goto(route);
     await page.waitForLoadState("networkidle");
     await page.evaluate(() => {
-      document.getAnimations().forEach((a) => { try { a.finish(); } catch { /* ignore */ } });
+      const style = document.createElement("style");
+      style.textContent = "*{animation:none !important; transition:none !important;}";
+      document.head.appendChild(style);
+      document.getAnimations().forEach((a) => { try { a.finish(); } catch { try { a.cancel(); } catch { /* ignore */ } } });
     });
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
     const serious = results.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");

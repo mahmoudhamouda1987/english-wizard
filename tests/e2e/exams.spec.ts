@@ -1,57 +1,62 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("IELTS exam API", () => {
-  const email = `ielts-e2e-${Date.now()}@example.com`;
-  let authed: Awaited<ReturnType<typeof import("@playwright/test").test["step"]>> extends never ? never : unknown;
+function uniqueEmail(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
+}
 
-  test.beforeAll(async ({ request }) => {
-    await request.post("/api/auth/register", { data: { email, displayName: "IELTS E2E", password: "StrongPass123!" } });
+test.describe("IELTS exam API", () => {
+  test.beforeEach(async ({ request }) => {
+    await request.post("/api/auth/register", { data: { email: uniqueEmail("ielts"), displayName: "IELTS E2E", password: "StrongPass123!" } });
   });
 
-  test("GET /api/exams/ielts returns catalog with modules for both variants", async ({ request }) => {
-    const res = await request.get("/api/exams/ielts?variant=ACADEMIC");
+  test("GET /api/exams/ielts returns a plan with modules for all four skills", async ({ request }) => {
+    const res = await request.get("/api/exams/ielts?variant=ACADEMIC&band=6.5");
     expect(res.ok()).toBeTruthy();
     const data = await res.json();
-    expect(data.variant).toBe("ACADEMIC");
-    expect(data.modules.length).toBeGreaterThanOrEqual(3);
-    expect(data.modules.some((m: { kind: string }) => m.kind === "listening")).toBe(true);
-    expect(data.modules.some((m: { kind: string }) => m.kind === "reading")).toBe(true);
-    expect(data.modules.some((m: { kind: string }) => m.kind === "writing")).toBe(true);
-    expect(data.modules.some((m: { kind: string }) => m.kind === "speaking")).toBe(true);
+    expect(data.plan.variant).toBe("ACADEMIC");
+    expect(data.plan.modules.length).toBeGreaterThanOrEqual(3);
+    const skills = data.plan.modules.map((m: { skill: string }) => m.skill);
+    expect(skills).toContain("listening");
+    expect(skills).toContain("reading");
+    expect(skills).toContain("writing");
+    expect(skills).toContain("speaking");
   });
 
   test("POST /api/exams/ielts returns grading and band estimate", async ({ request }) => {
     const res = await request.post("/api/exams/ielts", {
-      data: { variant: "GENERAL", bandTarget: "6", answers: {} },
+      data: { variant: "GENERAL", band: "6", skill: "reading", answers: {} },
     });
     expect(res.ok()).toBeTruthy();
     const data = await res.json();
-    expect(data.result).toBeDefined();
-    expect(data.result.overallBand).toBeGreaterThanOrEqual(0);
-    expect(data.result.overallBand).toBeLessThanOrEqual(9);
-    expect(data.result.band).toBeGreaterThanOrEqual(4);
-    expect(data.result.gapToTarget).toBeDefined();
+    expect(data.overallBand).toBeGreaterThanOrEqual(0);
+    expect(data.overallBand).toBeLessThanOrEqual(9);
+    expect(data.bandEstimate).toBeGreaterThanOrEqual(0);
+    expect(data.gap).toBeDefined();
   });
 });
 
 test.describe("Cambridge exam API", () => {
+  test.beforeEach(async ({ request }) => {
+    await request.post("/api/auth/register", { data: { email: uniqueEmail("camb"), displayName: "Cambridge E2E", password: "StrongPass123!" } });
+  });
+
   test("GET /api/exams/cambridge returns assessment with items", async ({ request }) => {
     const res = await request.get("/api/exams/cambridge?qualification=B2_FIRST&kind=readiness-assessment");
     expect(res.ok()).toBeTruthy();
     const data = await res.json();
-    expect(data.qualification).toBe("B2_FIRST");
+    expect(data.assessment.qualification.id).toBe("B2_FIRST");
     expect(data.assessment.objectiveItems.length).toBeGreaterThanOrEqual(5);
   });
 
   test("POST /api/exams/cambridge grades answers and returns scale estimate", async ({ request }) => {
     const res = await request.post("/api/exams/cambridge", {
-      data: { qualification: "C1_ADVANCED", answers: {} },
+      data: { qualification: "C1_ADVANCED", kind: "readiness-assessment", answers: {} },
     });
     expect(res.ok()).toBeTruthy();
     const data = await res.json();
-    expect(data.result.scaleEstimate).toBeGreaterThanOrEqual(142);
-    expect(data.result.readiness).toBeDefined();
-    expect(typeof data.result.readiness.verdict).toBe("string");
+    expect(data.scaleEstimate).toBeGreaterThanOrEqual(142);
+    expect(data.readiness).toBeDefined();
+    expect(typeof data.readiness.verdict).toBe("string");
   });
 });
 

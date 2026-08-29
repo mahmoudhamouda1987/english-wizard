@@ -6,7 +6,10 @@ type Session = NonNullable<Awaited<ReturnType<typeof currentUser>>>;
 function isAdminEmail(email: string): boolean {
   const raw = (process.env.ADMIN_EMAILS ?? "").trim();
   const allowlist = raw ? raw.split(",").map((item) => item.trim().toLowerCase()).filter(Boolean) : [];
-  if (allowlist.length === 0) return true;
+  // Fail closed: if no trusted admin allowlist is configured, no one is an admin.
+  // A missing configuration must never open admin endpoints to every authenticated
+  // learner (security/integrity — Part 34/56).
+  if (allowlist.length === 0) return false;
   return allowlist.includes(email.toLowerCase());
 }
 

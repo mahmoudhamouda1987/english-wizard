@@ -23,6 +23,10 @@ test("onboarding and settings expose core accessibility landmarks and labels", a
   expect(registered.ok()).toBeTruthy();
   await page.goto("/onboarding");
   await expect(page.locator("main")).toBeVisible();
+  // Premium onboarding opens with a welcome carousel; advance to the setup form.
+  for (let i = 0; i < 5; i++) {
+    await page.getByRole("button", { name: /→/ }).click();
+  }
   await expect(page.getByLabel("Your name")).toBeVisible();
   await page.goto("/settings");
   await expect(page.locator("main")).toBeVisible();

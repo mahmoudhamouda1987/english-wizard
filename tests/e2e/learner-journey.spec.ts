@@ -20,9 +20,15 @@ async function answerDiagnostic(request: APIRequestContext) {
 test("onboarding creates a persisted learner and dashboard loads state", async ({ page }) => {
   await register(page.request, "dashboard");
   await page.goto("/onboarding");
+  // The premium onboarding opens with a 5-screen welcome carousel; advance through
+  // every screen to reach the setup form (Part 35).
+  await expect(page.getByRole("button", { name: /→/ })).toBeVisible();
+  for (let i = 0; i < 5; i++) {
+    await page.getByRole("button", { name: /→/ }).click();
+  }
   await page.getByLabel("Your name").fill("E2E Learner");
-  await page.getByRole("checkbox", { name: "Improve work English" }).check();
-  await page.getByRole("button", { name: /Start diagnostic/ }).click();
+  await page.getByRole("button", { name: /Improve work English/ }).click();
+  await page.getByRole("button", { name: /Start LevelCheck/ }).click();
   await expect(page).toHaveURL(/\/diagnostic/);
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)|Your learning journey/ })).toBeVisible();
