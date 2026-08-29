@@ -179,6 +179,8 @@ export async function callAI(system: string, user: string, options: AICallOption
       signal: AbortSignal.timeout(30_000),
     });
     if (!response.ok) {
+      const errBody = await response.text().catch(() => "");
+      console.error(`[ai] provider ${response.status} for ${task}/${model} requestId=${requestId}: ${errBody.slice(0, 500)}`);
       if (options.learnerId) await recordAiEvent({ learnerId: options.learnerId, requestId, operation: task, provider: "openai", model, result: "PROVIDER_ERROR", latencyMs: Date.now() - startedAt, signalCount: budget ? 1 : undefined });
       return { error: `AI provider error (${response.status}).`, status: 502 as const, requestId };
     }
