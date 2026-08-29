@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { CEFRLevel } from "@/src/domain/learner";
 import { rotatedPool } from "@/src/domain/variety";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
 interface GrammarDrill {
@@ -94,10 +94,15 @@ export default function GrammarPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="🧩" title="Grammar Gym" sub={`Pattern drills at ${level}. Notice the rule, produce it, then explain it back.`} />
+      <PageHeader
+        eyebrow="Patterns in context"
+        title="Grammar"
+        purpose={`Pattern drills at ${level}: notice the rule in a real sentence, produce it, then check your understanding.`}
+      />
       <Celebration trigger={correct ? drill.id : ""} />
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {LEVELS.map((x) => <button key={x} className={x === level ? "button" : "button secondary"} onClick={() => switchLevel(x)}>{x}</button>)}
+      <div className="filters" role="group" aria-label="Choose your CEFR level">
+        <span className="f-label">Level</span>
+        {LEVELS.map((x) => <button key={x} type="button" className="f-chip" data-active={x === level} onClick={() => switchLevel(x)}>{x}</button>)}
       </div>
       <section className="panel" style={{ marginTop: 18, padding: 22 }}>
         <p className="eyebrow">{drill.pattern}</p>
@@ -110,15 +115,15 @@ export default function GrammarPage() {
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button className="button" disabled={!answer || checked} onClick={() => void check()}>Check</button>
-          <button className="button secondary" onClick={nextDrill}>Next drill →</button>
+          <button type="button" className="button secondary" onClick={nextDrill}>Next drill</button>
         </div>
         {checked && (
           <div className={correct ? "result-box" : "state-card error"} style={{ marginTop: 14 }}>
-            {correct ? <>✓ Correct — <strong>{drill.answer}</strong> is right.</> : <>Not quite. The answer is <strong>{drill.answer}</strong>.</>}
+            {correct ? <>Correct — <strong>{drill.answer}</strong> is right.</> : <>Not quite. The answer is <strong>{drill.answer}</strong>.</>}
             <p style={{ margin: "8px 0 0" }}>{drill.explanation}</p>
           </div>
         )}
-        {saved && correct && <p className="subtle" style={{ marginTop: 10 }}>Evidence saved to your learner model ✓</p>}
+        {saved && correct && <p className="subtle" style={{ marginTop: 10 }}>Evidence saved to your learner model.</p>}
       </section>
     </main>
   );

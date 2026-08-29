@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 import { speakText } from "@/src/domain/tts";
 
@@ -88,14 +88,19 @@ export default function VocabularyPage() {
 
   return (
     <main id="main-content" className="dash-main">
-      <PageHero icon="🔤" title="Vocabulary builder" sub={`Level ${level} · ${words.length} high-value words with Arabic meanings, examples and audio. Mark what you truly know — it becomes learner evidence.`} />
+      <PageHeader
+        eyebrow="Words in context"
+        title="Vocabulary"
+        purpose={`Level ${level} · ${words.length} high-value words with meanings, examples and audio. Mark what you truly know — it becomes learner evidence.`}
+      />
       <Celebration trigger={knownCount > 0 && knownCount % 5 === 0 ? `k${knownCount}` : ""} />
 
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+      <div className="filters" role="group" aria-label="Choose your CEFR level">
+        <span className="f-label">Level</span>
         {LEVELS.map((l) => (
-          <button key={l} className={l === level ? "button" : "button secondary"} onClick={() => setLevel(l)}>{l}</button>
+          <button key={l} type="button" className="f-chip" data-active={l === level} onClick={() => setLevel(l)}>{l}</button>
         ))}
-        <span className="streak-pill">✓ {knownCount}/{words.length} known</span>
+        <span className="streak-pill" style={{ marginLeft: 8 }}>{knownCount}/{words.length} known</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 14 }}>
@@ -117,8 +122,8 @@ export default function VocabularyPage() {
                 <button className="link-button" style={{ textAlign: "left", padding: 0 }} onClick={() => setOpenIndex(words.indexOf(w))}>Reveal meaning</button>
               )}
               <div style={{ display: "flex", gap: 8 }}>
-                <button className={known[w.word] ? "button secondary" : "button"} onClick={() => markKnown(w)}>{known[w.word] ? "✓ Known" : "I know this"}</button>
-                <button className="button secondary" aria-label={`Listen to ${w.word}`} onClick={() => speakText(w.word, { lang: "en-GB", rate: 0.9 })}>🔊</button>
+                <button className={known[w.word] ? "button secondary" : "button"} onClick={() => markKnown(w)}>{known[w.word] ? "Known" : "I know this"}</button>
+                <button className="button secondary" aria-label={`Listen to ${w.word}`} onClick={() => speakText(w.word, { lang: "en-GB", rate: 0.9 })}>Listen</button>
               </div>
             </article>
           );

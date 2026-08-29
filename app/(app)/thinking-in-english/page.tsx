@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
 type PromptResponse = { thinkingInEnglish?: { level: CEFRLevel; stage: string; prompt: string; target: string }; adaptation?: { rationale: string; nextPrompt: string }; error?: string; upgrade?: unknown };
@@ -151,7 +151,11 @@ export default function ThinkingInEnglishPage() {
 
   return (
     <main id="main-content" className="dash-main">
-      <PageHero icon="🧠" title="Think in English" sub="Skip translation. Climb the six-step mind ladder — from naming things to blending complex ideas, entirely in English." />
+      <PageHeader
+        eyebrow="Skip the translation step"
+        title="Thinking in English"
+        purpose="Climb the six-step mind ladder — from naming things to blending complex ideas, entirely in English."
+      />
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
         {levels.map((x) => (
@@ -186,7 +190,7 @@ export default function ThinkingInEnglishPage() {
                 <h2 style={{ margin: "4px 0 0", fontSize: 22, lineHeight: 1.45 }}>{result.thinkingInEnglish.prompt}</h2>
               </div>
             </div>
-            <p style={{ marginTop: 12 }}><span className="streak-pill">🎯 target: {result.thinkingInEnglish.target}</span></p>
+            <p style={{ marginTop: 12 }}><span className="streak-pill">Target: {result.thinkingInEnglish.target}</span></p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6 }}>
               <button className="button secondary" onClick={() => speakText(result.thinkingInEnglish!.prompt, { lang: "en-GB", rate: 0.95 })}>🔊 Hear the prompt</button>
               {thinkLeft === null && <button className="button secondary" onClick={startThinkTimer}>🧠 30-second think timer</button>}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 
 const TASKS = [
   { id: "w-prea1-form", title: "Fill in a form", prompt: "Write your name, country, and one thing you like. Three short lines.", level: "Pre-A1" },
@@ -47,10 +47,15 @@ export default function WritingPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="✍️" title="Writing Lab" sub="Pick a task, write, and watch your strength build live. Every submission becomes graded learning evidence." />
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
+      <PageHeader
+        eyebrow="From prompt to polished"
+        title="Writing"
+        purpose="Choose a task, draft, and get AI feedback against visible criteria — every submission becomes graded learning evidence."
+      />
+      <div className="filters" role="group" aria-label="Choose a writing task" style={{ marginTop: 18 }}>
+        <span className="f-label">Task</span>
         {TASKS.map((t) => (
-          <button key={t.id} className={t.id === taskId ? "button" : "button secondary"} onClick={() => { setTaskId(t.id); setText(""); setState("idle"); }}>
+          <button key={t.id} type="button" className="f-chip" data-active={t.id === taskId} onClick={() => { setTaskId(t.id); setText(""); setState("idle"); }}>
             {t.title} · {t.level}
           </button>
         ))}
