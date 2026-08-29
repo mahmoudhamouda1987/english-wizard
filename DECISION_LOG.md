@@ -115,3 +115,15 @@
 **Verification:** 22 public tables present in Supabase; Railway redeploy SUCCESS with register+learner-state verified against Supabase; Vercel production redeploy with identical end-to-end smoke on https://english-wizard.vercel.app.
 
 **Reversibility:** High " swapping DATABASE_URL per host returns to any previous arrangement; schema is plain PostgreSQL.
+
+## 2026-08-29 — Lint debt cleared and Railway GitHub auto-deploy restored
+
+**Problem:** ESLint gate was broken (13 errors, 55 warnings, contradicting PROJECT_STATUS.md's "lint clean" claim). Separately, the Railway service's GitHub source pointed at the pre-rename repo name `English-Wizard-2.0-`, which no longer exists, so pushes to `english-wizard` never triggered deployments.
+
+**Decision:** Fixed all 68 lint findings (escaped entities, typed Web Speech API, removed set-state-in-effect patterns, module-scoped diagnostic option rotation, dead code removal). Repointed the Railway service source to `mahmoudhamouda1987/english-wizard` (branch main) via the Railway API and confirmed auto-deploy is enabled. Deployed main@e5b09bf via Railway CLI.
+
+**Reason:** A passing lint gate is a merge precondition; a stale GitHub source silently forced every production update through manual CLI deploys.
+
+**Verification:** lint 0 problems; typecheck clean; unit 230/230; production build success; E2E 62 passed / 0 failed / 1 skipped (live-AI). Railway deployment SUCCESS (new image digest sha256:3b678b47) with /api/health and / returning 200. Vercel mirror auto-deployed the same commit and is READY at https://english-wizard.vercel.app.
+
+**Reversibility:** High — all changes are code-level or one API call (serviceConnect) away from the previous arrangement.
