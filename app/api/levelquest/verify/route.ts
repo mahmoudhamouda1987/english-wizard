@@ -15,31 +15,34 @@ const LEVEL_COLOR: Record<string, string> = {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const id = (url.searchParams.get("r") ?? "").trim();
-  if (!id) {
-    return new NextResponse("Missing report reference.", { status: 400 });
+  // Reject malformed references before hitting the database (UUID cast would raise).
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return notFoundPage();
   }
 
-  const r = await query<{
-    level: string; confidence: string; variant: number; created_at: string;
-    display_name: string; student_id: string | null;
-    skill_profile: Record<string, string>;
-  }>(
-    `SELECT pr.level, pr.confidence, pr.variant, pr.created_at,
-            l.display_name, l.student_id, pr.skill_profile
-     FROM placement_reports pr
-     JOIN learners l ON l.id = pr.learner_id
-     WHERE pr.id = $1::uuid`,
+  let rows: Awaited<ReturnType<typeof query>>["rows"];
+  try {
+    const r = await query<{
+      level: string; confidence: string; variant: number; created_at: string;
+      display_name: string; student_id: string | null;
+      skill_profile: Record<string, string>;
+    }>(
+      `SELECT pr.level, pr.confidence, pr.variant, pr.created_at,
+              l.display_name, l.student_id, pr.skill_profile
+       FROM placement_reports pr
+       JOIN learners l ON l.id = pr.learner_id
+       WHERE pr.id = $1::uuid`,
     [id],
   );
 
-  if (!r.rowCount || !r.rows[0]) {
-    return new NextResponse(
-      `<!doctype html><html><body style="font-family:sans-serif;background:#f4f5fb;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0"><div style="max-width:520px;background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:0 8px 24px rgba(15,21,53,.1)"><div style="font-size:46px">🚫</div><h2 style="color:#172033">Report not found</h2><p style="color:#64748b">This verification link does not correspond to a valid English Wizard placement report.</p></div></body></html>`,
-      { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } },
-    );
+    rows = r.rows;
+  } catch {
+    return notFoundPage();
   }
 
-  const row = r.rows[0];
+  if (!rows || !rows[0]) return notFoundPage();
+
+  const row = rows[0];
   const isPlace = CEFR_ORDER.includes(row.level as (typeof CEFR_ORDER)[number]);
   const color = LEVEL_COLOR[row.level] ?? "#6840d6";
   const date = new Date(row.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -73,5 +76,12 @@ export async function GET(req: Request) {
 </div>
 </body></html>`,
     { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
+  );
+}
+
+function notFoundPage(): NextResponse {
+  return new NextResponse(
+    `<!doctype html><html><body style="font-family:sans-serif;background:#f4f5fb;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0"><div style="max-width:520px;background:#fff;border-radius:14px;padding:40px;text-align:center;box-shadow:0 8px 24px rgba(15,21,53,.1)"><div style="font-size:46px">🚫</div><h2 style="color:#172033">Report not found</h2><p style="color:#64748b">This verification link does not correspond to a valid English Wizard placement report.</p></div></body></html>`,
+    { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } },
   );
 }
