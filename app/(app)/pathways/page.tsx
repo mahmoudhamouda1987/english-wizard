@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UpgradeModal } from "@/app/components/upgrade-modal";
+import { PageHeader } from "@/app/components/page-header";
 
 type Readiness = { ready: boolean; missing: string[] };
 type DomainSummary = { id: string; label: string; blurb: string; trackCount: number; tracks: Array<{ id: string; label: string }> };
@@ -80,23 +81,26 @@ export default function PathwaysPage() {
   }
 
   return (
-    <main id="main-content" style={{ maxWidth: 980, margin: "0 auto", padding: 40 }}><section className="panel" style={{marginBottom:24,padding:22,display:"flex",justifyContent:"space-between",gap:14,alignItems:"center",flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 4px"}}>📝 Take the mock exam</h2><p className="subtle" style={{margin:0}}>Reading, writing and speaking in ten minutes — transparent band estimate against CEFR descriptors.</p></div><a className="button" href="/pathways/mock">Start mock →</a></section>
-      <p className="eyebrow">Learning pathways</p>
-      <h1>Choose the English path that fits your life</h1>
-      <p className="muted">
-        Each pathway keeps its own readiness evidence, separate from general English mastery. Preparation never implies official certification.
-      </p>
+    <main id="main-content" className="dash-main">
+      <PageHeader
+        eyebrow="Assess & prepare"
+        title="Tests & Exams"
+        purpose="Choose the pathway that fits your goal. Each keeps its own readiness evidence, separate from general English mastery — preparation never implies official certification."
+        action="Take the mock exam"
+        actionHref="/pathways/mock"
+      />
+      <p className="subtle" style={{ margin: 0, fontSize: 13.5 }}>The mock exam covers reading, writing and speaking in ten minutes, with a transparent band estimate against CEFR descriptors.</p>
       {message && <p role="status" className="state-card">{message}</p>}
       {selected && (
         <section className="panel" style={{ marginTop: 20 }}>
-          <div className="panel-title"><h2>Active pathway</h2><span>{new Date(selected.selectedAt).toLocaleDateString()}</span></div>
+          <div className="panel-title"><h2>Active pathway</h2><span>Selected {new Date(selected.selectedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span></div>
           <p><strong>{selected.pathway.replaceAll("_", " ")}</strong>{selected.domain ? ` · ${selected.domain.replaceAll("_", " ")}` : ""}{selected.track ? ` · ${selected.track.replaceAll("_", " ")}` : ""}{selected.target ? ` · target ${selected.target}` : ""}</p>
         </section>
       )}
       {catalog && (
         <>
           <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>General English</h2><span>Default</span></div>
+            <div className="panel-title"><h2>General English</h2><span>The default path</span></div>
             <p>{catalog.generalEnglish.description}</p>
             <button className="button secondary" disabled={busy} onClick={() => select("GENERAL_ENGLISH")}>Follow general mastery</button>
           </section>
@@ -105,7 +109,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
             <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
             <p className="muted">{catalog.ielts.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/ielts"); }}>Open IELTS pathway →</button>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/ielts"); }}>Open IELTS preparation</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
           </section>
 
@@ -113,14 +117,14 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
             <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
             <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/cambridge"); }}>Open Cambridge pathway →</button>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/cambridge"); }}>Open Cambridge preparation</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
           </section>
 
           <section className="panel" style={{ marginTop: 20 }}>
             <div className="panel-title"><h2>Professional English</h2><span>28 lessons</span></div>
             <p className="subtle">28 professional English lessons covering emails, meetings, presentations, negotiations, leadership, and executive communication — B1 through C2, each with scenes, exercises, and vocabulary.</p>
-            <a className="button" href="/learning-path">Open Professional English curriculum →</a>
+            <a className="button" href="/learning-path">Open the Professional English curriculum</a>
           </section>
         </>
       )}

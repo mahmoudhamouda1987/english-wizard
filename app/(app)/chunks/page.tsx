@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 
 type Chunk = { id: string; text: string; meaning: string; level: string; functions: string[]; variants: string[]; state?: { knowledge: string; encounters: number; productive_attempts: number; successful_productions: number } | null };
 
@@ -25,7 +25,11 @@ export default function ChunksPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 1080, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="🧱" title="Chunks & communication" sub="Real English arrives in ready-made blocks. Learn the block, spot the situation, deploy it — that's fluency." />
+      <PageHeader
+        eyebrow="Ready-made English"
+        title="Chunks & Mediation"
+        purpose="Real English arrives in ready-made blocks. Learn the block, spot the situation, deploy it — that is fluency."
+      />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 16, marginTop: 8 }}>
         {chunks.map(chunk => {
@@ -48,8 +52,8 @@ export default function ChunksPage() {
                 </details>
               )}
               <div style={{ display: "flex", gap: 8, marginTop: "auto" }}>
-                <button className="button secondary" onClick={() => mark(chunk.id, false)}>👀 I recognise it</button>
-                <button className="button" onClick={() => mark(chunk.id, true)}>🗣️ I can use it</button>
+                <button type="button" className="button secondary" onClick={() => mark(chunk.id, false)}>I recognise it</button>
+                <button type="button" className="button" onClick={() => mark(chunk.id, true)}>I can use it</button>
               </div>
             </article>
           );

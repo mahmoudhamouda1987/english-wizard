@@ -69,8 +69,8 @@ export default function TeacherHelpPage() {
       </header>
 
       {memory && (
-        <section className="panel" style={{ marginTop: 16, borderLeft: "4px solid #a855f7" }}>
-          <p className="eyebrow">🧠 What your tutor remembers about you</p>
+        <section className="panel" style={{ marginTop: 16, borderLeft: "4px solid var(--accent-primary)" }}>
+          <p className="eyebrow">What your tutor remembers about you</p>
           <ul style={{ margin: "8px 0 0", paddingLeft: 18, lineHeight: 1.9 }}>
             {memory.summaryLines.map((line) => <li key={line}>{line}</li>)}
             {memory.memory.completedLessons > 0 && <li>{memory.memory.completedLessons} lesson{memory.memory.completedLessons === 1 ? "" : "s"} completed — I build on exactly what you have already proven.</li>}
