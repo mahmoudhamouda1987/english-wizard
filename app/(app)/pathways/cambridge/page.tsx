@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { speakText, speechFriendly } from "@/src/domain/tts";
-import { ExamTimer, clearExamTimer } from "@/app/components/exam-timer";
+import { ExamTimer } from "@/app/components/exam-timer";
 
 const QUALIFICATIONS = [
   { id: "A2_KEY", name: "A2 Key", cefr: "A2", color: "#34d399", icon: "🟢", desc: "Elementary level — basic everyday English." },
@@ -36,13 +36,12 @@ export default function CambridgePage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (qualId && kind) {
-      setLoading(true);
-      setError("");
-      fetch(`/api/exams/cambridge?qualification=${qualId}&kind=${kind}`)
-        .then(async (r) => { const data = await r.json(); setAssessment(data.assessment); setLoading(false); })
-        .catch(() => { setError("Failed to load assessment."); setLoading(false); });
-    }
+    if (!qualId || !kind) return;
+    let ignore = false;
+    fetch(`/api/exams/cambridge?qualification=${qualId}&kind=${kind}`)
+      .then(async (r) => { const data = await r.json(); if (!ignore) { setAssessment(data.assessment); setLoading(false); } })
+      .catch(() => { if (!ignore) { setError("Failed to load assessment."); setLoading(false); } });
+    return () => { ignore = true; };
   }, [qualId, kind]);
 
   async function submit() {
@@ -95,8 +94,8 @@ export default function CambridgePage() {
         <p className="subtle" style={{ maxWidth: 480, margin: "0 auto" }}>Choose where to begin — the readiness assessment is the recommended starting point.</p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-        {KINDS.map((k, i) => (
-          <button key={k.id} onClick={() => setKind(k.id)} className="button secondary" style={{ padding: 0, textAlign: "left", borderRadius: 12, overflow: "hidden" }}>
+        {KINDS.map((k) => (
+          <button key={k.id} onClick={() => { setLoading(true); setError(""); setKind(k.id); }} className="button secondary" style={{ padding: 0, textAlign: "left", borderRadius: 12, overflow: "hidden" }}>
             <div style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "16px 18px" }}>
               <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>{k.icon}</span>
               <div>

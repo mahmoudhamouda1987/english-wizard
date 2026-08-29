@@ -6,9 +6,7 @@ import {
   paperForVariant,
   simulateConvergence,
   variantForLearner,
-  VARIANT_THEMES,
   levelToEstimate,
-  type LevelQuestItem,
 } from "./levelquest";
 
 const objectiveFor = (v: number) => paperForVariant(v).filter((i) => i.type !== "speaking");

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { PageHero } from "@/app/components/page-hero";
-import { Celebration } from "@/app/components/celebration";
 
 type ReviewCard = { id: string; skill: string; prompt: string; answer: string | null; interval_days: number; repetitions: number };
 

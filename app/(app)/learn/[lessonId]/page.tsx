@@ -8,7 +8,7 @@ import { ListeningLab } from "@/app/components/listening-lab";
 import { fullSceneSetForLesson, dictationForLevel } from "@/src/domain/scenes";
 import { practiceForLesson } from "@/src/domain/practice-generator";
 import { missionFor } from "@/src/domain/mission";
-import { MVP_LESSONS, MVP_OBJECTIVES } from "@/src/domain/curriculum";
+import { MVP_LESSONS } from "@/src/domain/curriculum";
 import { bodyForProfessionalLesson } from "@/src/domain/professional-bodies";
 import { materialsForProfessionalLesson } from "@/src/domain/professional-materials";
 import { scenesForProfessionalLesson } from "@/src/domain/professional-scenes";
@@ -89,7 +89,6 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
   const mission = useMemo(() => isProfessional ? null : missionFor(decodedId), [decodedId, isProfessional]);
 
   const scene = sceneSet[Math.min(sceneIdx, sceneSet.length - 1)] ?? sceneSet[0];
-  const objective = lesson ? MVP_OBJECTIVES.find((o) => o.id === lesson.objectiveId) : null;
 
   useEffect(() => {
     fetch("/api/learner-state", { cache: "no-store" }).then(async (r) => { const p = await r.json(); if (r.ok) setCompletedLessonIds(p.state?.completedLessonIds ?? []); }).catch(() => {});
@@ -121,7 +120,7 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
     setBusy(false);
   }
 
-  if (!lesson) return <main style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px" }}><h1>Lesson not found</h1><p>The lesson "{decodedId}" doesn't exist.</p><a className="button" href="/learning-path">← Back to learning path</a></main>;
+  if (!lesson) return <main style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px" }}><h1>Lesson not found</h1><p>The lesson &ldquo;{decodedId}&rdquo; doesn&rsquo;t exist.</p><a className="button" href="/learning-path">← Back to learning path</a></main>;
 
   const color = lesson.level === "Pre-A1" ? "#94a3b8" : lesson.level === "A1" ? "#38bdf8" : lesson.level === "A2" ? "#34d399" : lesson.level === "B1" ? "#fbbf24" : lesson.level === "B2" ? "#fb923c" : lesson.level === "C1" ? "#f87171" : "#a855f7";
 
@@ -147,7 +146,7 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
         <div style={{ padding: 32, background: "#f0faf5", borderRadius: 14, border: "1px solid #10b98133", textAlign: "center" }}>
           <span style={{ fontSize: 48 }}>🎉</span>
           <h2 style={{ margin: "8px 0" }}>Lesson complete!</h2>
-          <p style={{ margin: "4px 0 16px", opacity: 0.7 }}>Great work on "{lesson.title}".</p>
+          <p style={{ margin: "4px 0 16px", opacity: 0.7 }}>Great work on &ldquo;{lesson.title}&rdquo;.</p>
           <a className="button" href="/learning-path">Continue to next lesson →</a>
         </div>
       ) : (

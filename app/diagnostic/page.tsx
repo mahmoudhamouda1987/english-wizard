@@ -1,5 +1,5 @@
 "use client";
-import { Component, useEffect, useMemo, useRef, useState } from "react";
+import { Component, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
 import { track } from "@/app/lib/track";
@@ -14,6 +14,41 @@ const SKILL_ICON: Record<string, string> = { grammar: "🔤", vocabulary: "📚"
 const SKILL_LABEL: Record<string, string> = { grammar: "Grammar", vocabulary: "Vocabulary", reading: "Reading", listening: "Listening", speaking: "Speaking" };
 const TOTAL_SECONDS = 30 * 60;
 
+/* Minimal structural types for the Web Speech API (not in all TS lib targets) */
+type SpeechRecognitionAlternativeLike = { transcript?: string };
+type SpeechRecognitionResultLike = ArrayLike<SpeechRecognitionAlternativeLike>;
+type SpeechRecognitionEventLike = { results?: ArrayLike<SpeechRecognitionResultLike> };
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((e: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
+/* Deterministic per-item option ordering (security/collusion).
+   Module-scope so it never captures stale component state; the variant must
+   be passed explicitly by the caller. */
+function orderOptions(paper: ExposedItem[], variant: number): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
+  for (const item of paper) {
+    if (item.type === "mcq" && item.options.length) {
+      // stable rotation by variant + item char sum to avoid trivial pattern detection
+      const seed = variant * 7 + Array.from(item.id).reduce((a, c) => a + c.charCodeAt(0), 0);
+      const arr = [...item.options];
+      for (let i = arr.length - 1; i > 0; i--) { const j = (seed + i) % (i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
+      map[item.id] = arr;
+    } else {
+      map[item.id] = item.options ?? [];
+    }
+  }
+  return map;
+}
+
 const ASSESSMENT_META = [
   { icon: "⏱️", label: "30:00 max" },
   { icon: "🎚️", label: "Adaptive difficulty" },
@@ -24,10 +59,8 @@ const ASSESSMENT_META = [
 ];
 
 export default function LevelQuestPage() {
-  const router = useRouter();
   const [paper, setPaper] = useState<ExposedItem[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [variant, setVariant] = useState(0);
   const [variantTheme, setVariantTheme] = useState<string | null>(null);
   const [idx, setIdx] = useState(0);
   const [options, setOptions] = useState<Record<string, string[]>>({});
@@ -57,7 +90,6 @@ export default function LevelQuestPage() {
         }
         setPaper(p.paper ?? []);
         setSessionId(p.sessionId);
-        setVariant(p.variant);
         setVariantTheme(p.variantTheme ?? null);
         setAnsweredCorrect(p.answered ?? {});
         setFlags(p.flags ?? []);
@@ -66,7 +98,7 @@ export default function LevelQuestPage() {
           setSecondsLeft(Math.max(0, p.remainingSeconds));
         }
         // Deterministic per-item option ordering (security/collusion)
-        setOptions(orderOptions(p.paper ?? []));
+        setOptions(orderOptions(p.paper ?? [], typeof p.variant === "number" ? p.variant : 0));
         setLoading(false);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Unable to load LevelCheck.");
@@ -74,22 +106,6 @@ export default function LevelQuestPage() {
       }
     })();
   }, []);
-
-  function orderOptions(paper: ExposedItem[]): Record<string, string[]> {
-    const map: Record<string, string[]> = {};
-    for (const item of paper) {
-      if (item.type === "mcq" && item.options.length) {
-        // stable rotation by variant + item char sum to avoid trivial pattern detection
-        const seed = variant * 7 + Array.from(item.id).reduce((a, c) => a + c.charCodeAt(0), 0);
-        const arr = [...item.options];
-        for (let i = arr.length - 1; i > 0; i--) { const j = (seed + i) % (i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
-        map[item.id] = arr;
-      } else {
-        map[item.id] = item.options ?? [];
-      }
-    }
-    return map;
-  }
 
   const currentItem = paper[idx];
   const answered = currentItem ? answeredCorrect[currentItem.id] !== undefined : false;
@@ -133,7 +149,7 @@ export default function LevelQuestPage() {
     speakText(text, { lang: "en-GB", rate: 0.85, onEnd: () => setListeningId(null) });
   }
 
-  async function finalize() {
+  const finalize = useCallback(async function finalize() {
     if (!sessionId || finished.current) return;
     finished.current = true;
     try {
@@ -151,7 +167,7 @@ export default function LevelQuestPage() {
       setError(e instanceof Error ? e.message : "Failed to finalize.");
       finished.current = false;
     }
-  }
+  }, [sessionId]);
 
   /* Timer */
   useEffect(() => {
@@ -163,13 +179,11 @@ export default function LevelQuestPage() {
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [sessionId, started, report]);
+  }, [sessionId, started, report, finalize]);
 
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");
   const timerState = secondsLeft > 600 ? "normal" : secondsLeft > 300 ? "attention" : "urgent";
-
-  const answeredCount = Object.values(answeredCorrect).filter(Boolean).length;
 
   if (report) return <ReportView report={report} />;
   if (loading) return <Centered><Spinner text="Preparing LevelCheck…" /></Centered>;
@@ -385,11 +399,12 @@ function SpeakingInterface({ item, onDone }: { item: ExposedItem; onDone: (t: st
 
   function start() {
     if (typeof window === "undefined") return;
-    const Ctor = (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: any }).webkitSpeechRecognition;
+    const w = window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor };
+    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!Ctor) { setTranscript((t) => t || "I'll type my answer instead."); return; }
     const rec = new Ctor();
     rec.lang = RECOGNITION_LANG; rec.continuous = false; rec.interimResults = false;
-    rec.onresult = (e: any) => { const t = Array.from(e.results ?? []).map((r: any) => r[0]?.transcript ?? "").join(" ").trim(); if (t) setTranscript(t); };
+    rec.onresult = (e: SpeechRecognitionEventLike) => { const t = Array.from(e.results ?? []).map((r: SpeechRecognitionResultLike) => r[0]?.transcript ?? "").join(" ").trim(); if (t) setTranscript(t); };
     rec.onerror = () => setTranscript((c) => c || "I'll type my answer.");
     rec.onend = () => setRecording(false);
     ref.current = rec; setRecording(true); rec.start();

@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { speakText, speechFriendly } from "@/src/domain/tts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { speakText } from "@/src/domain/tts";
 import { ExamTimer, clearExamTimer } from "@/app/components/exam-timer";
-import type { IeltsVariant, BandTarget, ObjectiveItem, ReadingSet, WritingTask, SpeakingCard } from "@/src/domain/ielts";
+import type { IeltsVariant, BandTarget, ObjectiveItem, WritingTask, SpeakingCard } from "@/src/domain/ielts";
 
 const BANDS = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9] as const;
 const SKILLS = ["reading", "listening", "writing", "speaking"] as const;
@@ -23,12 +23,11 @@ export default function IeltsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (variant && band) {
-      setLoading(true);
-      setError("");
-      fetch(`/api/exams/ielts?variant=${variant}&band=${band}`).then(async (r) => { const data = await r.json(); setPlan(data.plan); setStep("dashboard"); setLoading(false); })
-        .catch(() => { setError("Failed to load IELTS plan."); setLoading(false); });
-    }
+    if (!variant || !band) return;
+    let ignore = false;
+    fetch(`/api/exams/ielts?variant=${variant}&band=${band}`).then(async (r) => { const data = await r.json(); if (!ignore) { setPlan(data.plan); setStep("dashboard"); setLoading(false); } })
+      .catch(() => { if (!ignore) { setError("Failed to load IELTS plan."); setLoading(false); } });
+    return () => { ignore = true; };
   }, [variant, band]);
 
   function selectVariant(v: IeltsVariant) { setVariant(v); setStep("band"); }
@@ -82,7 +81,7 @@ export default function IeltsPage() {
           const isHigh = b >= 7;
           const isMid = b >= 5.5 && b < 7;
           const bg = isHigh ? "#f8717122" : isMid ? "#fbbf2422" : "#38bdf822";
-          return <button key={b} onClick={() => setBand(b)} className="button secondary" style={{ fontSize: 22, padding: "16px 0", borderRadius: 12, background: bg, fontWeight: 700 }}>{b}</button>;
+          return <button key={b} onClick={() => { setLoading(true); setError(""); setBand(b); }} className="button secondary" style={{ fontSize: 22, padding: "16px 0", borderRadius: 12, background: bg, fontWeight: 700 }}>{b}</button>;
         })}
       </div>
       <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 20, fontSize: 12.5, opacity: 0.6 }}>
@@ -154,7 +153,9 @@ function ModuleRunner({ variant, band, skill, stage, onBack, onComplete }: { var
       .catch(() => setError("Failed to load module content."));
   }, [variant, band, skill, stage]);
 
-  const handleTimeUp = useCallback(() => { void submit(); }, []);
+  const submitRef = useRef<() => void>(() => {});
+  useEffect(() => { submitRef.current = submit; });
+  const handleTimeUp = useCallback(() => { void submitRef.current(); }, []);
 
   async function submit() {
     setLoading(true);

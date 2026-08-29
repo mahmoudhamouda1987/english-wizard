@@ -58,7 +58,7 @@ export function ListeningLab({ items }: { items: Item[] }) {
       out.push("You typed extra words — the speaker says fewer words than you wrote.");
     }
     return out.slice(0, 3);
-  }, [diff, input]);
+  }, [diff, input, item.text]);
 
   if (!items.length) {
     return <div className="state-card">Dictation for your level is being expanded — check back after the next curriculum update.</div>;

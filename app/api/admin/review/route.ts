@@ -9,7 +9,6 @@ const ALLOWED_DECISIONS = new Set(["APPROVED", "REJECTED", "HUMAN_REVIEW"]);
 export async function GET() {
   const guard = await requireAdmin();
   if (guard.denied) return guard.denied;
-  const session = guard.session;
   const pending = await query(
     `SELECT entity_id, kind, version, change_summary, created_at FROM content_versions ORDER BY created_at DESC LIMIT 100`,
   ).catch(() => ({ rows: [] as unknown[] }));

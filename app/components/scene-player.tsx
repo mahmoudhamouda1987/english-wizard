@@ -26,8 +26,8 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
     speakText(l.text, { lang: "en-GB", rate: rate * (l.speaker === "b" ? 1 : 0.96), gender: genderForName(scene.characters[l.speaker].name) });
   }, [scene]);
 
-  const clearTimer = () => { if (timerRef.current !== null) { window.clearTimeout(timerRef.current); timerRef.current = null; } };
-  const stopAll = () => { tokenRef.current++; stopSpeaking(); clearTimer(); };
+  const clearTimer = useCallback(() => { if (timerRef.current !== null) { window.clearTimeout(timerRef.current); timerRef.current = null; } }, []);
+  const stopAll = useCallback(() => { tokenRef.current++; stopSpeaking(); clearTimer(); }, [clearTimer]);
 
   const advance = useCallback((from: number) => {
     if (from + 1 < scene.lines.length) {
@@ -57,7 +57,7 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, playing, finished, nonce]);
 
-  useEffect(() => () => stopAll(), []);
+  useEffect(() => () => stopAll(), [stopAll]);
 
   function goTo(i: number) {
     stopAll();

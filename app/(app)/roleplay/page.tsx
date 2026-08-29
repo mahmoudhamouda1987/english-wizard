@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { CEFRLevel } from "@/src/domain/learner";
 import { ROLEPLAY_SCENARIOS, type RoleplayScenario } from "@/src/domain/roleplay";
 import { speakText } from "@/src/domain/tts";
 import { PageHero } from "@/app/components/page-hero";

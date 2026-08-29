@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
-import { getProfile } from "@/src/infrastructure/profile-repository";
 import {
   buildIeltsPlan,
   bandFromPercent,

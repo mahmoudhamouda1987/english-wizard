@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function Home() {
   return (
     <>
       <header className="site-header">
-        <Link className="site-brand" href="/"><img src="/logo.png" alt="English Wizard logo" width={38} height={38} /> English Wizard</Link>
+        <Link className="site-brand" href="/"><Image src="/logo.png" alt="English Wizard logo" width={38} height={38} unoptimized /> English Wizard</Link>
         <nav className="site-nav" aria-label="Site">
           <Link href="/#how">How it works</Link>
           <a href="/pricing">Pricing</a>

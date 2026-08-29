@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function AuthCard() {
@@ -38,7 +39,7 @@ function AuthCard() {
   return (
     <main id="main-content" className="auth-shell">
       <section className="auth-art">
-        <div className="art-logo"><img src="/logo.png" alt="" width={44} height={44} /> English Wizard</div>
+        <div className="art-logo"><Image src="/logo.png" alt="" width={44} height={44} unoptimized /> English Wizard</div>
         <h2>Learn English the way it is really spoken.</h2>
         <ul className="auth-points">
           <li><span className="pt-icon">✓</span> A 5-minute diagnostic places your true CEFR level</li>
@@ -53,7 +54,7 @@ function AuthCard() {
       </section>
       <section className="auth-form-side">
         <div className="auth-card">
-          <img src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 13 }} />
+          <Image src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 13 }} unoptimized />
           <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
           <p className="subtle">{mode === "login" ? "Sign in to continue your journey." : "Start with a free placement check today."}</p>
           <form onSubmit={submit}>

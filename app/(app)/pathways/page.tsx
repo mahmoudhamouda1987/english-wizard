@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { UpgradeModal } from "@/app/components/upgrade-modal";
 
 type Readiness = { ready: boolean; missing: string[] };
@@ -26,11 +27,9 @@ type ExamPathwayView = {
 type Selection = { pathway: string; domain?: string; track?: string; target?: string; selectedAt: string };
 
 export default function PathwaysPage() {
+  const router = useRouter();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [selected, setSelected] = useState<Selection | null>(null);
-  const [domain, setDomain] = useState("BUSINESS");
-  const [track, setTrack] = useState("WORKPLACE_COMMUNICATION");
-  const [target, setTarget] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [premium, setPremium] = useState<boolean | null>(null);
@@ -106,7 +105,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
             <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
             <p className="muted">{catalog.ielts.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else window.location.href = "/pathways/ielts"; }}>Open IELTS pathway →</button>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/ielts"); }}>Open IELTS pathway →</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
           </section>
 
@@ -114,7 +113,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
             <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
             <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else window.location.href = "/pathways/cambridge"; }}>Open Cambridge pathway →</button>
+            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/cambridge"); }}>Open Cambridge pathway →</button>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
           </section>
 

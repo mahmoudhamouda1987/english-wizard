@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { track } from "@/app/lib/track";
 
 interface AccessInfo {
@@ -50,6 +51,7 @@ const FEATURE_COPY: Record<GateFeature, { icon: string; eyebrow: string; title: 
 };
 
 export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open: boolean; onClose: () => void; feature?: GateFeature }) {
+  const router = useRouter();
   const info = FEATURE_COPY[feature];
   const [starting, setStarting] = useState(false);
   const [trialDays, setTrialDays] = useState(7);
@@ -75,9 +77,9 @@ export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open
     try {
       await fetch("/api/trial", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
       // Opening the plan page lets the learner choose Plus / Pro (or continue free).
-      window.location.href = "/pricing?from=upgrade";
+      router.push("/pricing?from=upgrade");
     } catch {
-      window.location.href = "/pricing?from=upgrade";
+      router.push("/pricing?from=upgrade");
     }
   }
 

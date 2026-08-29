@@ -13,3 +13,4 @@ tsconfig.tsbuildinfo
 .env*
 
 axe-probe.cjs
+.tmp/

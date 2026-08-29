@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
 import { PageHero } from "@/app/components/page-hero";
@@ -34,6 +35,7 @@ interface SpeechRecognitionLike {
 }
 
 export default function ThinkingInEnglishPage() {
+  const router = useRouter();
   const [level, setLevel] = useState<CEFRLevel>("A1");
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<PromptResponse | null>(null);
@@ -54,7 +56,7 @@ export default function ThinkingInEnglishPage() {
       });
       const payload = (await response.json()) as PromptResponse;
       setResult(response.ok ? payload : { error: payload.error ?? "Unable to load the prompt." });
-      if (payload.upgrade) window.location.href = "/pricing";
+      if (payload.upgrade) router.push("/pricing");
     } catch {
       setResult({ error: "Unable to load the prompt." });
     } finally { setBusy(false); }

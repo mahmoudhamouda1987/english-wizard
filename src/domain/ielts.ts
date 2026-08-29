@@ -355,7 +355,6 @@ export function overallBand(skillPercents: Partial<Record<IeltsSkill, number>>):
 }
 
 const T1_DATA_LEXIS = ["increase", "decrease", "rise", "fall", "peak", "proportion", "percentage", "decline", "grow", "compared", "whereas", "while", "overall"];
-const FORMAL_MARKERS = ["dear sir", "dear madam", "yours faithfully", "yours sincerely", "i am writing", "i would like", "i look forward"];
 
 /** Heuristic writing scorer (internal estimate only). */
 export function scoreIeltsWriting(task: WritingTask, text: string): { percent: number; feedback: string[] } {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { PageHero } from "@/app/components/page-hero";
 
 interface Hit { kind: string; title: string; meta: string; href: string }
@@ -9,6 +9,7 @@ interface Results { query: string; total: number; lessons: Hit[]; words: Hit[]; 
 
 function SearchInner() {
   const params = useSearchParams();
+  const router = useRouter();
   const q = params.get("q") ?? "";
   const [data, setData] = useState<Results | null>(null);
   const [input, setInput] = useState(q);
@@ -39,7 +40,7 @@ function SearchInner() {
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
       <PageHero icon="🔎" title="Search everything" sub="Lessons, words with Arabic, animated scenes, chunks and role-plays — all generated inside the platform, nothing links out." />
       <form
-        onSubmit={(e) => { e.preventDefault(); window.location.href = `/search?q=${encodeURIComponent(input.trim())}`; }}
+        onSubmit={(e) => { e.preventDefault(); router.push(`/search?q=${encodeURIComponent(input.trim())}`); }}
         style={{ display: "flex", gap: 8, marginTop: 16 }}
       >
         <input aria-label="Search the platform" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Try “routine”, “موعد”, “complaint”…" style={{ flex: 1 }} />

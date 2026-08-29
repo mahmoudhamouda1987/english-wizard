@@ -5,8 +5,6 @@ import type { CEFRLevel } from "@/src/domain/learner";
 import { firstWinQuestions } from "@/src/domain/first-win";
 import { Celebration } from "@/app/components/celebration";
 
-interface Q { id: string; question: string; options: string[]; answer: string }
-
 export default function WelcomePage() {
   const [level, setLevel] = useState<CEFRLevel>("A1");
   const [started, setStarted] = useState(false);

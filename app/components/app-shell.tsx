@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@/app/components/theme-toggle";
@@ -54,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell">
       <aside className="snav" aria-label="Primary navigation">
-        <Link className="snav-brand" href="/dashboard"><img src="/logo.png" alt="" width={34} height={34} className="brand-logo" /> <strong>English Wizard</strong></Link>
+        <Link className="snav-brand" href="/dashboard"><Image src="/logo.png" alt="" width={34} height={34} className="brand-logo" unoptimized /> <strong>English Wizard</strong></Link>
         <div style={{ display: "flex", justifyContent: "flex-end", paddingBottom: 6 }}><ThemeToggle /></div>
         <nav>
           {NAV.map((group, gi) => (

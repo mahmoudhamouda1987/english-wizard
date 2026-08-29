@@ -30,19 +30,19 @@ export default function LearningPathPage() {
       setCurrent(rawCurrent && generalOrdered.some(l => l.id === rawCurrent) ? rawCurrent : null);
     }).catch(() => setError("Sign in and complete onboarding to see your path."));
     fetch("/api/admin/overview").then((r) => { if (r.ok) setIsAdmin(true); }).catch(() => {});
-  }, []);
+  }, [generalOrdered]);
 
   const generalStats = useMemo(() => ({
     completed: generalOrdered.filter(l => done.includes(l.id)).length,
     total: generalOrdered.length,
     percent: Math.round((generalOrdered.filter(l => done.includes(l.id)).length / Math.max(1, generalOrdered.length)) * 100),
-  }), [done]);
+  }), [done, generalOrdered]);
 
   const professionalStats = useMemo(() => ({
     completed: professionalOrdered.filter(l => done.includes(l.id)).length,
     total: professionalOrdered.length,
     percent: Math.round((professionalOrdered.filter(l => done.includes(l.id)).length / Math.max(1, professionalOrdered.length)) * 100),
-  }), [done]);
+  }), [done, professionalOrdered]);
 
   const stats = tab === "general" ? generalStats : professionalStats;
 

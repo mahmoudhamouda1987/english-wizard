@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
-import { LESSON_MATERIALS } from "@/src/domain/lesson-materials";
 import { GLOSSARY_AR_1 } from "@/src/domain/glossary-ar-1";
 import { GLOSSARY_AR_2 } from "@/src/domain/glossary-ar-2";
 import { LEARNING_CHUNKS } from "@/src/domain/chunks";

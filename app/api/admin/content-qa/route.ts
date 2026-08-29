@@ -4,7 +4,6 @@ import { validateScenes, hasCriticalSceneIssues } from "@/src/domain/scene-qa";
 import { MVP_LESSONS, MVP_OBJECTIVES } from "@/src/domain/curriculum";
 import { PROFESSIONAL_LIBRARY } from "@/src/domain/professional-library";
 import { listQualifications } from "@/src/domain/cambridge";
-import { LEARNING_SCENES } from "@/src/domain/scenes";
 import { READING_SETS, WRITING_TASKS, SPEAKING_CARDS } from "@/src/domain/ielts";
 
 export const dynamic = "force-dynamic";

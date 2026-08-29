@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { PROFESSIONAL_CURRICULUM, professionalLessonsByLevel, professionalLessonById } from "./professional-curriculum";
 import { PROFESSIONAL_SCENES, scenesForProfessionalLesson, allProfessionalSceneIds } from "./professional-scenes";
-import { PROFESSIONAL_MATERIALS, materialsForProfessionalLesson } from "./professional-materials";
-import { PROFESSIONAL_BODIES, bodyForProfessionalLesson } from "./professional-bodies";
+import { materialsForProfessionalLesson } from "./professional-materials";
+import { bodyForProfessionalLesson } from "./professional-bodies";
 
 describe("Professional curriculum", () => {
   it("has exactly 28 lessons spanning B1 to C2", () => {

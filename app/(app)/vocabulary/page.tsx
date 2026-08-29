@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { PageHero } from "@/app/components/page-hero";
 import { Celebration } from "@/app/components/celebration";
 import { speakText } from "@/src/domain/tts";
-import type { CEFRLevel } from "@/src/domain/curriculum";
 
 interface WordEntry { word: string; type: string; meaning: string; ar: string; example: string }
 

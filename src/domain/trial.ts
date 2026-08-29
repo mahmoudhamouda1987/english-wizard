@@ -10,7 +10,7 @@ export interface TrialRecord {
 export const TRIAL_DURATION_DAYS = 7;
 
 /** Compute the trial end time from a start time. */
-export function trialEndsAt(start: Date, now = start): Date {
+export function trialEndsAt(start: Date): Date {
   return new Date(start.getTime() + TRIAL_DURATION_DAYS * 86400000);
 }
 

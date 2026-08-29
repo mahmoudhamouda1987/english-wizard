@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
 import { CEFR_ORDER } from "@/src/domain/levelquest";
@@ -61,7 +62,7 @@ export default async function ReportPage() {
   return (
     <main id="main-content" style={{ maxWidth: 820, margin: "0 auto", padding: "32px 16px" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <img src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 12 }} />
+        <Image src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 12 }} unoptimized />
         <p className="eyebrow" style={{ marginTop: 8 }}>ENGLISH WIZARD · CEFR-ALIGNED ENGLISH PROFICIENCY ASSESSMENT</p>
         <h1 style={{ fontSize: 26, margin: "4px 0" }}>Placement Report</h1>
         <p className="subtle">{row.display_name} · Version {row.variant} of 15 · Issued {date}</p>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildIeltsPlan, bandFromPercent, roundHalf, gradeObjectiveItems, scoreIeltsWriting, gapToTarget, READING_SETS, LISTENING_SETS, WRITING_TASKS, SPEAKING_CARDS, BAND_TARGETS } from "./ielts";
+import { buildIeltsPlan, bandFromPercent, gradeObjectiveItems, scoreIeltsWriting, gapToTarget, READING_SETS, LISTENING_SETS, WRITING_TASKS, SPEAKING_CARDS, BAND_TARGETS } from "./ielts";
 
 describe("IELTS engine", () => {
   it("buildIeltsPlan produces modules for every skill × stage", () => {

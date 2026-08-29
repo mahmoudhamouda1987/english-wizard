@@ -29,7 +29,7 @@ export async function startTrial(learnerId: string, now = new Date()): Promise<T
   if (existing && existingStatus !== "EXPIRED" && existingStatus !== "CONVERTED") {
     return existing;
   }
-  const endsAt = trialEndsAt(now, now);
+  const endsAt = trialEndsAt(now);
   const result = await query<TrialRow>(
     `INSERT INTO trial_subscriptions (learner_id, started_at, ends_at, status)
      VALUES ($1, $2, $3, 'ACTIVE')

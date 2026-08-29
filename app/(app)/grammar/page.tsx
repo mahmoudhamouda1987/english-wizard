@@ -92,10 +92,6 @@ export default function GrammarPage() {
     }
   }
 
-  function switchLevelNext() {
-    nextDrill();
-  }
-
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
       <PageHero icon="🧩" title="Grammar Gym" sub={`Pattern drills at ${level}. Notice the rule, produce it, then explain it back.`} />

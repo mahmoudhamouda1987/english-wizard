@@ -7,7 +7,7 @@
 import { LEARNING_SCENES as SCENES } from "./scenes";
 import { CHARACTER_UNIVERSE, type CharacterGender } from "./characters";
 import { MVP_LESSONS } from "./curriculum";
-import type { LearningScene, SceneLine, SceneQuizItem } from "./scenes-types";
+import type { SceneLine, SceneQuizItem } from "./scenes-types";
 
 export interface SceneIssue {
   sceneId: string;

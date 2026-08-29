@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@/src/infrastructure/auth';
 import { requireAdmin } from '@/src/infrastructure/admin-guard';
 import { query } from '@/src/infrastructure/database';
 
