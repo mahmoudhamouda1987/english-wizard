@@ -12,12 +12,12 @@ type PromptResponse = { thinkingInEnglish?: { level: CEFRLevel; stage: string; p
 const levels: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 
 const STAGES = [
-  { key: "label", label: "Label", icon: "🏷️", blurb: "Name what you see" },
-  { key: "describe", label: "Describe", icon: "🖼️", blurb: "Paint the picture" },
+  { key: "label", label: "Label", icon: "", blurb: "Name what you see" },
+  { key: "describe", label: "Describe", icon: "", blurb: "Paint the picture" },
   { key: "retell", label: "Retell", icon: "🔁", blurb: "Replay it in your words" },
-  { key: "reason", label: "Reason", icon: "🧩", blurb: "Explain the why" },
-  { key: "argue", label: "Argue", icon: "⚖️", blurb: "Take a side" },
-  { key: "synthesise", label: "Synthesise", icon: "🧠", blurb: "Blend ideas into one thought" },
+  { key: "reason", label: "Reason", icon: "", blurb: "Explain the why" },
+  { key: "argue", label: "Argue", icon: "", blurb: "Take a side" },
+  { key: "synthesise", label: "Synthesise", icon: "", blurb: "Blend ideas into one thought" },
 ];
 
 function stageIndex(stage: string): number {
@@ -193,7 +193,7 @@ export default function ThinkingInEnglishPage() {
             <p style={{ marginTop: 12 }}><span className="streak-pill">Target: {result.thinkingInEnglish.target}</span></p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6 }}>
               <button className="button secondary" onClick={() => speakText(result.thinkingInEnglish!.prompt, { lang: "en-GB", rate: 0.95 })}>🔊 Hear the prompt</button>
-              {thinkLeft === null && <button className="button secondary" onClick={startThinkTimer}>🧠 30-second think timer</button>}
+              {thinkLeft === null && <button className="button secondary" onClick={startThinkTimer}>30-second think timer</button>}
               <button className="button secondary" disabled={busy} onClick={() => void loadPrompt()}>🔄 New prompt</button>
             </div>
           </section>
@@ -214,7 +214,7 @@ export default function ThinkingInEnglishPage() {
             </label>
             <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
               {!listening ? (
-                <button className="button secondary" onClick={dictate}>🎙️ Dictate instead</button>
+                <button className="button secondary" onClick={dictate}>Dictate instead</button>
               ) : (
                 <button className="button" style={{ background: "var(--danger)" }} onClick={() => { if (recognitionRef.current?.stop) recognitionRef.current.stop(); setListening(false); }}>⏹ Stop mic</button>
               )}
@@ -224,7 +224,7 @@ export default function ThinkingInEnglishPage() {
             {saved && (
               <>
                 <Celebration trigger={`saved-${words}`} />
-                <div className="result-box" style={{ marginTop: 14 }}><strong>🧠 Banked.</strong> That thought is now permanent learning evidence — stage {stageMeta.label} cleared for {level}!</div>
+                <div className="result-box" style={{ marginTop: 14 }}><strong>Banked.</strong> That thought is now permanent learning evidence — stage {stageMeta.label} cleared for {level}!</div>
               </>
             )}
             {result.adaptation && (

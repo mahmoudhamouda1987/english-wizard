@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { buildMock, cefrFromPercent, ieltsBand, scoreWritingMock } from "@/src/domain/exam-mock";
 import { scoreSpeech } from "@/src/domain/speech-scoring";
 import { speakText, RECOGNITION_LANG } from "@/src/domain/tts";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
 type Stage = "intro" | "reading" | "writing" | "speaking" | "result";
@@ -63,7 +63,7 @@ export default function MockExamPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="📝" title="Timed mock exam" sub="Reading → Writing → Speaking. A transparent internal estimate of your level and IELTS-style band — not an official certification." />
+      <PageHeader eyebrow="Assess & prepare" title="Timed mock exam" purpose="Reading, writing and speaking in one sitting — a transparent internal estimate of your level and IELTS-style band, not an official certification." />
 
       {stage === "intro" && (
         <section className="panel" style={{ padding: 26 }}>
@@ -107,7 +107,7 @@ export default function MockExamPage() {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button className="button secondary" onClick={() => speakText(mock.speakingPhrase, { lang: "en-GB", rate: 0.95 })}>🔊 Hear it</button>
             {!listening
-              ? <button className="button" onClick={listenSpeaking}>🎙️ Record</button>
+              ? <button className="button" onClick={listenSpeaking}>Record</button>
               : <button className="button" style={{ background: "var(--danger)" }} onClick={() => { recognitionRef.current?.stop(); setListening(false); }}>⏹ Stop</button>}
           </div>
           {transcript && <p className="subtle" style={{ marginTop: 10 }}>Heard: “{transcript}”</p>}

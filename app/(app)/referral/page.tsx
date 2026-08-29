@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
 export default function ReferralPage() {
@@ -21,7 +21,7 @@ export default function ReferralPage() {
 
   return (
     <main id="main-content" className="dash-main">
-      <PageHero icon="🎁" title="Invite friends, grow together" sub="Share your personal link. When a friend joins English Wizard with it, you both unlock rewards — friendship beats streaks." />
+      <PageHeader eyebrow="Grow together" title="Invite Friends" purpose="Share your personal link. When a friend joins English Wizard with it, you both unlock rewards." />
       <Celebration trigger={data ? `loaded-${data.joined}` : ""} />
 
       {!data && <div className="state-card">Preparing your invite…</div>}

@@ -14,12 +14,12 @@ const QUALIFICATIONS = [
 
 const KINDS = [
   { id: "readiness-assessment", label: "Exam readiness check", icon: "🧪", desc: "Full diagnostic across all skills." },
-  { id: "vocabulary-benchmark", label: "Vocabulary benchmark", icon: "📝", desc: "Test your word knowledge at this level." },
+  { id: "vocabulary-benchmark", label: "Vocabulary benchmark", icon: "", desc: "Test your word knowledge at this level." },
   { id: "grammar-benchmark", label: "Grammar & Use of English", icon: "🔧", desc: "Sentence structure and accuracy." },
-  { id: "reading-benchmark", label: "Reading benchmark", icon: "📖", desc: "Comprehension and inference skills." },
-  { id: "listening-benchmark", label: "Listening benchmark", icon: "🎧", desc: "Audio understanding and note-taking." },
-  { id: "writing-task", label: "Writing task", icon: "✍️", desc: "Structured writing with timed conditions." },
-  { id: "speaking-card", label: "Speaking card", icon: "🗣️", desc: "Part 2 long turn with cue card." },
+  { id: "reading-benchmark", label: "Reading benchmark", icon: "", desc: "Comprehension and inference skills." },
+  { id: "listening-benchmark", label: "Listening benchmark", icon: "", desc: "Audio understanding and note-taking." },
+  { id: "writing-task", label: "Writing task", icon: "", desc: "Structured writing with timed conditions." },
+  { id: "speaking-card", label: "Speaking card", icon: "", desc: "Part 2 long turn with cue card." },
 ] as const;
 
 type BankItem = { id: string; kind: string; prompt: string; options?: string[]; answer: string; explain: string };
@@ -61,7 +61,7 @@ export default function CambridgePage() {
   if (!qualId) return (
     <main style={{ maxWidth: 960, margin: "0 auto", padding: "48px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <span style={{ fontSize: 48 }}>🎓</span>
+        <span style={{ fontSize: 48 }}></span>
         <p className="eyebrow" style={{ marginTop: 8 }}>Cambridge Preparation</p>
         <h1 style={{ fontSize: 28, margin: "8px 0" }}>Choose your Cambridge exam</h1>
         <p className="subtle" style={{ maxWidth: 500, margin: "0 auto" }}>Five qualifications from A2 to C2. Each builds real exam skills with practice assessments, benchmarks, and timed tasks.</p>
@@ -151,10 +151,10 @@ export default function CambridgePage() {
         {assessment && <ExamTimer durationMinutes={assessment.minutes} attemptKey={`cambridge-${qualId}-${kind}`} onTimeUp={() => void submit()} />}
       </div>
       {assessment && <>
-        {assessment.script && <details style={{ marginBottom: 16 }}><summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 0" }}>🎧 Listening script</summary><pre style={{ whiteSpace: "pre-wrap", fontSize: 13.5, marginTop: 8, lineHeight: 1.65 }}>{assessment.script}</pre></details>}
+        {assessment.script && <details style={{ marginBottom: 16 }}><summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 0" }}> Listening script</summary><pre style={{ whiteSpace: "pre-wrap", fontSize: 13.5, marginTop: 8, lineHeight: 1.65 }}>{assessment.script}</pre></details>}
         {assessment.writingPrompt && (
           <div className="panel" style={{ padding: 22, marginBottom: 16, borderLeft: "4px solid #fb923c" }}>
-            <h3 style={{ margin: "0 0 10px" }}>✍️ Writing task</h3>
+            <h3 style={{ margin: "0 0 10px" }}> Writing task</h3>
             <p style={{ margin: "0 0 12px", lineHeight: 1.6 }}>{assessment.writingPrompt}</p>
             <textarea value={writingText} onChange={(e) => setWritingText(e.target.value)} rows={10} placeholder="Write your response here…" style={{ width: "100%", fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid #d0daf0", padding: 12 }} />
             <p className="subtle" style={{ margin: "6px 0 0", fontSize: 12 }}>Words: {writingText.trim().split(/\s+/).filter(Boolean).length}</p>
@@ -162,14 +162,14 @@ export default function CambridgePage() {
         )}
         {assessment.speakingCard && (
           <div className="panel" style={{ padding: 22, marginBottom: 16, borderLeft: "4px solid #a855f7" }}>
-            <h3 style={{ margin: "0 0 10px" }}>🗣️ Speaking prompt</h3>
+            <h3 style={{ margin: "0 0 10px" }}> Speaking prompt</h3>
             <ul style={{ paddingLeft: 20, lineHeight: 1.7, margin: "0 0 14px" }}>{assessment.speakingCard.map((p, i) => <li key={i}>{p}</li>)}</ul>
             <button className="button secondary" onClick={() => speakText(speechFriendly(assessment.speakingCard?.[0] ?? ""), { lang: "en-GB", gender: "female" })}>🔊 Listen to prompt</button>
           </div>
         )}
         {assessment.objectiveItems.length > 0 && (
           <div className="panel" style={{ padding: 22, marginBottom: 16 }}>
-            <h3 style={{ margin: "0 0 14px" }}>📝 Questions ({assessment.objectiveItems.length})</h3>
+            <h3 style={{ margin: "0 0 14px" }}> Questions ({assessment.objectiveItems.length})</h3>
             <div style={{ display: "grid", gap: 16 }}>
               {assessment.objectiveItems.map((item, idx) => (
                 <div key={item.id} style={{ padding: "14px 16px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>

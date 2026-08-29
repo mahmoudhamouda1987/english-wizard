@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
 interface QueueItem { id: string; learnerFirstName: string; level: string; taskTitle: string; responseText: string; selfCheckCount: number }
@@ -46,7 +46,7 @@ export default function CommunityPage() {
 
   return (
     <main id="main-content" className="dash-main">
-      <PageHero icon="🤝" title="Help another learner" sub="Real people correcting real work is the one thing AI can't fake. Review a peer's reality-checkpoint response — and collect feedback on your own." />
+      <PageHeader eyebrow="Learn together" title="Community" purpose="Real people correcting real work is the one thing AI cannot fake. Review a peer's reality-checkpoint response — and collect feedback on your own." />
       <Celebration trigger={sentTo.length ? `sent${sentTo.length}` : ""} />
 
       {!data && !error && <div className="state-card">Loading the community…</div>}

@@ -8,7 +8,7 @@ import type { IeltsVariant, BandTarget, ObjectiveItem, WritingTask, SpeakingCard
 const BANDS = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9] as const;
 const SKILLS = ["reading", "listening", "writing", "speaking"] as const;
 const STAGES = ["teach", "guided", "timed", "module-test"] as const;
-const SKILL_ICONS: Record<string, string> = { reading: "📖", listening: "🎧", writing: "✍️", speaking: "🗣️" };
+
 const STAGE_LABELS: Record<string, string> = { teach: "Teach", guided: "Guided", timed: "Timed", "module-test": "Module Test" };
 
 interface Plan { variant: IeltsVariant; band: BandTarget; modules: Array<{ id: string; skill: string; stage: string; title: string; minutes: number; description: string }> }
@@ -35,7 +35,7 @@ export default function IeltsPage() {
   if (step === "variant") return (
     <main style={{ maxWidth: 960, margin: "0 auto", padding: "48px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <span style={{ fontSize: 48 }}>🎯</span>
+        
         <p className="eyebrow" style={{ marginTop: 8 }}>IELTS Preparation</p>
         <h1 style={{ fontSize: 28, margin: "8px 0" }}>Choose your IELTS pathway</h1>
         <p className="subtle" style={{ maxWidth: 520, margin: "0 auto" }}>Both paths share Listening and Speaking — they differ in Reading and Writing formats. Internal estimates only — never official IELTS scores.</p>
@@ -93,7 +93,7 @@ export default function IeltsPage() {
   if (step === "dashboard" && plan) return (
     <main style={{ maxWidth: 960, margin: "0 auto", padding: "48px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <span style={{ fontSize: 40 }}>🎯</span>
+        
         <p className="eyebrow" style={{ marginTop: 4 }}>IELTS {variant} · Band {band}</p>
         <h1 style={{ fontSize: 26, margin: "6px 0" }}>Your preparation plan</h1>
         <p className="subtle" style={{ maxWidth: 460, margin: "0 auto" }}>Follow each skill in order: Teach → Guided → Timed → Module Test.</p>
@@ -103,7 +103,6 @@ export default function IeltsPage() {
           <div key={skill} className="panel" style={{ padding: 0, overflow: "hidden", borderRadius: 14 }}>
             <div style={{ background: "linear-gradient(135deg, #1e3a5f11, #4a90d911)", padding: "16px 20px", borderBottom: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 24 }}>{SKILL_ICONS[skill]}</span>
                 <strong style={{ fontSize: 16, textTransform: "capitalize" }}>{skill}</strong>
               </div>
             </div>
@@ -176,7 +175,6 @@ function ModuleRunner({ variant, band, skill, stage, onBack, onComplete }: { var
     const tips: Record<string, string[]> = { reading: ["Skim for main idea, then scan for keywords", "Always locate evidence — never rely on assumption", "Distractors paraphrase — match meaning, not exact words"], listening: ["Predict word types before audio plays (noun? number? name?)", "Listen for self-corrections — final answer is scored", "Spelling and digits are exact — write what you hear"], writing: ["Task 1: overview first, then comparisons with specific data", "Task 2: position your view, support with two body paragraphs", "Linkers must be precise — avoid overusing 'and'"], speaking: ["Extend to 3-4 sentences with one concrete detail", "Self-correcting shows examiners you monitor grammar", "Fluency beats complexity — stumbles from hard words cost marks"] };
     return <main style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <span style={{ fontSize: 40 }}>{SKILL_ICONS[skill]}</span>
         <p className="eyebrow" style={{ marginTop: 4 }}>IELTS {variant} · Band {band} · {stage === "teach" ? "Teach" : "Guided"}</p>
         <h1 style={{ fontSize: 26, margin: "6px 0" }}>{skill} — {stage === "teach" ? "Understanding the skill" : "Guided walkthrough"}</h1>
       </div>
@@ -193,7 +191,6 @@ function ModuleRunner({ variant, band, skill, stage, onBack, onComplete }: { var
   if (result) return (
     <main style={{ maxWidth: 820, margin: "0 auto", padding: "48px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <span style={{ fontSize: 40 }}>{SKILL_ICONS[skill]}</span>
         <p className="eyebrow" style={{ marginTop: 4 }}>IELTS {variant} · {stage}</p>
         <h1 style={{ fontSize: 26, margin: "6px 0" }}>Results</h1>
       </div>
@@ -204,7 +201,7 @@ function ModuleRunner({ variant, band, skill, stage, onBack, onComplete }: { var
           <p className="subtle" style={{ margin: "2px 0 0", fontSize: 12 }}>Internal estimate, not official IELTS</p>
         </div>
         {result.feedback.length > 0 && <div className="panel" style={{ padding: 20 }}><h3 style={{ margin: "0 0 8px" }}>📋 Feedback</h3><ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{result.feedback.slice(0, 6).map((f, i) => <li key={i}>{f}</li>)}</ul></div>}
-        {result.recommendations.length > 0 && <div className="panel" style={{ padding: 20 }}><h3 style={{ margin: "0 0 8px" }}>🎯 Next steps</h3><ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{result.recommendations.map((r, i) => <li key={i}>{r}</li>)}</ul></div>}
+        {result.recommendations.length > 0 && <div className="panel" style={{ padding: 20 }}><h3 style={{ margin: "0 0 8px" }}> Next steps</h3><ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{result.recommendations.map((r, i) => <li key={i}>{r}</li>)}</ul></div>}
       </div>
       <div style={{ textAlign: "center", marginTop: 20 }}>
         <button className="button" onClick={onComplete}>← Back to plan</button>
@@ -222,10 +219,10 @@ function ModuleRunner({ variant, band, skill, stage, onBack, onComplete }: { var
         {isTimed && <ExamTimer durationMinutes={minutes} attemptKey={`ielts-${variant}-${band}-${skill}-${stage}`} onTimeUp={handleTimeUp} />}
       </div>
       {passage && <section className="panel" style={{ padding: 22, lineHeight: 1.75, marginBottom: 18, fontSize: 14.5, borderRadius: 14 }}><p style={{ margin: "0 0 12px", fontWeight: 700 }}>{title}</p><div style={{ whiteSpace: "pre-wrap" }}>{passage}</div></section>}
-      {script && <details style={{ marginBottom: 18 }}><summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 0" }}>🎧 Full listening script</summary><pre style={{ whiteSpace: "pre-wrap", fontSize: 13.5, lineHeight: 1.65, marginTop: 8 }}>{script}</pre></details>}
-      {skill === "writing" && writingTask && <div className="panel" style={{ padding: 22, marginBottom: 18, borderLeft: "4px solid #fb923c", borderRadius: 14 }}><h3 style={{ margin: "0 0 10px" }}>✍️ {writingTask.title}</h3><p style={{ margin: "0 0 12px", lineHeight: 1.6 }}>{writingTask.prompt}</p>{writingTask.data && <pre style={{ fontSize: 13, whiteSpace: "pre-wrap", background: "#f5f7fa", padding: 12, borderRadius: 8 }}>{writingTask.data.join("\n")}</pre>}<textarea value={writingText} onChange={(e) => setWritingText(e.target.value)} rows={10} placeholder="Write your response here…" style={{ width: "100%", marginTop: 12, fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid #d0daf0", padding: 12 }} /><p className="subtle">Word count: {writingText.trim().split(/\s+/).filter(Boolean).length} / {writingTask.minWords}</p></div>}
-      {skill === "speaking" && speakingCard && <div className="panel" style={{ padding: 22, marginBottom: 18, borderLeft: "4px solid #a855f7", borderRadius: 14 }}><h3 style={{ margin: "0 0 10px" }}>🗣️ Cue card</h3><p style={{ margin: "0 0 8px", fontWeight: 600 }}>{speakingCard.topic}</p><ul style={{ margin: "0 0 16px", paddingLeft: 20, lineHeight: 1.7 }}>{speakingCard.prompts.map((p, i) => <li key={i}>{p}</li>)}</ul><button className="button secondary" onClick={() => { speakText(`Describe ${speakingCard.topic.toLowerCase()}.`, { lang: "en-GB", gender: "female" }); }}>🔊 Play prompt aloud</button></div>}
-      {items.length > 0 && <div className="panel" style={{ padding: 22, marginBottom: 18, borderRadius: 14 }}><h3 style={{ margin: "0 0 14px" }}>📝 Questions ({items.length})</h3><div style={{ display: "grid", gap: 14 }}>{items.map((item, idx) => <div key={item.id} style={{ padding: "14px 16px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+      {script && <details style={{ marginBottom: 18 }}><summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 0" }}> Full listening script</summary><pre style={{ whiteSpace: "pre-wrap", fontSize: 13.5, lineHeight: 1.65, marginTop: 8 }}>{script}</pre></details>}
+      {skill === "writing" && writingTask && <div className="panel" style={{ padding: 22, marginBottom: 18, borderLeft: "4px solid #fb923c", borderRadius: 14 }}><h3 style={{ margin: "0 0 10px" }}> {writingTask.title}</h3><p style={{ margin: "0 0 12px", lineHeight: 1.6 }}>{writingTask.prompt}</p>{writingTask.data && <pre style={{ fontSize: 13, whiteSpace: "pre-wrap", background: "#f5f7fa", padding: 12, borderRadius: 8 }}>{writingTask.data.join("\n")}</pre>}<textarea value={writingText} onChange={(e) => setWritingText(e.target.value)} rows={10} placeholder="Write your response here…" style={{ width: "100%", marginTop: 12, fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid #d0daf0", padding: 12 }} /><p className="subtle">Word count: {writingText.trim().split(/\s+/).filter(Boolean).length} / {writingTask.minWords}</p></div>}
+      {skill === "speaking" && speakingCard && <div className="panel" style={{ padding: 22, marginBottom: 18, borderLeft: "4px solid #a855f7", borderRadius: 14 }}><h3 style={{ margin: "0 0 10px" }}> Cue card</h3><p style={{ margin: "0 0 8px", fontWeight: 600 }}>{speakingCard.topic}</p><ul style={{ margin: "0 0 16px", paddingLeft: 20, lineHeight: 1.7 }}>{speakingCard.prompts.map((p, i) => <li key={i}>{p}</li>)}</ul><button className="button secondary" onClick={() => { speakText(`Describe ${speakingCard.topic.toLowerCase()}.`, { lang: "en-GB", gender: "female" }); }}>🔊 Play prompt aloud</button></div>}
+      {items.length > 0 && <div className="panel" style={{ padding: 22, marginBottom: 18, borderRadius: 14 }}><h3 style={{ margin: "0 0 14px" }}> Questions ({items.length})</h3><div style={{ display: "grid", gap: 14 }}>{items.map((item, idx) => <div key={item.id} style={{ padding: "14px 16px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
         <p style={{ margin: "0 0 8px", fontWeight: 600, fontSize: 14.5 }}>{idx + 1}. {item.prompt}</p>
         {item.kind === "mcq" && item.options && <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{item.options.map((opt) => <button key={opt} onClick={() => setAnswers((a) => ({ ...a, [item.id]: opt }))} className={`button secondary${answers[item.id] === opt ? " selected" : ""}`} style={{ padding: "8px 16px", fontSize: 13 }}>{opt}</button>)}</div>}
         {item.kind === "gap" && <input value={answers[item.id] ?? ""} onChange={(e) => setAnswers((a) => ({ ...a, [item.id]: e.target.value }))} placeholder="Type your answer…" style={{ padding: "10px 14px", fontSize: 14, borderRadius: 8, border: "1px solid #d0daf0", width: "100%" }} />}

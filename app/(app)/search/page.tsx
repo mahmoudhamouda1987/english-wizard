@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { PageHero } from "@/app/components/page-hero";
+import { PageHeader } from "@/app/components/page-header";
 
 interface Hit { kind: string; title: string; meta: string; href: string }
 interface Results { query: string; total: number; lessons: Hit[]; words: Hit[]; chunks: Hit[]; scenarios: Hit[]; scenes: Hit[] }
@@ -38,7 +38,7 @@ function SearchInner() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "48px 24px" }}>
-      <PageHero icon="🔎" title="Search everything" sub="Lessons, words with Arabic, animated scenes, chunks and role-plays — all generated inside the platform, nothing links out." />
+      <PageHeader eyebrow="Find the right activity" title="Search" purpose="Lessons, words with Arabic, animated scenes, chunks and role-plays — all generated inside the platform, nothing links out." />
       <form
         onSubmit={(e) => { e.preventDefault(); router.push(`/search?q=${encodeURIComponent(input.trim())}`); }}
         style={{ display: "flex", gap: 8, marginTop: 16 }}
