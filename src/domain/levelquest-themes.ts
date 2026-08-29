@@ -317,7 +317,7 @@ export const THEME_OBJECTIVE_BANKS: Record<string, LevelBank> = {
       T("reading", "name-badge", "A badge reads: 'Name: Sam. Role: Manager.' What is Sam's role?", ["Manager", "Cook", "Driver", "Student"], "Manager", "Sam is the manager."),
       T("listening", "welcome", "Welcome to the team. Please meet your colleagues.", "Listen. What should you do?", ["Meet colleagues", "Leave", "Close the door", "Say goodbye"], "Meet colleagues", "Meet your colleagues."),
       T("vocabulary", "workplace", "In the office we sit at a ___.", ["desk", "desker", "desks", "desked"], "desk", "We sit at a desk."),
-      T("grammar", "plural-work", "One boss, two ___.", ["bosses", "boss", "bosses", "bosses"], "bosses", "Plural of boss = bosses."),
+      T("grammar", "plural-work", "One boss, two ___.", ["bosses", "boss", "bossing", "bossed"], "bosses", "Plural of boss = bosses."),
       T("listening", "task", "Please email the report to Mr Lee by noon.", "Listen. What should you do by noon?", ["Email the report", "Call Mr Lee", "Print files", "Take a break"], "Email the report", "Email the report by noon."),
     ],
     A1: [
@@ -440,7 +440,7 @@ export const THEME_OBJECTIVE_BANKS: Record<string, LevelBank> = {
       T("reading", "review-tech", "'The camera is great for daylight shots, though low-light photos can be noisy.' What is a weakness?", ["Low-light quality", "The battery", "The screen", "The price"], "Low-light quality", "Low-light photos can be noisy."),
       T("reading", "troubleshoot", "'If the app freezes, clear the cache and restart it.' What should you do first?", ["Clear the cache", "Delete the app", "Buy a new phone", "Call support"], "Clear the cache", "Clear the cache and restart."),
       T("listening", "tech-advice", "Try disabling the notifications; they're draining your battery all day.", "Listen. What causes battery drain?", ["Notifications", "The screen", "The camera", "The network"], "Notifications", "Notifications drain the battery."),
-      T("vocabulary", "phrasal-tech", "To fix a frozen screen, try ___ the device off and on.", ["turning", "turning", "turn", "turns"], "turning", "Turning the device off and on."),
+      T("vocabulary", "phrasal-tech", "To fix a frozen screen, try ___ the device off and on.", ["turning", "turns", "turn", "turned"], "turning", "Turning the device off and on."),
       T("grammar", "gerund-tech", "___ on a bright screen for hours can strain your eyes.", ["Staring", "Stare", "To staring", "Stared"], "Staring", "Gerund as subject."),
       T("listening", "feature", "The new model recognises your face even in the dark.", "Listen. What can the new model do?", ["Recognise faces in the dark", "Only in daylight", "Read text", "Call phones"], "Recognise faces in the dark", "Recognises faces even in the dark."),
     ],
@@ -933,7 +933,7 @@ export const THEME_OBJECTIVE_BANKS: Record<string, LevelBank> = {
       T("reading", "notice-news", "A school poster says: 'News club meets Wednesdays.' When does the club meet?", ["Wednesdays", "Mondays", "Weekends only", "Never"], "Wednesdays", "News club on Wednesdays."),
       T("listening", "bulletin", "Good evening. Today's top story: the town fair opens tomorrow.", "Listen. What is the top story?", ["The town fair opening", "A storm warning", "A sale", "An election"], "The town fair opening", "The town fair opens tomorrow."),
       T("vocabulary", "media-words", "Pictures that move on the news are called ___.", ["footage", "footageer", "foots", "footings"], "footage", "Moving pictures are footage."),
-      T("grammar", "plural-news", "One story, two ___.", ["stories", "story", "stories", "storyes"], "stories", "Plural of story = stories."),
+      T("grammar", "plural-news", "One story, two ___.", ["stories", "story", "storys", "storieses"], "stories", "Plural of story = stories."),
       T("listening", "weather-news", "The weather today is sunny and warm.", "Listen. How is the weather?", ["Sunny and warm", "Cold and wet", "Windy", "Snowy"], "Sunny and warm", "Sunny and warm."),
     ],
     A1: [
@@ -1182,7 +1182,7 @@ export const THEME_OBJECTIVE_BANKS: Record<string, LevelBank> = {
       T("listening", "nuance-global", "I would celebrate the revival, were it not that it commercialises what was once spontaneous.", "Listen. Why hesitate?", ["It commercialises a spontaneous culture", "The revival is weak", "It is too costly", "It is illegal"], "It commercialises a spontaneous culture", "It commercialises what was spontaneous."),
       T("vocabulary", "idiom-global", "The once-isolated valley has entered the ___ of the global economy.", ["mainstream", "mainstreamer", "main", "mainly"], "mainstream", "The mainstream = the dominant current."),
       T("listening", "lateral-global", "We measure the village's openness by its visitors; we should measure it by who returns.", "Listen. How should openness be judged?", ["By who returns", "By the visitor count", "By local income", "By new buildings"], "By who returns", "Measure by who returns, not visits."),
-      T("vocabulary", "register-global", "The report frames the region as a ___ of cultures, each layer visible beneath the next.", ["mosaic", "mosaic", "mossaic", "mos"], "mosaic", "A mosaic = many pieces forming a whole."),
+      T("vocabulary", "register-global", "The report frames the region as a ___ of cultures, each layer visible beneath the next.", ["mosaic", "mossaic", "mosaically", "mosaicses"], "mosaic", "A mosaic = many pieces forming a whole."),
     ],
   },
 
