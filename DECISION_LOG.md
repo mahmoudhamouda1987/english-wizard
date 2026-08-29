@@ -127,3 +127,15 @@
 **Verification:** lint 0 problems; typecheck clean; unit 230/230; production build success; E2E 62 passed / 0 failed / 1 skipped (live-AI). Railway deployment SUCCESS (new image digest sha256:3b678b47) with /api/health and / returning 200. Vercel mirror auto-deployed the same commit and is READY at https://english-wizard.vercel.app.
 
 **Reversibility:** High — all changes are code-level or one API call (serviceConnect) away from the previous arrangement.
+
+## 2026-08-29 — LevelQuest: genuinely adaptive engine + trial personalization (40-part spec)
+
+**Problem.** The placement experience looked adaptive but wasn't: the paper order was precomputed once, the runtime ability estimate never re-routed questions, speaking transcripts were collected but never evaluated, every learner got Student ID `EW-2026-000000`, a placed C1 learner still started at lesson-01, and premium pathway gating existed only in the UI.
+
+**Decision.** Rebuilt the assessment engine (v2) with runtime item-adaptive selection (band-windowed choice, skill balancing, 34-item budget for the 30-minute timer, adaptive early-stop). Added rubric-based speaking evaluation on real linguistic signals (labelled indicative, never fabricated). Placement now anchors the curriculum starting lesson to the placed CEFR level. Student IDs sequence per year from the max existing suffix. IELTS/Cambridge selection enforces premium server-side (402 + upgrade payload; trial unlocks). Fixed a latent 500: `learners.display_name` is not in the schema — all report surfaces now COALESCE from `user_accounts`/`learner_profiles`. Renamed LevelCheck → LevelQuest product-wide and rebuilt onboarding as a 5-screen premium visual story behind the auth guard.
+
+**Reason.** Spec Parts 6/8/10/13/14/16-25/30/33/34 demand real adaptation, real evaluation, honest reporting, server-side integrity, and end-to-end personalization. Working systems were reused (bank, sessions, trial, subscriptions, PDF) rather than rebuilt.
+
+**Verification.** lint 0 · typecheck clean · unit 257/257 · build ok · E2E 67 passed / 1 live-AI skip incl. a new levelquest-journey spec (adaptive sitting → answer-change recalculation → finalize → PDF → public verify → curriculum anchor → gating → ID uniqueness). Visual QA at 1440/768/390 across onboarding (5 screens), assessment, report, dashboard, plan. Shipped `1fc14f5` → Railway webhook deploy SUCCESS (~80s) → Vercel READY; production session verified (session creation, onboarding guard 307→200, Student ID EW-2026-000001).
+
+**Reversibility.** Single commit; legacy v1 sessions are migrated in-place on resume (sequence synthesized from the old paper order). Revert = `git revert 1fc14f5`.
