@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ROLEPLAY_SCENARIOS, type RoleplayScenario } from "@/src/domain/roleplay";
 import type { CEFRLevel } from "@/src/domain/learner";
 import { speakText } from "@/src/domain/tts";
@@ -31,7 +31,8 @@ function LoadingSkeleton() {
 }
 
 export default function RoleplayPage() {
-  const [ready, setReady] = useState(false);
+  // True only after hydration, so the server and the first client render agree.
+  const ready = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [filter, setFilter] = useState<string>(ALL_LEVELS);
   const [scenario, setScenario] = useState<RoleplayScenario | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -44,7 +45,6 @@ export default function RoleplayPage() {
   const [allUsedTargets, setAllUsedTargets] = useState<string[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { setReady(true); }, []);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [turns, busy]);
 
   const levels = useMemo(() => {

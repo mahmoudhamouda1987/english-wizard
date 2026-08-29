@@ -35,7 +35,6 @@ export default function CheckpointsPage() {
 
   useEffect(() => {
     let alive = true;
-    setLoadError(false);
     fetch("/api/checkpoints", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error("load-failed");

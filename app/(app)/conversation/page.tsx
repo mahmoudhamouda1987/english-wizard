@@ -243,11 +243,7 @@ export default function ConversationPage() {
     setPlaying(false);
   }
 
-  function retryLoad() {
-    setFailed(false);
-    setLoading(true);
-    void fetchConversation(level);
-  }
+  function chooseTopic(topic: Exercise) {
     window.speechSynthesis?.cancel();
     setPlaying(false);
     setExercise(topic);
@@ -277,7 +273,7 @@ export default function ConversationPage() {
       <div className="filters" role="group" aria-label="Choose your CEFR level">
         <span className="f-label">Level</span>
         {LEVELS.map((lv) => (
-          <button key={lv} type="button" className="f-chip" data-active={lv === level} onClick={() => setLevel(lv)}>
+          <button key={lv} type="button" className="f-chip" data-active={lv === level} onClick={() => chooseLevel(lv)}>
             {lv}
           </button>
         ))}
@@ -287,7 +283,7 @@ export default function ConversationPage() {
         <div className="state-card error" role="alert">
           <strong>The conversation could not be loaded.</strong> Check your connection and try again.
           <div style={{ marginTop: 10 }}>
-            <button className="button secondary" onClick={() => loadConversation(level)}>Try again</button>
+            <button className="button secondary" onClick={() => fetchConversation(level)}>Try again</button>
           </div>
         </div>
       )}

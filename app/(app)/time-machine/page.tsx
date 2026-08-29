@@ -62,7 +62,9 @@ export default function TimeMachinePage() {
   }, []);
 
   useEffect(() => {
-    void load();
+    let cancelled = false;
+    void Promise.resolve().then(() => { if (!cancelled) return load(); });
+    return () => { cancelled = true; };
   }, [load]);
 
   async function startRecording() {

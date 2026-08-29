@@ -312,15 +312,18 @@ export default function ReadingPage() {
   const levelTouched = useRef(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(PROGRESS_KEY);
-      if (raw) setProgress(JSON.parse(raw) as Record<string, ProgressEntry>);
-      const storedFont = window.localStorage.getItem(FONT_KEY);
-      if (storedFont) {
-        const parsed = Number(storedFont);
-        if (Number.isInteger(parsed) && parsed >= 0 && parsed < FONT_STEPS.length) setFontIndex(parsed);
-      }
-    } catch { /* private browsing — progress stays in memory */ }
+    // Restore persisted reader preferences after hydration (async, no sync setState in the effect body).
+    void Promise.resolve().then(() => {
+      try {
+        const raw = window.localStorage.getItem(PROGRESS_KEY);
+        if (raw) setProgress(JSON.parse(raw) as Record<string, ProgressEntry>);
+        const storedFont = window.localStorage.getItem(FONT_KEY);
+        if (storedFont) {
+          const parsed = Number(storedFont);
+          if (Number.isInteger(parsed) && parsed >= 0 && parsed < FONT_STEPS.length) setFontIndex(parsed);
+        }
+      } catch { /* private browsing — progress stays in memory */ }
+    });
 
     let cancelled = false;
     void (async () => {
