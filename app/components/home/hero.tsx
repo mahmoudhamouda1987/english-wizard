@@ -13,7 +13,7 @@ const NAV = [
   { label: "Learn", href: "/dashboard" },
   { label: "Levels", href: "/#cefr" },
   { label: "Skills", href: "/#skills" },
-  { label: "LevelCheck", href: "/diagnostic" },
+  { label: "LevelQuest", href: "/diagnostic" },
   { label: "For Organizations", href: "/#organizations" },
   { label: "Pricing", href: "/pricing" },
 ];
@@ -33,7 +33,7 @@ const TRUST = [
   { icon: IconTarget, text: "CEFR-aligned learning" },
   { icon: IconRoute, text: "Pre-A1 → C2" },
   { icon: IconChart, text: "4 core skills" },
-  { icon: IconShield, text: "Adaptive LevelCheck" },
+  { icon: IconShield, text: "Adaptive LevelQuest" },
   { icon: IconRoute, text: "Personalized learning path" },
   { icon: IconDoc, text: "Professional assessment report" },
 ];
@@ -127,7 +127,7 @@ export function Hero() {
             {/* Interactive learner ecosystem */}
             <div className="hp-eco" role="group" aria-label="Interactive preview of the English Wizard learner experience">
               <div className="hp-eco-card hp-eco-check" aria-hidden="true">
-                <div className="hp-eco-check-head"><span>LevelCheck</span><span style={{ color: "#2fbd8f" }}>done</span></div>
+                <div className="hp-eco-check-head"><span>LevelQuest</span><span style={{ color: "#2fbd8f" }}>done</span></div>
                 <div className="hp-eco-check-body">
                   <div style={{ fontSize: 13, fontWeight: 700 }}>Result: <span style={{ color: "#6a3fe0" }}>B2 · Upper-intermediate</span></div>
                   <div className="hp-cefr-sbar"><span>Reading</span><span className="track"><i style={{ width: "78%" }} /></span></div>

@@ -6,17 +6,34 @@ import { query } from "@/src/infrastructure/database";
 export const dynamic = "force-dynamic";
 
 const ALLOWED = new Set([
+  // Onboarding (Part 34)
   "onboarding_started",
   "onboarding_completed",
+  // LevelQuest assessment
   "levelquest_started",
   "levelquest_question_answered",
+  "question_skipped",
+  "question_flagged",
+  "listening_started",
+  "listening_completed",
+  "speaking_started",
+  "speaking_completed",
+  "assessment_completed",
+  "assessment_abandoned",
   "levelquest_completed_viewed",
+  // Report
+  "report_generated",
   "report_downloaded",
+  // Dashboard + trial + subscription
+  "dashboard_entered",
+  "trial_started",
   "trial_viewed",
+  "trial_expired_notice",
+  "premium_feature_viewed",
   "upgrade_modal_opened",
   "upgrade_clicked",
   "plan_page_viewed",
-  "trial_expired_notice",
+  "subscription_started",
 ]);
 
 /**

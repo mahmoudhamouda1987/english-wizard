@@ -17,6 +17,14 @@ test("IELTS pathway is selectable, distinct from general mastery, and never clai
   expect(payload.catalog.ielts.certificationClaim).toBe(false);
   expect(payload.disclaimer).toMatch(/never|not official/i);
 
+  // Free learners are gated (server-side premium enforcement, Parts 13/19)...
+  const gated = await request.post("/api/pathways", { data: { pathway: "IELTS" } });
+  expect(gated.status()).toBe(402);
+
+  // ...and the 7-day trial unlocks exam pathways.
+  const trial = await request.post("/api/trial", { data: {} });
+  expect(trial.ok()).toBeTruthy();
+
   const selected = await request.post("/api/pathways", { data: { pathway: "IELTS", ieltsVariant: "GENERAL", bandTarget: "7", target: "7.0" } });
   expect(selected.status()).toBe(201);
   const selection = (await selected.json()).selection;

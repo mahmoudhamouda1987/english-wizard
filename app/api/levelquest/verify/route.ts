@@ -28,9 +28,11 @@ export async function GET(req: Request) {
       skill_profile: Record<string, string>;
     }>(
       `SELECT pr.level, pr.confidence, pr.variant, pr.created_at,
-              l.display_name, l.student_id, pr.skill_profile
+              COALESCE(ua.display_name, lp.display_name) AS display_name, l.student_id, pr.skill_profile
        FROM placement_reports pr
        JOIN learners l ON l.id = pr.learner_id
+       LEFT JOIN user_accounts ua ON ua.learner_id = l.id
+       LEFT JOIN learner_profiles lp ON lp.learner_id = l.id
        WHERE pr.id = $1::uuid`,
     [id],
   );
@@ -58,7 +60,7 @@ export async function GET(req: Request) {
   <div style="background:#fff;border-radius:0 0 16px 16px;padding:30px 28px">
     <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#ecfdf5;border:1px solid #a7f3d0;margin-bottom:22px">
       <div style="font-size:22px">✅</div>
-      <div><div style="font-weight:800;color:#065f46">Certificate is genuine</div><div style="font-size:12.5px;color:#047857">This is a valid English Wizard LevelCheck placement report.</div></div>
+      <div><div style="font-weight:800;color:#065f46">Certificate is genuine</div><div style="font-size:12.5px;color:#047857">This is a valid English Wizard LevelQuest placement report.</div></div>
     </div>
     <div style="text-align:center;padding:8px 0 20px">
       <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#64748b">Candidate English Level</div>
@@ -69,7 +71,7 @@ export async function GET(req: Request) {
       <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Candidate</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${row.display_name || "—"}</td></tr>
       <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Student ID</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${row.student_id ?? "—"}</td></tr>
       <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Issue date</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${date}</td></tr>
-      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Assessment</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">LevelCheck — CEFR Placement</td></tr>
+      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Assessment</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">LevelQuest — CEFR Placement</td></tr>
     </table>
     <p style="margin-top:18px;font-size:12.5px;color:#64748b;line-height:1.6">This report is aligned to the Common European Framework of Reference for Languages (CEFR). ${isPlace && row.level ? `The candidate achieved the level of <strong>${row.level}</strong>.` : ""}</p>
   </div>

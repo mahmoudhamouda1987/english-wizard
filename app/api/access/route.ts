@@ -34,6 +34,10 @@ export async function GET() {
     trialStatus,
     paidTier,
     inTrial: trialStatus === "ACTIVE" && view.active,
-    trialExpired: trialStatus === "EXPIRED" && paidTier === "FREE",
+    // "Trial ended" applies only to learners who actually STARTED a trial
+    // (onboarding). A learner who never began one must not see ended-trial
+    // messaging — their account state is simply pre-trial (Parts 18/22).
+    trialEverStarted: Boolean(trial),
+    trialExpired: trialStatus === "EXPIRED" && paidTier === "FREE" && Boolean(trial),
   }, { headers: { "Cache-Control": "no-store" } });
 }

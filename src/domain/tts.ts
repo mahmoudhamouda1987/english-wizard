@@ -53,9 +53,12 @@ const GENDER_PITCH: Record<VoiceGender, number> = { male: 0.92, female: 1.14 };
 
 export function speakText(
   text: string,
-  options: { lang?: Lang; rate?: number; pitch?: number; volume?: number; gender?: VoiceGender; onStart?: () => void; onEnd?: () => void } = {},
+  options: { lang?: Lang; rate?: number; pitch?: number; volume?: number; gender?: VoiceGender; onStart?: () => void; onEnd?: () => void; onBoundary?: (charIndex: number) => void; onError?: () => void } = {},
 ): void {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (options.onError) options.onError();
+    return;
+  }
   const lang = options.lang ?? "en-GB";
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
@@ -68,6 +71,8 @@ export function speakText(
   if (options.volume !== undefined) utterance.volume = options.volume;
   if (options.onStart) utterance.onstart = () => options.onStart!();
   if (options.onEnd) utterance.onend = () => options.onEnd!();
+  if (options.onBoundary) utterance.onboundary = (e) => options.onBoundary!(e.charIndex);
+  if (options.onError) utterance.onerror = () => options.onError!();
   window.speechSynthesis.speak(utterance);
 }
 

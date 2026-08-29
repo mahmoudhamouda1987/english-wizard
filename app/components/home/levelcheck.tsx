@@ -21,7 +21,7 @@ const QUESTIONS = [
   { diff: "Confirming · C1", q: "Complete the sentence:", opts: ["Far from ___ the deadline, the team delivered early.", "miss", "to miss", "missing", "missed"], correct: 2 },
 ];
 
-export function LevelCheckSection() {
+export function LevelQuestSection() {
   const [qi, setQi] = useState(0);
   const [phase, setPhase] = useState<"answering" | "graded">("answering");
   const [picked, setPicked] = useState<number | null>(null);
@@ -48,9 +48,9 @@ export function LevelCheckSection() {
     <section className="hp-section hp-band-paper" aria-labelledby="hp-lc-title" id="levelcheck">
       <div className="hp-wrap">
         <Reveal className="hp-head hp-center">
-          <span className="hp-eyebrow">Your first step · LevelCheck</span>
+          <span className="hp-eyebrow">Your first step · LevelQuest</span>
           <h2 id="hp-lc-title" className="hp-display hp-h2">Know your English.<br />Not just your score.</h2>
-          <p className="hp-lead">Most tests hand you a number. LevelCheck walks your ability boundary — question by question — until it knows exactly where you stand.</p>
+          <p className="hp-lead">Most tests hand you a number. LevelQuest walks your ability boundary — question by question — until it knows exactly where you stand.</p>
         </Reveal>
 
         <div className="hp-adapt">
@@ -69,8 +69,8 @@ export function LevelCheckSection() {
           </Reveal>
 
           <Reveal delay={1}>
-            <div className="hp-adapt-visual" role="img" aria-label="Animated preview of an adaptive LevelCheck assessment question">
-              <div className="hp-assess-meta"><span>Question {qi + 1} / 30</span><span>{Math.round(((qi + 1) / QUESTIONS.length) * 100)}% explored</span></div>
+            <div className="hp-adapt-visual" role="img" aria-label="Illustrative preview of an adaptive LevelQuest assessment question">
+              <div className="hp-assess-meta"><span>Live demo · Question {qi + 1} of {QUESTIONS.length}</span><span>{Math.round(((qi + 1) / QUESTIONS.length) * 100)}% explored</span></div>
               <span className="hp-assess-diff"><IconTarget size={13} /> {q.diff}</span>
               <p className="hp-assess-q" style={{ marginTop: 16 }}>{q.q}</p>
               {q.opts.map((o, i) => (
@@ -87,7 +87,7 @@ export function LevelCheckSection() {
                 )
               ))}
               <div className="hp-assess-foot">
-                <span>{phase === "graded" ? "Response recorded — recalibrating…" : "LevelCheck is listening to your answers…"}</span>
+                <span>{phase === "graded" ? "Response recorded — recalibrating…" : "LevelQuest is listening to your answers…"}</span>
                 <IconArrow size={16} />
               </div>
             </div>
@@ -95,7 +95,7 @@ export function LevelCheckSection() {
         </div>
 
         <Reveal className="hp-center" style={{ marginTop: 56 }}>
-          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Take LevelCheck</Link>
+          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Take LevelQuest</Link>
         </Reveal>
       </div>
 
@@ -111,7 +111,7 @@ export function LevelCheckSection() {
           <div className="hp-trans-flow">
             <div className="hp-trans-node hp-trans-b2">
               <span className="hp-big">B2</span>
-              <small>LevelCheck result</small>
+              <small>LevelQuest result</small>
             </div>
             <span className="hp-trans-arrow" aria-hidden="true">→</span>
             <div className="hp-trans-node hp-trans-b2">

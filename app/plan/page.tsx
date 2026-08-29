@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { track } from "@/app/lib/track";
 
 interface Access {
   premium: boolean;
@@ -26,6 +27,7 @@ export default function PlanPage() {
   const [changing, setChanging] = useState<string | null>(null);
 
   useEffect(() => {
+    track("plan_page_viewed");
     fetch("/api/access", { cache: "no-store" })
       .then(async (r) => { const p = await r.json(); if (!r.ok) throw new Error(p.error); setAccess(p as Access); })
       .catch((e) => { if (String(e?.message ?? "").toLowerCase().includes("auth")) router.push("/auth"); else setError(String(e?.message ?? "Unable to load plan.")); });
@@ -43,6 +45,7 @@ export default function PlanPage() {
       localStorage.setItem("plan", tier);
       // A paid plan converts the trial so it stops counting down.
       await fetch("/api/trial", { method: "PUT" }).catch(() => {});
+      if (tier !== "FREE") track("subscription_started", { tier });
       setAccess((a) => (a ? { ...a, premium: tier !== "FREE", paidTier: tier, trialStatus: tier === "FREE" ? a.trialStatus : "CONVERTED", trialExpired: false } : a));
       setChanging(null);
     } catch (e) {
@@ -58,6 +61,16 @@ export default function PlanPage() {
 
   return (
     <main id="main-content" style={{ maxWidth: 860, margin: "0 auto", padding: "40px 24px 80px" }}>
+      {/* Trial-expired presentation (Part 23): premium continuation headline */}
+      {access.trialExpired && (
+        <section style={{ marginBottom: 26, textAlign: "center", padding: "34px 24px", borderRadius: 20, background: "linear-gradient(135deg,#0f1535,#2a1a4a)", color: "white" }}>
+          <p className="eyebrow" style={{ color: "#a5b4fc" }}>Your journey continues</p>
+          <h1 style={{ fontSize: "clamp(28px,4.5vw,40px)", margin: "6px 0 10px", fontWeight: 900 }}>Continue Your English Journey</h1>
+          <p style={{ fontSize: 15.5, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto" }}>
+            Your LevelQuest discovered where you are. Now continue building the skills that take you where you want to go.
+          </p>
+        </section>
+      )}
       <p className="eyebrow">Your plan</p>
       <h1 style={{ fontSize: "clamp(28px,4vw,40px)", margin: "4px 0 6px" }}>Subscription &amp; trial</h1>
       <p className="subtle" style={{ margin: "0 0 24px" }}>Manage access to English Wizard&rsquo;s premium practice features.</p>
@@ -93,6 +106,36 @@ export default function PlanPage() {
         })}
       </div>
 
+      {/* Feature comparison (Part 23) */}
+      <h2 style={{ fontSize: 20, margin: "28px 0 12px" }}>What each plan unlocks</h2>
+      <section className="panel" style={{ padding: 0, overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 560 }}>
+          <thead>
+            <tr style={{ textAlign: "left", borderBottom: "2px solid #e4e8f0" }}>
+              <th style={{ padding: "12px 16px" }}>Feature</th>
+              <th style={{ padding: "12px 16px" }}>Free</th>
+              <th style={{ padding: "12px 16px" }}>Plus</th>
+              <th style={{ padding: "12px 16px" }}>Pro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["Personalized dashboard + placement report", "✓", "✓", "✓"],
+              ["Core curriculum + review system", "✓", "✓", "✓"],
+              ["AI teacher sessions / day", "5", "30", "Unlimited"],
+              ["Speaking coach checks / day", "2", "10", "Unlimited"],
+              ["Exam pathways (IELTS · Cambridge)", "—", "✓", "✓"],
+              ["Deep Study sessions", "—", "3 / day", "Unlimited"],
+              ["Boss Missions", "—", "1 / day", "Unlimited"],
+            ].map((row) => (
+              <tr key={row[0]} style={{ borderBottom: "1px solid #eef1f6" }}>
+                {row.map((cell, ci) => <td key={ci} style={{ padding: "11px 16px", fontWeight: ci === 0 ? 600 : 400, color: cell === "—" ? "#b6bdcc" : undefined }}>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
       <p className="subtle" style={{ marginTop: 18, fontSize: 12.5 }}>Plan changes in this environment are recorded directly for you. In production a payment provider attaches its own reference — your learning data is never affected by a plan change.</p>
       <Link href="/dashboard" style={{ display: "inline-block", marginTop: 8 }}>← Back to dashboard</Link>
     </main>
@@ -123,13 +166,14 @@ function TrialActive({ trial }: { trial: Access["trial"] }) {
 function TrialExpired() {
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontSize: 28 }}>⏳</span>
-        <div>
+        <div style={{ flex: 1, minWidth: 200 }}>
           <h2 style={{ fontSize: 20, margin: 0 }}>Your 7-day trial has ended</h2>
-          <p className="subtle" style={{ margin: "2px 0 0" }}>Premium features are now paused. There&rsquo;s nothing to lose — your progress and report are safe.</p>
+          <p className="subtle" style={{ margin: "2px 0 0" }}>Premium features are now paused. There&rsquo;s nothing to lose — your placement report, Student ID and progress are all preserved.</p>
         </div>
       </div>
+      <p className="subtle" style={{ fontSize: 12.5, margin: "12px 0 0" }}>You can still log in, view your report and profile, and explore plans below.</p>
     </>
   );
 }

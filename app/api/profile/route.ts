@@ -40,12 +40,21 @@ export async function POST(request: Request) {
   });
 
   // Assign an idempotent Student ID (EW-YYYY-NNNNNN) on first profile setup.
+  // Sequence is derived from the highest existing suffix for the current year so
+  // every learner receives a UNIQUE id (never a repeated 000000).
   let studentId: string | null = null;
   const idRow = await query<{ student_id: string | null }>(`SELECT student_id FROM learners WHERE id = $1::uuid`, [session.learnerId]);
   if (idRow.rows.length) {
     if (!idRow.rows[0].student_id) {
-      studentId = generateStudentId();
-      await query(`UPDATE learners SET student_id = $2, updated_at = NOW() WHERE id = $1::uuid`, [session.learnerId, studentId]);
+      const year = new Date().getFullYear();
+      const seqRow = await query<{ max_seq: number | null }>(
+        `SELECT COALESCE(MAX(NULLIF(SUBSTRING(student_id FROM '^EW-[0-9]{4}-([0-9]{6})$'), '')::int), -1) AS max_seq
+         FROM learners WHERE student_id LIKE $1`,
+        [`EW-${year}-%`],
+      );
+      const nextSeq = Math.max(0, (seqRow.rows[0]?.max_seq ?? -1) + 1);
+      studentId = generateStudentId(year, nextSeq);
+      await query(`UPDATE learners SET student_id = $2, updated_at = NOW() WHERE id = $1::uuid AND student_id IS NULL`, [session.learnerId, studentId]);
     } else {
       studentId = idRow.rows[0].student_id;
     }

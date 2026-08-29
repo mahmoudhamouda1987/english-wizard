@@ -63,16 +63,17 @@ export async function GET(req: Request) {
 
   const r = await query<ReportRow>(
     `SELECT pr.id, pr.level, pr.confidence, pr.variant, pr.skill_profile, pr.report_json, pr.created_at,
-            l.display_name, la.email, l.student_id
+            COALESCE(la.display_name, lp.display_name) AS display_name, la.email, l.student_id
      FROM placement_reports pr
      JOIN learners l ON l.id = pr.learner_id
      LEFT JOIN user_accounts la ON la.learner_id = l.id
+     LEFT JOIN learner_profiles lp ON lp.learner_id = l.id
      WHERE pr.learner_id = $1::uuid
      ORDER BY pr.created_at DESC LIMIT 1`,
     [user.learnerId],
   );
   if (!r.rowCount || !r.rows[0]) {
-    return htmlPage(404, "No report available yet", "Complete your LevelCheck placement assessment to generate your official CEFR placement report.", "/diagnostic", "Take the assessment →");
+    return htmlPage(404, "No report available yet", "Complete your LevelQuest placement assessment to generate your official CEFR placement report.", "/diagnostic", "Take the assessment →");
   }
 
   const row = r.rows[0];
@@ -110,7 +111,7 @@ export async function GET(req: Request) {
     text("English Wizard", M + 76, H - 94, 21, R(WHITE), b);
     text("Personalised English Proficiency", M + 76, H - 116, 9.5, R(SOFT));
     text("OFFICIAL PLACEMENT REPORT", W - M - 252, H - 90, 10.5, R([0.9, 0.88, 0.97]), b);
-    text("CEFR-aligned · LevelCheck", W - M - 252, H - 108, 9, R(SOFT));
+    text("CEFR-aligned · LevelQuest", W - M - 252, H - 108, 9, R(SOFT));
 
     // ── Title ──
     y = H - 152;
@@ -123,7 +124,7 @@ export async function GET(req: Request) {
       ["Candidate", row.display_name || "—", M],
       ["Test date", date, c2],
       ["Student ID", studentId, M],
-      ["Assessment", "LevelCheck — CEFR Placement", c2],
+      ["Assessment", "LevelQuest — CEFR Placement", c2],
       ["Issue date", date, M],
       ["Variant", `Version ${row.variant} of 15`, c2],
     ];

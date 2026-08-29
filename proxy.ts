@@ -4,6 +4,7 @@ const protectedPath = [
   "/dashboard", "/learn", "/learning-path", "/practice", "/progress", "/mistakes",
   "/achievements", "/settings", "/vocabulary", "/conversation", "/community",
   "/diagnostic", "/review", "/speaking", "/worlds", "/reading", "/english-ear", "/say-it-better", "/pathways",
+  "/onboarding",
 ];
 
 export function proxy(req: NextRequest) {
@@ -26,5 +27,6 @@ export const config = {
     "/mistakes/:path*", "/achievements/:path*", "/settings/:path*", "/vocabulary/:path*",
     "/conversation/:path*", "/community/:path*", "/diagnostic/:path*", "/review/:path*", "/speaking/:path*",
     "/worlds/:path*", "/reading/:path*", "/english-ear/:path*", "/say-it-better/:path*", "/pathways/:path*",
+    "/onboarding/:path*",
   ],
 };

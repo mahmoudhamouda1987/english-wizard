@@ -206,6 +206,204 @@ export function estimateToLevel(estimate: number): { level: CEFRLevel; confidenc
   return { level: CEFR_ORDER[idx], confidence };
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ADAPTIVE ENGINE V2 — genuine runtime item-adaptive selection (Part 6).
+ *
+ * V1 presented a paper whose ORDER was precomputed once (baseline-first climb);
+ * the runtime estimate never re-routed the sequence. V2 makes the sitting
+ * genuinely item-adaptive: after every graded answer the server selects the
+ * next item from the variant pool using the current ability estimate, with
+ * band windows, skill balancing, anti-jump guards and a 30-minute-fit budget.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Sitting budget sized so a complete sitting fits the 30:00 timer with speaking. */
+export const SESSION_BUDGET = {
+  /** Maximum objective (mcq/listening) items presented in one sitting. */
+  objective: 30,
+  /** Speaking tasks per sitting (drawn from the variant's 7 level-keyed prompts). */
+  speaking: 4,
+  /** Minimum objective evidence before adaptive early-stop is allowed. */
+  minObjectiveForEarlyStop: 16,
+  /** Minimum evidence per objective skill before early-stop is allowed. */
+  minPerSkillForEarlyStop: 3,
+} as const;
+
+export interface AdaptiveSelectionContext {
+  askedIds: string[];
+  estimate: number;
+  skillTotal: Record<string, number>;
+  /** Last presented item id (used for anti-repetition of subskill). */
+  lastItemId?: string | null;
+}
+
+/**
+ * Select the next objective item for a sitting (Part 6 adaptive rules):
+ * - prefers items within ±1.0 band of the estimate (widens only when starved);
+ * - balances skills so no skill dominates the evidence;
+ * - never jumps several bands off a single correct answer (window enforces);
+ * - never traps the learner (fallback to globally closest items);
+ * - avoids repeating the same subskill back-to-back when alternatives exist.
+ */
+export function selectNextAdaptiveItem(variant: number, ctx: AdaptiveSelectionContext): LevelQuestItem | null {
+  const pool = LEVELQUEST_BANK.filter(
+    (i) => i.variant === variant && i.type !== "speaking" && !ctx.askedIds.includes(i.id),
+  );
+  if (pool.length === 0) return null;
+
+  const est = clampEstimate(ctx.estimate);
+  const lastSubskill = ctx.lastItemId
+    ? LEVELQUEST_BANK.find((i) => i.id === ctx.lastItemId)?.subskill ?? null
+    : null;
+
+  // Skill deficit: skills with less evidence get priority.
+  const skills: SkillKey[] = ["grammar", "vocabulary", "reading", "listening"];
+  const counts = skills.map((s) => ctx.skillTotal[s] ?? 0);
+  const minCount = Math.min(...counts);
+
+  const candidates = pool.map((item) => {
+    const dist = Math.abs(g(item) - est);
+    const skillDeficit = (ctx.skillTotal[item.skill] ?? 0) - minCount; // 0 for least-asked skills
+    const subskillRepeat = lastSubskill && item.subskill === lastSubskill ? 0.45 : 0;
+    return { item, score: dist + skillDeficit * 0.28 + subskillRepeat };
+  });
+  candidates.sort((a, b) => a.score - b.score);
+
+  // Band window: ±1.0 preferred; widen progressively rather than jumping levels.
+  for (const window of [1.0, 1.4, 1.8]) {
+    const inWindow = candidates.filter((c) => Math.abs(g(c.item) - est) <= window);
+    if (inWindow.length >= 3) return inWindow[0].item;
+  }
+  return candidates[0].item;
+}
+
+/**
+ * Select the next speaking task. The FIRST task enters near the learner's
+ * estimated level (not always Pre-A1); later tasks walk upward one band at a
+ * time from the previous speaking task so production difficulty progresses.
+ */
+export function selectNextSpeakingItem(
+  variant: number,
+  askedIds: string[],
+  estimate: number,
+  lastSpeakingLevelIndex: number | null,
+): LevelQuestItem | null {
+  const pool = LEVELQUEST_BANK.filter(
+    (i) => i.variant === variant && i.type === "speaking" && !askedIds.includes(i.id),
+  );
+  if (pool.length === 0) return null;
+  if (lastSpeakingLevelIndex === null) {
+    const target = clampEstimate(estimate);
+    return pool.sort((a, b) => Math.abs(LEVEL_INDEX[a.cefr] - target) - Math.abs(LEVEL_INDEX[b.cefr] - target))[0];
+  }
+  const upward = pool.filter((i) => LEVEL_INDEX[i.cefr] > lastSpeakingLevelIndex);
+  if (upward.length > 0) {
+    return upward.sort((a, b) => LEVEL_INDEX[a.cefr] - LEVEL_INDEX[b.cefr])[0];
+  }
+  return pool.sort((a, b) => LEVEL_INDEX[a.cefr] - LEVEL_INDEX[b.cefr])[0];
+}
+
+/* ── Ability estimation, confidence and boundary detection (Part 14) ── */
+
+/** Rasch-style probability of a correct answer at ability `est` on difficulty `d`. */
+export function probabilityCorrect(est: number, difficulty: number): number {
+  return 1 / (1 + Math.exp(-1.7 * (est - difficulty)));
+}
+
+/**
+ * Standard error of the ability estimate from the answered items' information.
+ * SE = 1 / sqrt(Σ 4·p·(1−p)); small SE = precise estimate.
+ */
+export function estimateStandardError(
+  items: Array<Pick<LevelQuestItem, "cefr" | "difficulty">>,
+  estimate: number,
+): number {
+  let info = 0;
+  for (const item of items) {
+    const p = probabilityCorrect(estimate, g(item));
+    info += 4 * p * (1 - p);
+  }
+  return info > 0 ? 1 / Math.sqrt(info) : 2;
+}
+
+export interface PlacementVerdict {
+  level: CEFRLevel;
+  confidence: "High" | "Moderate";
+  /** e.g. "B1 / Emerging B2" when the estimate sits near the next boundary. */
+  boundary: string | null;
+  emerging: CEFRLevel | null;
+  se: number;
+}
+
+/**
+ * Final placement verdict combining the estimate, its standard error and
+ * boundary proximity. Does NOT imply precision the evidence cannot support:
+ * - confidence is High only when the SE is small or the evidence is decisive;
+ * - an "Emerging X" boundary is reported when the estimate sits close to the
+ *   next band with meaningful evidence behind it (Part 14).
+ */
+export function placementVerdict(
+  estimate: number,
+  answeredItems: Array<Pick<LevelQuestItem, "cefr" | "difficulty">>,
+): PlacementVerdict {
+  const se = estimateStandardError(answeredItems, estimate);
+  const idx = Math.max(0, Math.min(6, Math.round(estimate)));
+  const level = CEFR_ORDER[idx];
+
+  const enoughEvidence = answeredItems.length >= SESSION_BUDGET.minObjectiveForEarlyStop;
+  const high = (se <= 0.52 && answeredItems.length >= 12) || (enoughEvidence && se <= 0.62);
+  const confidence: "High" | "Moderate" = high ? "High" : "Moderate";
+
+  // Boundary (Part 14): "B1 / Emerging B2" means the estimate rounded UP into
+  // the band — the learner sits just below the band's centre with real
+  // evidence, so the previous band is acknowledged alongside the verdict.
+  // Estimates at/above the band centre claim no emergence (no overclaiming).
+  const roundedUp = estimate > idx - 0.5 && estimate < idx; // frac >= .5 rounds up
+  let emerging: CEFRLevel | null = null;
+  if (enoughEvidence && answeredItems.length >= 12 && roundedUp && idx > 0) {
+    emerging = CEFR_ORDER[idx - 1];
+  }
+  const boundary = emerging ? `${emerging} / Emerging ${level}` : null;
+  return { level, confidence, boundary, emerging, se: Math.round(se * 100) / 100 };
+}
+
+/**
+ * Recompute the ability estimate from scratch over all graded answers in
+ * presentation order. Used when a learner changes a previously-graded answer
+ * (Part 10: recalculation instead of silent corruption).
+ */
+export function recomputeEstimate(
+  orderedItems: LevelQuestItem[], // presentation order, objective items only
+  answers: Record<string, { correct: boolean }>,
+  startEstimate: number,
+): number {
+  let est = clampEstimate(startEstimate);
+  let n = 0;
+  for (const item of orderedItems) {
+    const graded = answers[item.id];
+    if (!graded) continue;
+    n += 1;
+    est = updateEstimate(est, graded.correct, g(item), n);
+  }
+  return est;
+}
+
+/* ── Placement → curriculum personalization (Part 24) ── */
+
+const LEVEL_FIRST_LESSON: Record<CEFRLevel, string> = {
+  "Pre-A1": "lesson-01-me-my-world",
+  A1: "lesson-03-food-shopping-services",
+  A2: "lesson-06-people-social-life",
+  B1: "lesson-13-relationships-behaviour",
+  B2: "lesson-17-business-economy",
+  C1: "lesson-21-science-natural-world",
+  C2: "lesson-26-advanced-argumentation",
+};
+
+/** The first curriculum lesson of a CEFR level (personalized starting point). */
+export function firstLessonIdForLevel(level: string): string {
+  return LEVEL_FIRST_LESSON[level as CEFRLevel] ?? LEVEL_FIRST_LESSON["Pre-A1"];
+}
+
 const clampEstimate = (e: number) => Math.max(0, Math.min(6, e));
 
 /**

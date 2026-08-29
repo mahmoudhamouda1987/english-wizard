@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
+import { track } from "@/app/lib/track";
 
 interface Dash {
   firstName: string;
@@ -138,26 +139,36 @@ function TrialBanner() {
   useEffect(() => {
     fetch("/api/access", { cache: "no-store" }).then((r) => r.json()).then(setAccess).catch(() => {});
   }, []);
+  useEffect(() => {
+    if (access?.trialExpired) track("trial_expired_notice");
+  }, [access?.trialExpired]);
   if (!access) return null;
   if (access.inTrial) {
     const days = Math.max(access.trial.daysLeft, 0);
+    const trialDay = Math.min(7, Math.max(1, 8 - days)); // Day 1..7 of the guided trial
     return (
-      <section className="panel" style={{ margin: "18px 0 0", padding: 16, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+      <section className="panel" aria-label="Trial status" style={{ margin: "18px 0 0", padding: 16, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
         <span style={{ fontSize: 24 }}>🎁</span>
         <div style={{ flex: 1, minWidth: 200 }}>
-          <strong>7-day guided trial active</strong> — enjoy every premium feature free.
+          <strong>Trial Day {trialDay} of 7</strong> — your guided trial is active. Enjoy every premium feature free.
           <div className="track" style={{ marginTop: 8, maxWidth: 320 }}><span style={{ width: `${Math.min(100, Math.max(0, (access.trial.fractionRemaining ?? 1) * 100))}%` }} /></div>
         </div>
-        <span className="streak-pill" style={{ fontSize: 13 }}>{days} day{days === 1 ? "" : "s"} left</span>
+        <span className="streak-pill" style={{ fontSize: 13 }}>Trial ends in {days} day{days === 1 ? "" : "s"}</span>
         <button onClick={() => router.push("/plan")} className="button secondary" style={{ fontSize: 12.5 }}>Manage plan</button>
       </section>
     );
   }
   if (access.trialExpired) {
     return (
-      <section className="panel" style={{ margin: "18px 0 0", padding: 16, background: "#fff7ed", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 24 }}>⏳</span>
-        <div style={{ flex: 1, minWidth: 200 }}><strong>Your 7-day trial has ended.</strong> Premium features paused — your progress is safe. <a href="/plan" style={{ fontWeight: 700, color: "#6840d6" }}>See options →</a></div>
+      <section className="panel" aria-label="Trial ended" style={{ margin: "18px 0 0", padding: "18px 20px", background: "linear-gradient(135deg,#0f1535,#2a1a4a)", color: "white", borderRadius: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 26 }}>🚀</span>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <strong style={{ fontSize: 16 }}>Continue Your English Journey</strong>
+            <div style={{ fontSize: 13.5, opacity: .85, marginTop: 3 }}>Your LevelQuest discovered where you are — now keep building the skills that take you where you want to go. Your report and progress are safe.</div>
+          </div>
+          <button onClick={() => router.push("/plan")} className="button" style={{ fontSize: 13.5 }}>View plans →</button>
+        </div>
       </section>
     );
   }
@@ -176,6 +187,7 @@ export default function DashboardPage() {
   }, [data]);
 
   useEffect(() => {
+    track("dashboard_entered");
     fetch("/api/dashboard", { cache: "no-store" })
       .then(async (r) => {
         const payload = await r.json();
@@ -228,7 +240,7 @@ export default function DashboardPage() {
         <header className="dash-header">
           <div>
             <h1>{greeting()}{data ? `, ${data.firstName}!` : "!"} 👋</h1>
-            <p className="subtle">Let&rsquo;s continue your journey to English mastery.</p>
+            <p className="subtle">{data?.level ? <>Your English journey starts at <strong>{data.level}</strong> — let&rsquo;s keep building.</> : "Let's continue your journey to English mastery."}</p>
           </div>
           <form className="searchbox" role="search" onSubmit={search}>
             <input aria-label="Search anything" placeholder="Search anything…" value={query} onChange={(e) => setQuery(e.target.value)} />
@@ -278,6 +290,11 @@ export default function DashboardPage() {
                   <p className="xp-line">XP <strong>{data.xp.toLocaleString()}</strong> / {data.nextXp.toLocaleString()}</p>
                 </div>
                 <a className="button hero-btn" href={data.currentLessonId ? `/learn?lesson=${encodeURIComponent(data.currentLessonId)}` : "/diagnostic"}>Continue Journey →</a>
+                {data.currentLessonId && ALL_LESSONS.find((l) => l.id === data.currentLessonId) && (
+                  <p style={{ margin: "10px 0 0", fontSize: 12.5, opacity: .8 }}>
+                    Recommended first lesson: <strong>{ALL_LESSONS.find((l) => l.id === data.currentLessonId)?.title}</strong>
+                  </p>
+                )}
                 <div className="mountain" aria-hidden="true">⛰️<span>🚩</span></div>
               </section>
 

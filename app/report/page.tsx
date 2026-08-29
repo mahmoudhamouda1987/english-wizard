@@ -21,12 +21,15 @@ interface ReportRow {
   report_json: {
     estimate?: number;
     answeredCount?: number;
+    boundary?: string | null;
     skillScores?: Record<string, number>;
+    skillLowEvidence?: string[];
     skillAnswered?: Record<string, number>;
     strengths?: string[];
     focusAreas?: string[];
     speakingSubmitted?: boolean;
     speakingResponses?: number;
+    speakingBand?: string | null;
   };
   created_at: Date;
   display_name: string;
@@ -44,9 +47,11 @@ export default async function ReportPage() {
 
   const r = await query<ReportRow>(
     `SELECT pr.id, pr.level, pr.confidence, pr.variant, pr.skill_profile, pr.report_json, pr.created_at,
-            l.display_name, l.student_id
+            COALESCE(ua.display_name, lp.display_name) AS display_name, l.student_id
      FROM placement_reports pr
      JOIN learners l ON l.id = pr.learner_id
+     LEFT JOIN user_accounts ua ON ua.learner_id = l.id
+     LEFT JOIN learner_profiles lp ON lp.learner_id = l.id
      WHERE pr.learner_id = $1::uuid
      ORDER BY pr.created_at DESC LIMIT 1`,
     [user.learnerId],
@@ -63,21 +68,28 @@ export default async function ReportPage() {
     <main id="main-content" style={{ maxWidth: 820, margin: "0 auto", padding: "32px 16px" }}>
       <div style={{ textAlign: "center", marginBottom: 24 }}>
         <Image src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 12 }} unoptimized />
-        <p className="eyebrow" style={{ marginTop: 8 }}>ENGLISH WIZARD · CEFR-ALIGNED ENGLISH PROFICIENCY ASSESSMENT</p>
+        <p className="eyebrow" style={{ marginTop: 8 }}>ENGLISH WIZARD · LEVELQUEST · CEFR-ALIGNED PLACEMENT ASSESSMENT</p>
         <h1 style={{ fontSize: 26, margin: "4px 0" }}>Placement Report</h1>
-        <p className="subtle">{row.display_name} · Version {row.variant} of 15 · Issued {date}</p>
+        {/* Student identity block (Part 16) */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 22, flexWrap: "wrap", marginTop: 12, fontSize: 13 }}>
+          <span><strong>{row.display_name}</strong><span className="subtle" style={{ display: "block", fontSize: 11 }}>Student name</span></span>
+          <span><strong style={{ fontVariantNumeric: "tabular-nums" }}>{row.student_id ?? "—"}</strong><span className="subtle" style={{ display: "block", fontSize: 11 }}>Student ID</span></span>
+          <span><strong>{date}</strong><span className="subtle" style={{ display: "block", fontSize: 11 }}>Assessment date</span></span>
+          <span><strong style={{ fontSize: 12, fontFamily: "monospace" }}>{row.id.slice(0, 8).toUpperCase()}</strong><span className="subtle" style={{ display: "block", fontSize: 11 }}>Assessment ID</span></span>
+          <span><strong>Version {row.variant} of 15</strong><span className="subtle" style={{ display: "block", fontSize: 11 }}>Assessment edition</span></span>
+        </div>
       </div>
 
       <section className="panel" style={{ padding: 28, textAlign: "center", background: "linear-gradient(135deg, #0f1535, #2a1a4a)", color: "white", borderRadius: 18 }}>
         <div style={{ fontSize: 12.5, opacity: .7, textTransform: "uppercase", letterSpacing: ".12em" }}>Overall English Level</div>
         <div style={{ fontSize: 80, fontWeight: 900, margin: "8px 0" }}>{row.level}</div>
         <div style={{ fontSize: 18 }}>{row.confidence} Confidence</div>
-        <p className="subtle" style={{ color: "#cbd5e1", fontSize: 13 }}>Adaptive estimate boundary {row.report_json?.estimate ?? "—"} · {row.report_json?.answeredCount ?? 0} responses analysed</p>
+        <p className="subtle" style={{ color: "#cbd5e1", fontSize: 13 }}>Adaptive estimate {row.report_json?.estimate ?? "—"} · {row.report_json?.answeredCount ?? 0} responses analysed{row.report_json?.boundary ? ` · ${row.report_json.boundary}` : ""}</p>
       </section>
 
-      <section className="panel" style={{ padding: 24, marginTop: 18 }}>
-        <h3 style={{ margin: "0 0 16px" }}>Your journey on the CEFR scale</h3>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 4 }}>
+      <section className="panel" style={{ padding: "30px 24px 24px", marginTop: 18 }}>
+        <h3 style={{ margin: "0 0 20px" }}>Your journey on the CEFR scale</h3>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 4, paddingTop: 8 }}>
           {CEFR_ORDER.map((lv, i) => {
             const reached = i <= CEFR_ORDER.indexOf(row.level as typeof CEFR_ORDER[number]);
             const isCurrent = lv === row.level;
@@ -115,20 +127,24 @@ export default async function ReportPage() {
                   </div>
                 )}
                 <span style={{ fontSize: 12.5, opacity: .7, textAlign: "right" }}>
-                  {isSpeaking ? (attempted ? `${row.report_json?.speakingResponses ?? 0} resp.` : "n/a") : attempted ? `${score}%` : "n/a"}
+                  {isSpeaking ? (attempted ? `${row.report_json?.speakingResponses ?? 0} resp.` : "n/a") : attempted ? `${row.report_json?.skillLowEvidence?.includes(sk) ? `${score}%*` : `${score}%`}` : "n/a"}
                 </span>
               </div>
             );
           })}
         </div>
+        {(row.report_json?.skillLowEvidence?.length ?? 0) > 0 && (
+          <p className="subtle" style={{ fontSize: 11.5, margin: "12px 0 0" }}>* Based on limited questions in this sitting — the band may firm up as you practise.</p>
+        )}
       </section>
 
       <section className="panel" style={{ padding: 24, marginTop: 18, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)" }}>
-        <h3 style={{ margin: "0 0 12px" }}>Recommended starting point</h3>
-        <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{row.level}</strong>.</p>
+        <h3 style={{ margin: "0 0 8px" }}>Recommended starting point</h3>
+        <p style={{ margin: "0 0 6px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{row.level}</strong>.</p>
+        <p style={{ margin: "0 0 12px", color: "#6840d6", fontWeight: 600, fontSize: 14.5 }}>Your level has been discovered. Now let&rsquo;s build your path.</p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a href="/api/levelquest/report" className="button">⬇️ Download official PDF report</a>
-          <a href="/learning-path" className="button secondary">Continue to English Wizard →</a>
+          <a href="/dashboard" className="button" style={{ padding: "13px 24px" }}>Continue to English Wizard →</a>
+          <a href="/api/levelquest/report" className="button secondary">⬇️ Download Report (PDF)</a>
           <a href="/diagnostic" className="button secondary">Retake assessment</a>
         </div>
         <p className="subtle" style={{ marginTop: 14, fontSize: 12 }}>
