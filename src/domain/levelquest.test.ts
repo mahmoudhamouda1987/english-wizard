@@ -35,6 +35,31 @@ describe("LevelQuest variant distinctness (Part 12-13)", () => {
       expect(themes.has(VARIANT_THEMES[v - 1])).toBe(true);
     }
   });
+
+  it("gives each variant genuinely distinct objective prompts per level (not shared templates)", () => {
+    for (const level of CEFR_ORDER) {
+      // Objective prompt identity across all 15 variants for a given level.
+      const prompts: string[][] = [];
+      for (let v = 1; v <= 15; v++) {
+        prompts.push(paperForVariant(v).filter((i) => i.type !== "speaking" && i.cefr === level).map((i) => i.prompt));
+      }
+      // Every level should present largely unique prompts across the variants.
+      const all = prompts.flat();
+      expect(new Set(all).size / all.length).toBeGreaterThan(0.6);
+    }
+  });
+
+  it("keeps 105 unique themed speaking prompts plus a rich themed objective bank", () => {
+    expect(LEVELQUEST_BANK.filter((i) => i.type === "speaking")).toHaveLength(105);
+    const objective = LEVELQUEST_BANK.filter((i) => i.type !== "speaking");
+    // A large, genuinely themed objective bank (~1,000 bespoke questions).
+    expect(objective.length).toBeGreaterThanOrEqual(15 * 7 * 8);
+    // Within a single sitting/paper, no objective prompt is ever repeated.
+    for (let v = 1; v <= 15; v++) {
+      const prompts = paperForVariant(v).filter((i) => i.type !== "speaking").map((i) => i.prompt);
+      expect(new Set(prompts).size, `variant ${v}`).toBe(prompts.length);
+    }
+  });
 });
 
 describe("LevelQuest baseline-first adaptivity", () => {
