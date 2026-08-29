@@ -9,7 +9,8 @@ function normalise(s: string): string {
   return s.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function ListeningLab({ items }: { items: Item[] }) {
+/** `onComplete` (optional) fires once when the learner finishes the final item — lets host pages record real progress. */
+export function ListeningLab({ items, onComplete }: { items: Item[]; onComplete?: () => void }) {
   const [i, setI] = useState(0);
   const [input, setInput] = useState("");
   const [checked, setChecked] = useState(false);
@@ -80,7 +81,7 @@ export function ListeningLab({ items }: { items: Item[] }) {
 
   function next() {
     stopSpeaking();
-    if (i + 1 >= items.length) { setDone(true); return; }
+    if (i + 1 >= items.length) { setDone(true); onComplete?.(); return; }
     setI(i + 1); setInput(""); setChecked(false);
   }
 

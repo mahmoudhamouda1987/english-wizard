@@ -173,7 +173,7 @@ export default function SettingsPage() {
       <section className="panel" style={{ display: "grid", gap: 12, marginTop: 18 }}>
         <h2>Privacy</h2>
         <label><input type="checkbox" checked={privacy.analytics} onChange={(event) => setPrivacy({ ...privacy, analytics: event.target.checked })} /> Product analytics</label>
-        <label><input type="checkbox" checked={privacy.personalized_ai} onChange={(event) => setPrivacy({ ...privacy, personalized_ai: event.target.checked })} /> Personalized AI teacher</label>
+        <label><input type="checkbox" checked={privacy.personalized_ai} onChange={(event) => setPrivacy({ ...privacy, personalized_ai: event.target.checked })} /> Personalised AI tutor</label>
         <label><input type="checkbox" checked={privacy.voice_processing} onChange={(event) => setPrivacy({ ...privacy, voice_processing: event.target.checked })} /> Allow voice processing</label>
         <label>Voice retention days<input type="number" min="0" max="365" value={privacy.voice_retention_days} onChange={(event) => setPrivacy({ ...privacy, voice_retention_days: Number(event.target.value) })} /></label>
         <label><input type="checkbox" checked={privacy.share_for_human_review} onChange={(event) => setPrivacy({ ...privacy, share_for_human_review: event.target.checked })} /> Allow voice samples for human review</label>

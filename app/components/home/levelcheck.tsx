@@ -95,7 +95,7 @@ export function LevelQuestSection() {
         </div>
 
         <Reveal className="hp-center" style={{ marginTop: 56 }}>
-          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Take LevelQuest</Link>
+          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
         </Reveal>
       </div>
 
@@ -115,7 +115,7 @@ export function LevelQuestSection() {
             </div>
             <span className="hp-trans-arrow" aria-hidden="true">→</span>
             <div className="hp-trans-node hp-trans-b2">
-              <span className="hp-big" style={{ fontSize: "clamp(22px,2.4vw,30px)", paddingTop: 12, paddingBottom: 12 }}>Personalized path</span>
+              <span className="hp-big" style={{ fontSize: "clamp(22px,2.4vw,30px)", paddingTop: 12, paddingBottom: 12 }}>Personalised path</span>
               <small>Built from your gaps</small>
             </div>
             <span className="hp-trans-arrow" aria-hidden="true">→</span>

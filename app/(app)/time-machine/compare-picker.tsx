@@ -8,7 +8,7 @@ export function ComparePicker({ samples, onCompare }: { samples: Sample[]; onCom
   const [olderId, setOlderId] = useState("");
   const [newerId, setNewerId] = useState("");
 
-  const label = (s: Sample) => new Date(s.createdAt).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" });
+  const label = (s: Sample) => new Date(s.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
   return (
     <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginTop: 12 }}>

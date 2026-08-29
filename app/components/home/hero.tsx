@@ -13,7 +13,7 @@ const NAV = [
   { label: "Learn", href: "/dashboard" },
   { label: "Levels", href: "/#cefr" },
   { label: "Skills", href: "/#skills" },
-  { label: "LevelQuest", href: "/diagnostic" },
+  { label: "Check My English", href: "/diagnostic" },
   { label: "For Organizations", href: "/#organizations" },
   { label: "Pricing", href: "/pricing" },
 ];
@@ -34,7 +34,7 @@ const TRUST = [
   { icon: IconRoute, text: "Pre-A1 → C2" },
   { icon: IconChart, text: "4 core skills" },
   { icon: IconShield, text: "Adaptive LevelQuest" },
-  { icon: IconRoute, text: "Personalized learning path" },
+  { icon: IconRoute, text: "Personalised learning path" },
   { icon: IconDoc, text: "Professional assessment report" },
 ];
 
@@ -69,7 +69,7 @@ export function Hero() {
           </nav>
           <div className="hp-nav-cta">
             <Link className="hp-nav-signin" href="/auth">Sign in</Link>
-            <Link className="hp-btn hp-btn-primary" href="/diagnostic">Discover My Level</Link>
+            <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
             <ThemeToggle />
           </div>
           <button
@@ -105,11 +105,11 @@ export function Hero() {
                 where <em className="hp-hero-em">you stand.</em>
               </h1>
               <p className="hp-lead">
-                English Wizard measures your English, builds your personalized learning path,
+                English Wizard measures your English, builds your personalised learning path,
                 and helps you progress from Pre-A1 to C2 — with proof, not promises.
               </p>
               <div className="hp-hero-ctas">
-                <Link className="hp-btn hp-btn-primary" href="/diagnostic">Discover My Level</Link>
+                <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
                 <Link className="hp-btn hp-btn-ghost on-dark" href="/plan">Explore the Journey</Link>
               </div>
               <p className="hp-hero-micro">Adaptive placement &bull; Pre-A1 to C2 &bull; About 30 minutes</p>

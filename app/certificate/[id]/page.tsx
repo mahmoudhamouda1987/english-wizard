@@ -51,7 +51,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
         <div style={{ fontSize: 56, fontWeight: 800, color: "#4626b8", letterSpacing: "-.02em", margin: "8px 0" }}>{cert.level}</div>
         <p style={{ color: "#5b6272", maxWidth: 480, margin: "0 auto 18px" }}>{LEVEL_DESCRIPTION[cert.level] ?? ""}</p>
         <p><strong>Overall mastery score:</strong> {cert.overall_percent}%</p>
-        <p className="subtle">Issued {new Date(cert.issued_at).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })}</p>
+        <p className="subtle">Issued {new Date(cert.issued_at).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}</p>
         <Image src={qr} alt={`QR code linking to verification page ${verifyUrl}`} width={160} height={160} style={{ margin: "18px auto 6px", borderRadius: 12, border: "1px solid #e4e8f0" }} unoptimized />
         <p className="subtle" style={{ fontSize: 12 }}>Scan to verify this credential</p>
         <div style={{ display: "inline-block", marginTop: 10, padding: "8px 14px", background: "#f4f2fb", borderRadius: 10, fontSize: 11, fontFamily: "monospace", color: "#4626b8" }}>

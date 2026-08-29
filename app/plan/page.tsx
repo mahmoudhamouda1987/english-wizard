@@ -120,7 +120,7 @@ export default function PlanPage() {
           </thead>
           <tbody>
             {[
-              ["Personalized dashboard + placement report", "✓", "✓", "✓"],
+              ["Personalised dashboard + placement report", "✓", "✓", "✓"],
               ["Core curriculum + review system", "✓", "✓", "✓"],
               ["AI teacher sessions / day", "5", "30", "Unlimited"],
               ["Speaking coach checks / day", "2", "10", "Unlimited"],

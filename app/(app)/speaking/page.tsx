@@ -110,7 +110,7 @@ export default function SpeakingPage() {
         </label>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
           <button className="button" onClick={toggleRecording}>{recording ? "Stop speaking" : "Start speaking"}</button>
-          <button className="button secondary" disabled={busy || transcript.trim().length < 5} onClick={getFeedback}>{busy ? "Analyzing…" : "Get AI feedback"}</button>
+          <button className="button secondary" disabled={busy || transcript.trim().length < 5} onClick={getFeedback}>{busy ? "Analysing…" : "Get AI feedback"}</button>
         </div>
         <p style={{ marginTop: 12, fontSize: 13, opacity: 0.75 }}>
           {recording ? "Listening… speak at a comfortable pace." : "You can type or paste your answer if browser speech recognition is unavailable."}

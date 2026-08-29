@@ -89,7 +89,7 @@ export async function GET() {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const key = dayKey(d);
-    week.push({ label: d.toLocaleDateString("en", { weekday: "narrow" }), value: [...activeDays].includes(key) ? Math.min(100, (rows.filter((r) => dayKey(r.occurred_at) === key).length / 6) * 100) : 0 });
+    week.push({ label: d.toLocaleDateString("en-GB", { weekday: "narrow" }), value: [...activeDays].includes(key) ? Math.min(100, (rows.filter((r) => dayKey(r.occurred_at) === key).length / 6) * 100) : 0 });
   }
 
   // Skill scores for radar (0-100).

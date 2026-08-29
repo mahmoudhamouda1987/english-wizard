@@ -257,7 +257,7 @@ export default function LevelQuestPage() {
             { icon: "🎧", label: "Listening" },
             { icon: "🗣️", label: "Speaking" },
             { icon: "❓", label: "Multiple choice" },
-            { icon: "📄", label: "Personalized report" },
+            { icon: "📄", label: "Personalised report" },
           ].map((m) => <div key={m.label} style={{ padding: "14px 10px", borderRadius: 12, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)" }}><div style={{ fontSize: 24 }}>{m.icon}</div><div style={{ fontSize: 12.5, marginTop: 6, opacity: .85 }}>{m.label}</div></div>)}
         </div>
         {error && <p style={{ color: "#fda4af", marginBottom: 12 }}>{error}</p>}
@@ -612,7 +612,7 @@ function NavGrid({ paper, answered, flags, idx, onGo }: { paper: ExposedItem[]; 
 
 /* ── Assessment Processing transition (Part 1) ── */
 function ProcessingView() {
-  const STAGES = ["Analyzing your responses…", "Locating your ability boundary…", "Composing your personalized report…"];
+  const STAGES = ["Analysing your responses…", "Locating your ability boundary…", "Composing your personalised report…"];
   const [stage, setStage] = useState(0);
   useEffect(() => {
     const a = setInterval(() => setStage((s) => Math.min(STAGES.length - 1, s + 1)), 620);
@@ -770,7 +770,7 @@ function ReportView({ report }: { report: Report }) {
 
         <div className="panel" style={{ padding: 24, marginTop: 18, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)" }}>
           <h3 style={{ margin: "0 0 8px" }}>🧭 Recommended starting point</h3>
-          <p style={{ margin: "0 0 6px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{report.level}</strong>{report.speakingBand ? <> with speaking developing at <strong>{report.speakingBand}</strong></> : ""}. Your path is personalized to reinforce focus areas while building on your strengths.</p>
+          <p style={{ margin: "0 0 6px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{report.level}</strong>{report.speakingBand ? <> with speaking developing at <strong>{report.speakingBand}</strong></> : ""}. Your path is personalised to reinforce focus areas while building on your strengths.</p>
           <p style={{ margin: "0 0 14px", color: "#6840d6", fontWeight: 600, fontSize: 14.5 }}>Your level has been discovered. Now let&rsquo;s build your path.</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button onClick={() => router.push("/dashboard")} className="button" style={{ padding: "14px 28px", fontSize: 15 }}>Continue to English Wizard →</button>

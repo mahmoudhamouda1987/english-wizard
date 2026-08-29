@@ -22,7 +22,7 @@ export default function PortfolioPage() {
     const byMonth = new Map<string, Artifact[]>();
     for (const item of visible) {
       const d = new Date(item.occurredAt);
-      const key = d.toLocaleDateString("en", { month: "long", year: "numeric" });
+      const key = d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
       const list = byMonth.get(key) ?? [];
       list.push(item);
       byMonth.set(key, list);
@@ -77,7 +77,7 @@ export default function PortfolioPage() {
                   <article key={item.id} className="panel" style={{ margin: 0, padding: 18, borderLeft: `4px solid ${item.transfer ? "#10b981" : "#6840d6"}` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
                       <strong>{SKILL_ICONS[item.skill] ?? "🗂️"} {item.kind.replace(/_/g, " ")}{item.transfer ? " · transfer ✓" : ""}</strong>
-                      <small className="subtle">{new Date(item.occurredAt).toLocaleDateString("en", { day: "numeric", month: "short" })}{item.score !== null ? ` · ${item.score}%` : ""}</small>
+                      <small className="subtle">{new Date(item.occurredAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}{item.score !== null ? ` · ${item.score}%` : ""}</small>
                     </div>
                     {item.prompt && <p className="subtle" style={{ marginTop: 6 }}>Task: {item.prompt}</p>}
                     {item.excerpt && <p style={{ marginTop: 8, lineHeight: 1.6 }}>“{item.excerpt}{(item.excerpt.length ?? 0) >= 280 ? "…" : ""}”</p>}

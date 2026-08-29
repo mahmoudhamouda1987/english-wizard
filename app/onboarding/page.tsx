@@ -5,7 +5,7 @@ import { track } from "@/app/lib/track";
 
 /* ═══════════════════════════════════════════════════════════════════════
  * PREMIUM ONBOARDING (Part 2) — a 5-screen visual story:
- * Welcome → Discover Your Level → Personalized Learning → Your Journey →
+ * Welcome → Discover Your Level → Personalised Learning → Your Journey →
  * Start LevelQuest. Rich CSS-only visual storytelling (animated level path,
  * skill profile, journey map), reduced-motion aware, keyboard navigable.
  * ═══════════════════════════════════════════════════════════════════════ */
@@ -111,7 +111,7 @@ export default function OnboardingPage() {
           <>
             <div className="ob-wizard" aria-hidden="true">🧙</div>
             <p className="ob-eyebrow">Welcome to English Wizard</p>
-            <h1 className="ob-h1">Your personalized journey to<br /><span className="ob-grad">confident English</span> starts here.</h1>
+            <h1 className="ob-h1">Your personalised journey to<br /><span className="ob-grad">confident English</span> starts here.</h1>
             <p className="ob-sub">A smarter way to learn — built around your level, your goals, and your progress.</p>
             <div className="ob-words" aria-hidden="true">
               {FLOATING_WORDS.slice(0, 6).map((w, i) => <span key={`${w}-${i}`} className="ob-word" style={{ animationDelay: `${i * 0.7}s` }}>{w}</span>)}
@@ -130,7 +130,7 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <>
-            <p className="ob-eyebrow">Personalized Learning</p>
+            <p className="ob-eyebrow">Personalised Learning</p>
             <h1 className="ob-h1">Every lesson adapts to your <span className="ob-grad">strengths and gaps</span>.</h1>
             <p className="ob-sub">Your skills are continuously profiled — so you always practise the right thing at the right time.</p>
             <div className="ob-skills">
@@ -175,7 +175,7 @@ export default function OnboardingPage() {
                 <div><strong>⏱️ ~30 min</strong><span>adaptive maximum</span></div>
                 <div><strong>🎚️ Adaptive</strong><span>difficulty follows you</span></div>
                 <div><strong>🎧 🗣️ ❓</strong><span>listening · speaking · choice</span></div>
-                <div><strong>📄 Report</strong><span>personalized + downloadable</span></div>
+                <div><strong>📄 Report</strong><span>personalised + downloadable</span></div>
               </div>
               <p className="ob-note" style={{ marginBottom: 0 }}>Pre-A1 to C2 coverage — your result unlocks your personal path.</p>
             </div>
