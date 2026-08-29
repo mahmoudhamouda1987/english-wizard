@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { effectiveTrialStatus, generateStudentId, trialEndsAt, trialView, TRIAL_DURATION_DAYS } from "./trial";
+import { effectiveTrialStatus, generateSequentialStudentId, generateStudentId, trialEndsAt, trialView, TRIAL_DURATION_DAYS } from "./trial";
 
 describe("trial domain", () => {
   it("computes a 7-day end time", () => {
@@ -37,10 +37,19 @@ describe("trial domain", () => {
     expect(trialView(record, new Date("2026-01-20T00:00:00Z")).active).toBe(false);
   });
 
-  it("generates EW-YYYY-NNNNNN student IDs", () => {
-    expect(generateStudentId(2026, 0)).toBe("EW-2026-000000");
-    expect(generateStudentId(2026, 42)).toBe("EW-2026-000042");
-    expect(generateStudentId(2026, 123456)).toBe("EW-2026-123456");
-    expect(generateStudentId(2026, 9999999)).toBe("EW-2026-999999");
+  it("generates EW-YY-XXXXXX student IDs from an unambiguous alphabet", () => {
+    expect(generateStudentId(new Date("2026-08-29T00:00:00Z"), () => 0)).toBe("EW-26-222222");
+    expect(generateStudentId(new Date("2026-08-29T00:00:00Z"), () => 0.999999)).toMatch(/^EW-26-[A-Z2-9]{6}$/);
+    const id = generateStudentId(new Date("2026-08-29T00:00:00Z"));
+    expect(id).toMatch(/^EW-\d{2}-[A-Z2-9]{6}$/);
+    expect(id).not.toContain("0");
+    expect(id).not.toContain("O");
+    expect(id).not.toContain("1");
+    expect(id).not.toContain("I");
+    expect(id).not.toContain("L");
+  });
+
+  it("keeps the legacy sequential scheme available for existing IDs", () => {
+    expect(generateSequentialStudentId(2026, 42)).toBe("EW-2026-000042");
   });
 });

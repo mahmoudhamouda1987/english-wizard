@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { query } from "@/src/infrastructure/database";
 import { CEFR_ORDER } from "@/src/domain/levelquest";
+import { reportReference } from "@/src/domain/placement-report";
 
 export const dynamic = "force-dynamic";
-
-const LEVEL_COLOR: Record<string, string> = {
-  "Pre-A1": "#64748b", A1: "#0284c7", A2: "#059669", B1: "#d97706", B2: "#ea580c", C1: "#dc2626", C2: "#9333ea",
-};
 
 /**
  * Public verification page for a placement report.
@@ -46,34 +43,38 @@ export async function GET(req: Request) {
 
   const row = rows[0];
   const isPlace = CEFR_ORDER.includes(row.level as (typeof CEFR_ORDER)[number]);
-  const color = LEVEL_COLOR[row.level] ?? "#6840d6";
   const date = new Date(row.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const reportRef = reportReference(row.id);
 
   return new NextResponse(
-    `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Verify Placement Report — English Wizard</title></head>
+    `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Report Verification — English Wizard</title></head>
 <body style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f4f5fb;margin:0;padding:24px">
-<div style="max-width:620px;margin:0 auto">
-  <div style="background:#0f1535;color:#fff;border-radius:16px 16px 0 0;padding:22px 28px;display:flex;align-items:center;gap:12px">
-    <div style="width:44px;height:44px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">🧙</div>
-    <div><div style="font-weight:800;font-size:17px">English Wizard</div><div style="font-size:12px;opacity:.7">Placement Report Verification</div></div>
+<div style="max-width:620px;margin:0 auto;border-top:3px solid #6840d6">
+  <div style="background:#0f1535;color:#fff;border-radius:0;padding:22px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">🧙</div>
+      <div><div style="font-weight:800;font-size:16px;letter-spacing:.02em">ENGLISH WIZARD</div><div style="font-size:11px;opacity:.7">Personalised English Learning</div></div>
+    </div>
+    <div style="text-align:right"><div style="font-weight:800;font-size:13px">REPORT VERIFICATION</div><div style="font-size:10.5px;opacity:.7">CEFR-ALIGNED ASSESSMENT</div></div>
   </div>
-  <div style="background:#fff;border-radius:0 0 16px 16px;padding:30px 28px">
-    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#ecfdf5;border:1px solid #a7f3d0;margin-bottom:22px">
-      <div style="font-size:22px">✅</div>
-      <div><div style="font-weight:800;color:#065f46">Certificate is genuine</div><div style="font-size:12.5px;color:#047857">This is a valid English Wizard LevelQuest placement report.</div></div>
+  <div style="background:#fff;border-radius:0 0 4px 4px;padding:30px 28px">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;background:#ecfdf5;border:1px solid #a7f3d0;margin-bottom:22px">
+      <div style="font-size:20px">✓</div>
+      <div><div style="font-weight:800;color:#065f46">Report is genuine</div><div style="font-size:12.5px;color:#047857">This is a valid English Wizard CEFR-aligned English proficiency placement report.</div></div>
     </div>
     <div style="text-align:center;padding:8px 0 20px">
-      <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#64748b">Candidate English Level</div>
-      <div style="font-size:60px;font-weight:900;color:${color}">${row.level}</div>
-      <div style="color:#475569">${row.confidence} confidence · Version ${row.variant} of 15</div>
+      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#64748b">Overall English Proficiency</div>
+      <div style="font-size:58px;font-weight:900;color:#6840d6">${row.level}</div>
+      <div style="color:#475569">${row.confidence} confidence</div>
     </div>
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Candidate</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${row.display_name || "—"}</td></tr>
       <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Student ID</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${row.student_id ?? "—"}</td></tr>
-      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Issue date</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${date}</td></tr>
-      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Assessment</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">LevelQuest — CEFR Placement</td></tr>
+      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Report ID</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${reportRef}</td></tr>
+      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Assessment date</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">${date}</td></tr>
+      <tr><td style="padding:9px 0;color:#64748b;border-bottom:1px solid #eef0f7">Assessment method</td><td style="padding:9px 0;font-weight:700;text-align:right;border-bottom:1px solid #eef0f7">Adaptive CEFR-Aligned Assessment</td></tr>
     </table>
-    <p style="margin-top:18px;font-size:12.5px;color:#64748b;line-height:1.6">This report is aligned to the Common European Framework of Reference for Languages (CEFR). ${isPlace && row.level ? `The candidate achieved the level of <strong>${row.level}</strong>.` : ""}</p>
+    <p style="margin-top:18px;font-size:12.5px;color:#64748b;line-height:1.6">English proficiency is referenced to the Common European Framework of Reference for Languages (CEFR). ${isPlace && row.level ? `The candidate's assessed level is <strong>${row.level}</strong>.` : ""}</p>
   </div>
 </div>
 </body></html>`,

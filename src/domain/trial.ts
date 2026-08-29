@@ -58,8 +58,27 @@ export function trialView(record: TrialRecord | null, now = new Date()): TrialVi
   };
 }
 
-/** Generate a Student ID in the EW-YYYY-NNNNNN format. */
-export function generateStudentId(year = new Date().getFullYear(), seq = 0): string {
+/**
+ * Student ID character set: unambiguous uppercase alphanumerics.
+ * Excludes 0/O (zero/letter O) and 1/I/L (one/I/ell) so IDs can be read aloud
+ * or transcribed from paper without confusion.
+ */
+const STUDENT_ID_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+
+/**
+ * Generate a unique Student ID in the EW-YY-XXXXXX format (e.g. EW-26-7F4K82).
+ * Six unambiguous alphanumeric characters give ~733 million combinations per
+ * year; the caller re-rolls on the (vanishingly unlikely) collision.
+ */
+export function generateStudentId(now: Date = new Date(), random = (): number => Math.random()): string {
+  const yy = String(now.getFullYear() % 100).padStart(2, "0");
+  let suffix = "";
+  for (let i = 0; i < 6; i++) suffix += STUDENT_ID_ALPHABET[Math.floor(random() * STUDENT_ID_ALPHABET.length)];
+  return `EW-${yy}-${suffix}`;
+}
+
+/** Legacy sequential scheme (EW-YYYY-NNNNNN) kept for recognising existing IDs. */
+export function generateSequentialStudentId(year: number, seq: number): string {
   const padded = String(Math.max(0, Math.min(999999, seq))).padStart(6, "0");
   return `EW-${year}-${padded}`;
 }

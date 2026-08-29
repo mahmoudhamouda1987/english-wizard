@@ -39,22 +39,28 @@ export async function POST(request: Request) {
     updatedAt: new Date().toISOString(),
   });
 
-  // Assign an idempotent Student ID (EW-YYYY-NNNNNN) on first profile setup.
-  // Sequence is derived from the highest existing suffix for the current year so
-  // every learner receives a UNIQUE id (never a repeated 000000).
+  // Assign an idempotent Student ID (EW-YY-XXXXXX, e.g. EW-26-7F4K82) on first
+  // profile setup. Random unambiguous suffix with a collision re-roll loop —
+  // every learner receives a UNIQUE id (never a placeholder constant).
   let studentId: string | null = null;
   const idRow = await query<{ student_id: string | null }>(`SELECT student_id FROM learners WHERE id = $1::uuid`, [session.learnerId]);
   if (idRow.rows.length) {
     if (!idRow.rows[0].student_id) {
-      const year = new Date().getFullYear();
-      const seqRow = await query<{ max_seq: number | null }>(
-        `SELECT COALESCE(MAX(NULLIF(SUBSTRING(student_id FROM '^EW-[0-9]{4}-([0-9]{6})$'), '')::int), -1) AS max_seq
-         FROM learners WHERE student_id LIKE $1`,
-        [`EW-${year}-%`],
-      );
-      const nextSeq = Math.max(0, (seqRow.rows[0]?.max_seq ?? -1) + 1);
-      studentId = generateStudentId(year, nextSeq);
-      await query(`UPDATE learners SET student_id = $2, updated_at = NOW() WHERE id = $1::uuid AND student_id IS NULL`, [session.learnerId, studentId]);
+      for (let attempt = 0; attempt < 6 && !studentId; attempt++) {
+        const candidate = generateStudentId();
+        const clash = await query<{ student_id: string }>(`SELECT student_id FROM learners WHERE student_id = $1 LIMIT 1`, [candidate]);
+        if (clash.rows.length) continue;
+        const assigned = await query<{ student_id: string }>(
+          `UPDATE learners SET student_id = $2, updated_at = NOW() WHERE id = $1::uuid AND student_id IS NULL RETURNING student_id`,
+          [session.learnerId, candidate],
+        );
+        if (assigned.rows.length) studentId = assigned.rows[0].student_id;
+      }
+      if (!studentId) studentId = idRow.rows[0].student_id; // concurrent writer won; fall through to their value
+      if (!studentId) {
+        const refreshed = await query<{ student_id: string | null }>(`SELECT student_id FROM learners WHERE id = $1::uuid`, [session.learnerId]);
+        studentId = refreshed.rows[0]?.student_id ?? null;
+      }
     } else {
       studentId = idRow.rows[0].student_id;
     }

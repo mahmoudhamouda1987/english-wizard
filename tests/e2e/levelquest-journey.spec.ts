@@ -131,10 +131,10 @@ test("student IDs are unique across learners (Part 25)", async () => {
   const profileBody = { displayName: "A", dailyMinutes: 20, nativeLanguage: "Arabic", targetLevel: "B1", goals: ["Speak confidently"] };
   const pa = await (await ctxA.post("/api/profile", { data: profileBody })).json();
   const pb = await (await ctxB.post("/api/profile", { data: { ...profileBody, displayName: "B" } })).json();
-  expect(pa.studentId).toMatch(/^EW-\d{4}-\d{6}$/);
-  expect(pb.studentId).toMatch(/^EW-\d{4}-\d{6}$/);
+  expect(pa.studentId).toMatch(/^EW-\d{2}-[A-Z2-9]{6}$/); // EW-26-7F4K82-style, no placeholder zeros
+  expect(pb.studentId).toMatch(/^EW-\d{2}-[A-Z2-9]{6}$/);
   expect(pa.studentId).not.toBe(pb.studentId);
-  expect(pa.studentId).not.toBe("EW-" + new Date().getFullYear() + "-000000"); // never the degenerate constant
+  expect(pa.studentId).not.toContain("0000"); // never a placeholder constant
   await ctxA.dispose();
   await ctxB.dispose();
 });
