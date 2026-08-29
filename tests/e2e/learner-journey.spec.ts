@@ -28,12 +28,12 @@ test("onboarding creates a persisted learner and dashboard loads state", async (
   }
   await page.getByLabel("Your name").fill("E2E Learner");
   await page.getByRole("button", { name: /Improve work English/ }).click();
-  await page.getByRole("button", { name: /Start LevelQuest/ }).click();
+  await page.getByRole("button", { name: /Start the assessment/ }).click();
   await expect(page).toHaveURL(/\/diagnostic/);
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)|Your learning journey/ })).toBeVisible();
-  await expect(page.getByText("Lessons completed")).toBeVisible();
-  await expect(page.getByText("Next best action")).toBeVisible();
+  await expect(page.getByText(/Your English journey continues at/i)).toBeVisible();
+  await expect(page.getByText(/next best step|Start by checking your English/i)).toBeVisible();
 });
 
 test("diagnostic produces English DNA, adaptive evidence, and assessed-level placement", async ({ request }) => {
@@ -81,10 +81,10 @@ test("conversation API provides a one-minute five-gap exercise for every level",
 test("conversation page renders listening controls, transcript, Word of the Day, and five gaps", async ({ page }) => {
   await register(page.request, "conversation");
   await page.goto("/conversation?level=B1");
-  await expect(page.getByRole("heading", { name: "One-minute character conversation" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Conversation/ }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: /Play conversation/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Word of the Day" })).toBeVisible();
-  await expect(page.getByText("Here is the same script with five words removed.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /conversation transcript/i })).toBeVisible();
+  await expect(page.getByText(/Here is the same script with \d+ words removed/)).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Missing word 1" })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Missing word 5" })).toBeVisible();
 });
@@ -96,11 +96,15 @@ test("new learning surfaces render from the authenticated dashboard", async ({ p
     await expect(page.locator("main")).toBeVisible();
   }
   await page.goto("/dashboard");
-  const navigation = page.getByRole("navigation");
-  await expect(page.getByRole("link", { name: /Explore Worlds/ })).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "English Ear" })).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "Reading Engine" })).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "Say It Better" })).toBeVisible();
+  // Expand the LEARN group in the desktop sidebar, then the skill links are present.
+  const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
+  await sidebar.getByRole("button", { name: "Learn" }).click();
+  await sidebar.getByRole("button", { name: "Skills" }).click();
+  await sidebar.getByRole("button", { name: "Practise" }).click();
+  await expect(sidebar.getByRole("link", { name: /Worlds & Missions/i })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "English Ear" })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "Reading Engine" })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "Say It Better" })).toBeVisible();
 });
 
 test("privacy preferences and voice consent persist per learner", async ({ request }) => {

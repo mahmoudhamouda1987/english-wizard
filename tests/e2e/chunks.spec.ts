@@ -22,6 +22,6 @@ test("chunks API and learner-facing practice persist receptive/productive knowle
   expect((await productive.json()).knowledge).toBe("PRODUCTIVE");
 
   await page.goto("/chunks");
-  await expect(page.getByRole("heading", { name: "Chunks & communication" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Chunks & Mediation" })).toBeVisible();
   await expect(page.getByRole("button", { name: /I can use it/ }).first()).toBeVisible();
 });

@@ -11,7 +11,7 @@ test("Say It Better presents all five structured variants", async ({ page }) => 
   await register(page, "sib");
   await page.goto("/say-it-better");
   await expect(page.locator("main")).toBeVisible();
-  for (const variant of ["Your version", "Corrected", "Natural", "Advanced", "Professional"]) {
+  for (const variant of ["What you said", "Corrected", "A more natural alternative", "Expressive upgrade", "Professional register"]) {
     await expect(page.getByText(variant, { exact: true })).toBeVisible();
   }
 });
@@ -19,10 +19,10 @@ test("Say It Better presents all five structured variants", async ({ page }) => 
 test("English Ear trains connected speech against the formal spelling", async ({ page }) => {
   await register(page, "ear");
   await page.goto("/english-ear");
-  await expect(page.getByRole("heading", { name: /Hear what people actually say/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /English Ear/ })).toBeVisible();
   await expect(page.getByText(/Written form:/)).toBeVisible();
   await page.getByRole("button", { name: /Hear spoken form/ }).click();
-  await expect(page.getByText(/Listen attempts:/)).toContainText("1");
+  await expect(page.getByText(/Listening attempts:/)).toContainText("1");
 });
 
 test("Reading engine progresses from word meaning to specialist text tasks", async ({ page }) => {
@@ -30,8 +30,9 @@ test("Reading engine progresses from word meaning to specialist text tasks", asy
   await page.goto("/reading");
   await expect(page.locator("main")).toBeVisible();
   const body = await page.locator("main").innerText();
-  expect(body).toMatch(/Read, understand/i);
-  expect(body).toMatch(/Transfer/i);
+  expect(body).toMatch(/check your understanding/i);
+  expect(body).toMatch(/CEFR/i);
+  expect(body).toMatch(/genre/i);
 });
 
 test("Thinking in English exposes a level-based progression with prompts", async ({ page }) => {

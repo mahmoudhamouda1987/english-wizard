@@ -66,7 +66,7 @@ test("audio learning surfaces expose visible transcripts and accessible audio co
   expect(registered.ok()).toBeTruthy();
 
   await page.goto("/english-ear");
-  await expect(page.getByRole("heading", { name: /Hear what people actually say/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /English Ear/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Hear spoken form/ })).toBeVisible();
   await expect(page.getByText(/Written form:/)).toBeVisible();
 

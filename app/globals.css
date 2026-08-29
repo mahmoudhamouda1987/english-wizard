@@ -58,10 +58,10 @@
   /* Navigation chrome — a deliberate deep navy surface in BOTH themes */
   --nav-bg: #0d1930;
   --nav-bg-elevated: #16233f;
-  --nav-text: rgba(255, 255, 255, .78);
+  --nav-text: rgba(255, 255, 255, .82);
   --nav-text-strong: #ffffff;
-  --nav-text-muted: rgba(255, 255, 255, .5);
-  --nav-text-faint: rgba(255, 255, 255, .38);
+  --nav-text-muted: rgba(255, 255, 255, .72);
+  --nav-text-faint: rgba(255, 255, 255, .6);
   --nav-hover: rgba(255, 255, 255, .08);
   --nav-border: rgba(255, 255, 255, .1);
 
@@ -149,10 +149,10 @@ html[data-theme="dark"] {
   /* Navigation chrome stays dark in dark mode too — slightly deeper */
   --nav-bg: #0b1424;
   --nav-bg-elevated: #131f38;
-  --nav-text: rgba(255, 255, 255, .78);
+  --nav-text: rgba(255, 255, 255, .82);
   --nav-text-strong: #ffffff;
-  --nav-text-muted: rgba(255, 255, 255, .5);
-  --nav-text-faint: rgba(255, 255, 255, .38);
+  --nav-text-muted: rgba(255, 255, 255, .72);
+  --nav-text-faint: rgba(255, 255, 255, .6);
   --nav-hover: rgba(255, 255, 255, .08);
   --nav-border: rgba(255, 255, 255, .1);
 
