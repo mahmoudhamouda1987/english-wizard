@@ -1,8 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegister } from "./components/service-worker-register";
 import { TextSizeControl } from "./components/text-size-control";
 import { ThemeApply } from "./components/theme-apply";
+
+const display = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+const body = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: { default: "English Wizard — Prove your progress", template: "%s · English Wizard" },
@@ -40,7 +55,7 @@ const themeScript = `try{var t=localStorage.getItem("ew-theme");if(t==="dark"||(
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-GB" suppressHydrationWarning className={`${display.variable} ${body.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

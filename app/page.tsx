@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
 import { Hero } from "@/app/components/home/hero";
 import { LevelQuestSection } from "@/app/components/home/levelcheck";
 import { CefrJourney } from "@/app/components/home/cefr-journey";
@@ -8,20 +7,6 @@ import {
   Personalization, LearningPath, RealLife, ProgressStory, ReportSection,
   WhyAndOrganizations, Conversion, Footer,
 } from "@/app/components/home/value";
-
-const display = Fraunces({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const body = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-body",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Master English. Know Exactly Where You Stand. — English Wizard",
@@ -54,7 +39,7 @@ const jsonLd = {
 
 export default function Home() {
   return (
-    <div className={`hp-root ${display.variable} ${body.variable}`}>
+    <div className="hp-root">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Hero />
       <LevelQuestSection />
