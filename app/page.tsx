@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 
 export const metadata: Metadata = {
-  title: "Most apps measure streaks. We prove progress.",
-  description: "Adaptive CEFR placement, an AI tutor that remembers your mistakes for months, reality checkpoints scored against authentic rubrics - and progress you can hear, show and verify.",
+  title: "Discover Your English Level — English Wizard",
+  description: "Discover where you stand on the CEFR scale with an adaptive English assessment, then learn with an AI tutor and earn verifiable progress reports.",
 };
 
 const PROOF_POINTS = [
@@ -17,7 +17,7 @@ const PROOF_POINTS = [
 ];
 
 const STEPS = [
-  { n: "1", title: "5-minute diagnostic", text: "Place yourself precisely on the CEFR scale — Pre-A1 to C2 — with adaptive questions that adapt to your answers." },
+  { n: "1", title: "Discover your level", text: "Place yourself precisely on the CEFR scale — Pre-A1 to C2 — with an adaptive assessment that adapts to your answers." },
   { n: "2", title: "Learn what you need next", text: "Lessons chosen from evidence, not a fixed checklist. Every mistake becomes a spaced-review card; every win becomes evidence." },
   { n: "3", title: "Prove it to yourself", text: "Compare recordings across months, collect real work in your portfolio, pass reality checkpoints, earn verifiable certificates." },
 ];
@@ -39,14 +39,14 @@ export default function Home() {
         <section className="hero-band" style={{ textAlign: "center" }}>
           <p style={{ fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", fontSize: 13, opacity: .85, margin: "0 0 12px" }}>The honest English platform</p>
           <h1 style={{ fontSize: "clamp(36px, 6vw, 66px)", lineHeight: 1.05, margin: "0 auto 18px", letterSpacing: "-.02em", maxWidth: 820 }}>
-            Most apps measure streaks.<br />We prove progress.
+            Know your English level.<br />Then prove your progress.
           </h1>
           <p style={{ maxWidth: 640, fontSize: 19, lineHeight: 1.6, opacity: .92, margin: "0 auto 28px" }}>
-            Adaptive CEFR placement, an AI tutor that remembers your mistakes for months, reality checkpoints scored against authentic rubrics — and progress you can actually hear, show and verify.
+            Discover where you stand on the CEFR scale — Pre-A1 to C2 — with an adaptive assessment that adapts to your answers. Then learn with an AI tutor that remembers your mistakes, and earn verifiable reports.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-            <a href="/onboarding" style={{ background: "#fff", color: "#4626b8", padding: "14px 28px", borderRadius: 12, fontWeight: 800 }}>Start free — no card needed →</a>
-            <a href="/diagnostic" style={{ border: "1px solid rgba(255,255,255,.55)", color: "#fff", padding: "14px 28px", borderRadius: 12, fontWeight: 800 }}>Take the 5-minute diagnostic</a>
+            <a href="/diagnostic" style={{ background: "#fff", color: "#4626b8", padding: "15px 30px", borderRadius: 12, fontWeight: 800, boxShadow: "0 10px 26px rgba(255,255,255,.18)" }}>Discover My English Level →</a>
+            <a href="/onboarding" style={{ border: "1px solid rgba(255,255,255,.55)", color: "#fff", padding: "15px 30px", borderRadius: 12, fontWeight: 800 }}>Explore English Wizard</a>
           </div>
         </section>
 

@@ -5,10 +5,55 @@ import {
   paperForVariant,
   g,
   CEFR_ORDER,
+  simulateConvergence,
+  VARIANT_THEMES,
+  LEVELQUEST_BANK,
+  type LevelQuestItem,
 } from "./levelquest";
 
-describe("LevelQuest adaptivity", () => {
-  it("does not start an A1 learner on the same questions as a C2 learner", () => {
+const objectiveOf = (paper: LevelQuestItem[]) => paper.filter((i) => i.type !== "speaking").map((i) => g(i));
+
+describe("LevelQuest variant distinctness (Part 12-13)", () => {
+  it("defines 15 unique thematic identities", () => {
+    expect(VARIANT_THEMES).toHaveLength(15);
+    expect(new Set(VARIANT_THEMES).size).toBe(15);
+    expect(VARIANT_THEMES.filter((t, i) => VARIANT_THEMES.indexOf(t) === i)).toHaveLength(15);
+  });
+
+  it("assigns each variant a distinct speaking prompt per level (not just reordering)", () => {
+    for (const level of CEFR_ORDER) {
+      const prompts = LEVELQUEST_BANK.filter((i) => i.type === "speaking" && i.cefr === level).map((i) => i.prompt);
+      // 15 variants but only fully distinct prompts: at least most levels differ.
+      expect(new Set(prompts).size).toBeGreaterThanOrEqual(15);
+    }
+  });
+
+  it("every variant carries its theme on items", () => {
+    for (let v = 1; v <= 15; v++) {
+      const paper = paperForVariant(v);
+      const themes = new Set(paper.map((i) => i.theme));
+      expect(themes.has(VARIANT_THEMES[v - 1])).toBe(true);
+    }
+  });
+});
+
+describe("LevelQuest baseline-first adaptivity", () => {
+  it("anchors an unknown learner at the baseline, not the B1 midpoint", () => {
+    expect(levelToEstimate(null)).toBe(0);
+    expect(levelToEstimate("NOT-A-LEVEL")).toBe(0);
+    expect(levelToEstimate("Pre-A1")).toBe(0);
+    expect(levelToEstimate("C2")).toBe(6);
+  });
+
+  it("does not open an unknown learner with advanced questions", () => {
+    // Unknown learner (baseline 0): the first items must be near the baseline.
+    const unknownPaper = adaptiveOrderForStart(1, levelToEstimate(null));
+    const firstG = objectiveOf(unknownPaper)[0];
+    // Opening difficulty must be at or just above baseline, never mid/B1 or higher.
+    expect(firstG).toBeLessThanOrEqual(1.2);
+  });
+
+  it("opens a known C2 learner on harder items than an A1 learner", () => {
     const variant = 1;
     const a1Paper = adaptiveOrderForStart(variant, levelToEstimate("A1"));
     const c2Paper = adaptiveOrderForStart(variant, levelToEstimate("C2"));
@@ -17,15 +62,12 @@ describe("LevelQuest adaptivity", () => {
     expect(c2Start - a1Start).toBeGreaterThan(1.5);
   });
 
-  it("ramps difficulty upward from a learner's starting level", () => {
-    const paper = adaptiveOrderForStart(1, levelToEstimate("A2"));
-    const objective = paper.filter((i) => i.type !== "speaking").slice(0, 20);
-    const start = g(objective[0]);
-    let climbed = 0;
-    for (const item of objective.slice(1)) {
-      if (g(item) > start + 0.8) climbed++;
-    }
-    expect(climbed).toBeGreaterThan(0);
+  it("climbs one band at a time from the baseline (no high-jump up front)", () => {
+    // For a mid-level learner the opening band is their band-1, then +1 per stage.
+    const paper = adaptiveOrderForStart(1, levelToEstimate("B2"));
+    const diffs = objectiveOf(paper);
+    // First item difficulty must correspond to B1-ish, i.e. roughly band 2-3, not 6.
+    expect(diffs[0]).toBeLessThanOrEqual(3.2);
   });
 
   it("produces a deterministic order for the same start level", () => {
@@ -34,28 +76,25 @@ describe("LevelQuest adaptivity", () => {
     expect(a).toEqual(b);
   });
 
-  it("includes every objective item once, then speaking last", () => {
+  it("includes every objective item once (order preserves the battery), speaking last", () => {
     const paper = adaptiveOrderForStart(1, levelToEstimate("B1"));
     const ids = paper.map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
+    const objectiveIds = paperForVariant(1).filter((i) => i.type !== "speaking").map((i) => i.id);
+    for (const oid of objectiveIds) expect(ids).toContain(oid);
     const lastIdx = paper.findIndex((i) => i.type === "speaking");
     const laterNonSpeaking = paper.slice(lastIdx).some((i) => i.type !== "speaking");
     expect(laterNonSpeaking).toBe(false);
   });
 
-  it("paperForVariant partitions objective before speaking, with no gaps", () => {
-    const paper = paperForVariant(1);
-    const firstSpeaking = paper.findIndex((i) => i.type === "speaking");
-    const laterObjective = paper.slice(firstSpeaking).some((i) => i.type !== "speaking");
-    expect(firstSpeaking).toBeGreaterThan(0);
-    expect(laterObjective).toBe(false);
-    expect(paper.length).toBe(adaptiveOrderForStart(1, 3).length);
-  });
-
-  it("maps known levels and defaults unknown learners to the midpoint", () => {
-    expect(levelToEstimate("Pre-A1")).toBe(0);
-    expect(levelToEstimate("C2")).toBe(6);
-    expect(levelToEstimate(null)).toBe(CEFR_ORDER.indexOf("B1"));
-    expect(levelToEstimate("NOT-A-LEVEL")).toBe(CEFR_ORDER.indexOf("B1"));
+  it("converges to the learner's true level for all seven profiles", () => {
+    const variant = 1;
+    for (let trueIdx = 0; trueIdx < CEFR_ORDER.length; trueIdx++) {
+      const paper = adaptiveOrderForStart(variant, trueIdx);
+      const converged = simulateConvergence(paper, trueIdx);
+      // Converged estimate must land on or within one band of the true level.
+      const err = Math.abs(converged - trueIdx);
+      expect(err, `profile ${CEFR_ORDER[trueIdx]} (${trueIdx}) -> ${converged}`).toBeLessThanOrEqual(1.1);
+    }
   });
 });

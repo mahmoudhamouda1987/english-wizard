@@ -22,7 +22,7 @@ const SCREENS: Screen[] = [
   { icon: "🎯", eyebrow: "Discover Your Level", title: "We start by finding exactly where you are today.", sub: "English Wizard measures your current ability across seven levels so your path is built for you — not a generic checklist.", cta: "Discover My Level" },
   { icon: "🧩", eyebrow: "Personalized Learning", title: "Every lesson adapts to your strengths and gaps.", sub: "Your listening, speaking, vocabulary, grammar and reading are profiled — so you always practise the right thing at the right time.", cta: "See How It Adapts" },
   { icon: "🧭", eyebrow: "Your Journey", title: "Discover → Learn → Practice → Master → Advance.", sub: "A clear, motivating path that carries you from your first words to confident, fluent communication.", cta: "Show My Path" },
-  { icon: "🚀", eyebrow: "Start Assessment", title: "Your first mission is LevelQuest — our adaptive English placement assessment.", sub: "About 30 minutes · Adaptive difficulty · Listening, speaking and multiple-choice · Pre-A1 to C2 · A personalized, downloadable report at the end.", cta: "Start LevelQuest" },
+  { icon: "🚀", eyebrow: "Start Assessment", title: "Your first mission is LevelCheck — our adaptive English placement assessment.", sub: "About 30 minutes · Adaptive difficulty · Listening, speaking and multiple-choice · Pre-A1 to C2 · A personalized, downloadable report at the end.", cta: "Start LevelCheck" },
 ];
 
 export default function OnboardingPage() {
@@ -60,7 +60,7 @@ export default function OnboardingPage() {
       });
       const profilePayload = await profile.json();
       if (!profile.ok) throw new Error(profilePayload.error ?? "Unable to save your profile.");
-      // Begin the 7-day guided trial (idempotent) so premium features are available during LevelQuest.
+      // Begin the 7-day guided trial (idempotent) so premium features are available during LevelCheck.
       try { await fetch("/api/trial", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }); } catch { /* trial start must never block onboarding */ }
       track("onboarding_completed", { name, targetLevel, dailyMinutes, goals });
       track("levelquest_started");
@@ -121,7 +121,7 @@ export default function OnboardingPage() {
       <main id="main-content" style={{ minHeight: "100vh", padding: "40px 24px", maxWidth: 720, margin: "0 auto" }}>
         <p className="eyebrow" style={{ textAlign: "center" }}>Almost there</p>
         <h1 style={{ textAlign: "center", fontSize: 28, margin: "8px 0 6px" }}>Tell us a little about you</h1>
-        <p className="subtle" style={{ textAlign: "center", margin: "0 0 28px" }}>This lets English Wizard personalize your LevelQuest and learning path.</p>
+        <p className="subtle" style={{ textAlign: "center", margin: "0 0 28px" }}>This lets English Wizard personalize your LevelCheck and learning path.</p>
 
         <section className="panel" style={{ display: "grid", gap: 16, padding: 28 }}>
           <label style={{ display: "grid", gap: 6 }}>
@@ -163,7 +163,7 @@ export default function OnboardingPage() {
 
           {error && <p role="alert" style={{ color: "#a53b3b" }}>{error}</p>}
           <button className="button" disabled={busy || !name.trim() || goals.length === 0} onClick={startDiagnostic} style={{ padding: 15 }}>
-            {busy ? "Preparing your profile…" : "Start LevelQuest Assessment →"}
+            {busy ? "Preparing your profile…" : "Start LevelCheck Assessment →"}
           </button>
         </section>
       </main>

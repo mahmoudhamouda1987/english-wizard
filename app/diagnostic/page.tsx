@@ -6,7 +6,7 @@ import { track } from "@/app/lib/track";
 
 /* ── types ── */
 type ExposedItem = { id: string; cefr: string; difficulty: number; skill: string; subskill: string; type: "mcq" | "listening" | "speaking"; prompt: string; options: string[]; estimatedTime: number; audioText?: string };
-type Report = { level: string; confidence: string; estimate: number; skillProfile: Record<string, string>; skillScores: Record<string, number>; skillAnswered?: Record<string, number>; skillsAttempted?: string[]; strengths: string[]; focusAreas: string[]; variant: number; answeredCount: number; speakingSubmitted?: boolean; speakingResponses?: number };
+type Report = { level: string; confidence: string; estimate: number; skillProfile: Record<string, string>; skillScores: Record<string, number>; skillAnswered?: Record<string, number>; skillsAttempted?: string[]; strengths: string[]; focusAreas: string[]; variant: number; variantTheme?: string; answeredCount: number; speakingSubmitted?: boolean; speakingResponses?: number };
 
 const LEVELS = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 const LEVEL_COLOR: Record<string, string> = { "Pre-A1": "#94a3b8", A1: "#38bdf8", A2: "#34d399", B1: "#fbbf24", B2: "#fb923c", C1: "#f87171", C2: "#a855f7" };
@@ -28,6 +28,7 @@ export default function LevelQuestPage() {
   const [paper, setPaper] = useState<ExposedItem[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variant, setVariant] = useState(0);
+  const [variantTheme, setVariantTheme] = useState<string | null>(null);
   const [idx, setIdx] = useState(0);
   const [options, setOptions] = useState<Record<string, string[]>>({});
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -50,20 +51,25 @@ export default function LevelQuestPage() {
         const p = await r.json();
         if (!r.ok) {
           // Auth or DB issue — show intro/auth state
-          setError(p.error ?? "Unable to load LevelQuest.");
+          setError(p.error ?? "Unable to load LevelCheck.");
           setLoading(false);
           return;
         }
         setPaper(p.paper ?? []);
         setSessionId(p.sessionId);
         setVariant(p.variant);
+        setVariantTheme(p.variantTheme ?? null);
         setAnsweredCorrect(p.answered ?? {});
         setFlags(p.flags ?? []);
+        // Server-authoritative remaining time so a refresh/reopen keeps the 30:00 timer.
+        if (typeof p.remainingSeconds === "number") {
+          setSecondsLeft(Math.max(0, p.remainingSeconds));
+        }
         // Deterministic per-item option ordering (security/collusion)
         setOptions(orderOptions(p.paper ?? []));
         setLoading(false);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Unable to load LevelQuest.");
+        setError(e instanceof Error ? e.message : "Unable to load LevelCheck.");
         setLoading(false);
       }
     })();
@@ -166,23 +172,23 @@ export default function LevelQuestPage() {
   const answeredCount = Object.values(answeredCorrect).filter(Boolean).length;
 
   if (report) return <ReportView report={report} />;
-  if (loading) return <Centered><Spinner text="Preparing LevelQuest…" /></Centered>;
+  if (loading) return <Centered><Spinner text="Preparing LevelCheck…" /></Centered>;
 
   /* Auth/intro gate when no paper */
   if (paper.length === 0 && !started) return (
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(160deg, #0f1535, #2a1a4a)", color: "white", textAlign: "center" }}>
       <div style={{ maxWidth: 640 }}>
         <div style={{ fontSize: 64, marginBottom: 8 }}>🚀</div>
-        <p className="eyebrow" style={{ color: "#93c5fd" }}>LEVELQUEST</p>
+        <p className="eyebrow" style={{ color: "#93c5fd" }}>LEVELCHECK</p>
         <h1 style={{ fontSize: 32, margin: "12px 0" }}>Adaptive English Placement Assessment</h1>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 540, margin: "0 auto 26px" }}>
-          LevelQuest adapts to you. As your answers demonstrate stronger English ability, the challenge increases. If questions become too difficult, the assessment adjusts to accurately identify your current level.
+          LevelCheck adapts to you. As your answers demonstrate stronger English ability, the challenge increases. If questions become too difficult, the assessment adjusts to accurately identify your current level.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto 28px" }}>
           {ASSESSMENT_META.map((m) => <div key={m.label} style={{ padding: "14px 10px", borderRadius: 12, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)" }}><div style={{ fontSize: 24 }}>{m.icon}</div><div style={{ fontSize: 12.5, marginTop: 6, opacity: .85 }}>{m.label}</div></div>)}
         </div>
         {error && <p style={{ color: "#fda4af", marginBottom: 12 }}>{error}</p>}
-        {!error && <button onClick={() => setStarted(true)} className="button" style={{ padding: "15px 36px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)" }}>Start LevelQuest →</button>}
+        {!error && <button onClick={() => setStarted(true)} className="button" style={{ padding: "15px 36px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)" }}>Start LevelCheck →</button>}
         {error && <a className="button" href={`/auth?next=/diagnostic`}>Sign in to continue →</a>}
       </div>
     </main>
@@ -198,7 +204,7 @@ export default function LevelQuestPage() {
             <p className="eyebrow" style={{ color: "#6840d6", margin: "14px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Level Placement Assessment</p>
             <h1 style={{ fontSize: "clamp(26px,4vw,34px)", margin: "0 0 14px", fontWeight: 800, color: "#172033", lineHeight: 1.2, letterSpacing: "-.01em" }}>Ready to start your placement assessment?</h1>
             <p style={{ fontSize: 16, lineHeight: 1.75, color: "#334155", maxWidth: 540, margin: "0 auto 20px" }}>
-              You&rsquo;ll have <strong style={{ color: "#172033" }}>30 minutes</strong>. You can navigate back and forward, flag questions for review, and change your answers before finishing. One of 15 versions is assigned to you at random.
+              You&rsquo;ll have <strong style={{ color: "#172033" }}>30 minutes</strong>. You can navigate back and forward, flag questions for review, and change your answers before finishing. One of 15 themed versions is assigned to you at random{variantTheme ? <> — this sitting&rsquo;s theme is <strong style={{ color: "#6840d6" }}>{variantTheme}</strong></> : ""}.
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 10, maxWidth: 520, margin: "0 auto 26px" }}>
               {[
@@ -223,7 +229,7 @@ export default function LevelQuestPage() {
             <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, minHeight: 62 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontWeight: 800, fontSize: 15 }}>🧙 English Wizard</span>
-                <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "#6840d622", color: "#6840d6", fontWeight: 700 }}>LEVELQUEST</span>
+                <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 6, background: "#6840d622", color: "#6840d6", fontWeight: 700 }}>LEVELCHECK</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <TimerDisplay mm={mm} ss={ss} state={timerState} />
@@ -419,9 +425,9 @@ function ReportView({ report }: { report: Report }) {
       <div style={{ maxWidth: 820, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ fontSize: 40 }}>🏆</div>
-          <p className="eyebrow" style={{ margin: 6 }}>ENGLISH WIZARD · LEVELQUEST</p>
+          <p className="eyebrow" style={{ margin: 6 }}>ENGLISH WIZARD · LEVELCHECK</p>
           <h1 style={{ fontSize: 26, margin: "4px 0" }}>Your Placement Report</h1>
-          <p className="subtle">Adaptive English Placement Assessment · Variant {report.variant}</p>
+          <p className="subtle">Adaptive English Placement Assessment · Variant {report.variant}{report.variantTheme ? ` · ${report.variantTheme}` : ""}</p>
         </div>
 
         <div className="panel" style={{ padding: 28, textAlign: "center", background: "linear-gradient(135deg, #0f1535, #2a1a4a)", color: "white", borderRadius: 18 }}>
@@ -507,6 +513,7 @@ function ReportView({ report }: { report: Report }) {
           <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{report.level}</strong>. Your path is personalized to reinforce focus areas while building on your strengths.</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button onClick={() => router.push("/learning-path")} className="button">Continue to English Wizard →</button>
+          <a href="/report" target="_blank" rel="noopener noreferrer" className="button secondary">📄 View report in new tab</a>
           <a href="/api/levelquest/report" className="button secondary">⬇️ Download official PDF report</a>
           <button onClick={() => router.push("/plan")} className="button secondary">🗂️ My plan</button>
           <button onClick={() => window.print()} className="button secondary">🖨️ Print</button>

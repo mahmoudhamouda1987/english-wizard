@@ -9,17 +9,21 @@ import {
   estimateToLevel,
   levelToEstimate,
   CEFR_ORDER,
+  VARIANT_THEMES,
   type LevelQuestItem,
   type SkillKey,
 } from "@/src/domain/levelquest";
 
 export const dynamic = "force-dynamic";
 
+const TOTAL_SECONDS = 30 * 60;
+
 interface Graded { correct: boolean; expected?: string; explanation?: string; given: string }
 interface SessionState {
   sessionId: string;
   variant: number;
   startedAt: string;
+  deadlineAt: string;
   status: "IN_PROGRESS" | "COMPLETE";
   asked: string[];
   answers: Record<string, Graded>;
@@ -39,16 +43,9 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
   try {
-    const variant = variantForLearner(session.learnerId);
-
-    // Start the adaptive ramp from the learner's known level when available, so a
-    // confident B2 learner is not given the same opening questions as an A1 learner.
-    const known = await query(`SELECT english_dna FROM learner_profiles WHERE learner_id = $1::uuid`, [session.learnerId]);
-    const knownLevel = (known.rows[0]?.english_dna as { overallLevel?: string } | undefined)?.overallLevel;
-    const startEstimate = levelToEstimate(knownLevel);
-    const paper = adaptiveOrderForStart(variant, startEstimate);
-
-    // Resume in-progress session
+    // Try to resume an in-progress session first. A NEW attempt (no in-progress
+    // session) picks a variant different from the learner's most recent completed
+    // attempt, so repeated sittings do not repeat the same paper (Part 13).
     const resume = await query(
       `SELECT id, payload FROM levelquest_sessions WHERE learner_id = $1 AND status = 'IN_PROGRESS' ORDER BY started_at DESC LIMIT 1`,
       [session.learnerId],
@@ -59,11 +56,28 @@ export async function GET() {
       state.sessionId = resume.rows[0].id;
     }
 
+    // Baseline-first start level (unknown learners anchor at Pre-A1).
+    const known = await query(`SELECT english_dna FROM learner_profiles WHERE learner_id = $1::uuid`, [session.learnerId]);
+    const knownLevel = (known.rows[0]?.english_dna as { overallLevel?: string } | undefined)?.overallLevel;
+    const startEstimate = levelToEstimate(knownLevel);
+
+    let variant: number;
+    if (state) {
+      variant = state.variant;
+    } else {
+      variant = await pickVariedVariant(session.learnerId);
+    }
+
+    const paper = adaptiveOrderForStart(variant, startEstimate);
+
     if (!state) {
       const sessionId = crypto.randomUUID();
+      const startedAt = new Date();
+      const deadlineAt = new Date(startedAt.getTime() + TOTAL_SECONDS * 1000).toISOString();
       state = {
-        sessionId, variant, startedAt: new Date().toISOString(), status: "IN_PROGRESS",
-        asked: [], answers: {}, flag: [], estimate: 0, skillCorrect: {}, skillTotal: {},
+        sessionId, variant, startedAt: startedAt.toISOString(), deadlineAt,
+        status: "IN_PROGRESS", asked: [], answers: {}, flag: [], estimate: startEstimate,
+        skillCorrect: {}, skillTotal: {},
       };
       await query(
         `INSERT INTO levelquest_sessions (id, learner_id, variant, status, payload, started_at) VALUES ($1, $2::uuid, $3, 'IN_PROGRESS', $4, now())`,
@@ -71,24 +85,53 @@ export async function GET() {
       );
     }
 
-    const exposed = paper.map(({ id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime, audioText }) => ({
+    const exposed = paper.map(({ id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime, audioText, theme }) => ({
       id, cefr, difficulty, skill, subskill, type, prompt, options, estimatedTime,
+      ...(theme ? { theme } : {}),
       ...(type === "listening" && audioText ? { audioText } : {}),
     }));
 
+    // Server-authoritative remaining time (Part 20-22): resume or spawn auto-finish.
+    const remaining = serverRemaining(state);
+    let returnedState = state;
+    if (remaining <= 0 && state.status === "IN_PROGRESS") {
+      returnedState = { ...state, status: "COMPLETE" };
+      await query(`UPDATE levelquest_sessions SET status = 'COMPLETE', payload = $2, completed_at = now() WHERE id = $1`, [state.sessionId, JSON.stringify(returnedState)]);
+    }
+
     return NextResponse.json({
       paper: exposed,
-      sessionId: state.sessionId,
-      variant: state.variant,
-      answered: Object.fromEntries(Object.entries(state.answers).map(([k, v]) => [k, v.correct])),
-      flags: state.flag,
-      estimate: state.estimate,
+      sessionId: returnedState.sessionId,
+      variant: returnedState.variant,
+      answered: Object.fromEntries(Object.entries(returnedState.answers).map(([k, v]) => [k, v.correct])),
+      flags: returnedState.flag,
+      estimate: returnedState.estimate,
       startEstimate,
+      variantTheme: VARIANT_THEMES[(returnedState.variant - 1) % VARIANT_THEMES.length],
+      remainingSeconds: Math.max(0, remaining),
       ...(knownLevel ? { startLevel: knownLevel } : {}),
     });
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Unable to start LevelQuest." }, { status: 500 });
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Unable to start LevelCheck." }, { status: 500 });
   }
+}
+
+/** Choose a variant different from the learner's most recent completed attempt. */
+async function pickVariedVariant(learnerId: string): Promise<number> {
+  const recent = await query(
+    `SELECT variant FROM levelquest_sessions WHERE learner_id = $1 AND status = 'COMPLETE' ORDER BY completed_at DESC NULLS LAST, started_at DESC LIMIT 1`,
+    [learnerId],
+  );
+  const last = recent.rowCount && recent.rows[0] ? recent.rows[0].variant as number : null;
+  const base = variantForLearner(learnerId);
+  if (last === null) return base;
+  // Pick a deterministic-but-different variant; wrap to stay in 1..15.
+  return ((base - 1 + 7) % 15) + 1;
+}
+
+function serverRemaining(state: SessionState): number {
+  if (!state.deadlineAt) return TOTAL_SECONDS;
+  return Math.ceil((new Date(state.deadlineAt).getTime() - Date.now()) / 1000);
 }
 
 /** POST — grade an answer and (optionally) finalize. */
@@ -108,6 +151,12 @@ export async function POST(request: Request) {
     if (!saved.rowCount || !saved.rows[0]) return NextResponse.json({ error: "Session not found." }, { status: 404 });
     const state = saved.rows[0].payload as SessionState;
     state.sessionId = saved.rows[0].id;
+
+    // Server-authoritative 30-minute deadline: once elapsed, no more answers are
+    // accepted — the session is finalized with the evidence gathered (Part 20-22).
+    if (serverRemaining(state) <= 0 && state.status === "IN_PROGRESS" && !body.flag) {
+      return finalize(session.learnerId, state);
+    }
 
     if (body.flag) {
       state.flag = body.flag;
@@ -176,6 +225,7 @@ async function finalize(learnerId: string, state: SessionState) {
     strengths,
     focusAreas: focus,
     variant: state.variant,
+    variantTheme: VARIANT_THEMES[(state.variant - 1) % VARIANT_THEMES.length],
     answeredCount: Object.keys(state.answers).length,
     speakingSubmitted,
     speakingResponses: speakingCount,
