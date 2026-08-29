@@ -110,9 +110,9 @@ export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open
   return (
     <div style={OVERLAY} role="dialog" aria-modal="true" aria-labelledby="upgrade-title" onClick={onClose}>
       <div style={MODAL} onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 14, right: 16, border: 0, background: "transparent", fontSize: 22, cursor: "pointer", color: "#5b6272" }}>✕</button>
+        <button onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 14, right: 16, border: 0, background: "transparent", fontSize: 22, cursor: "pointer", color: "var(--text-secondary)" }}>✕</button>
         <div style={{ fontSize: 42 }}>{info.icon}</div>
-        <p className="eyebrow" style={{ margin: "8px 0 2px", color: "#6840d6" }}>{info.eyebrow}</p>
+        <p className="eyebrow" style={{ margin: "8px 0 2px", color: "var(--accent-primary)" }}>{info.eyebrow}</p>
         <h2 id="upgrade-title" style={{ margin: "0 0 4px", fontSize: 22 }}>Unlock Your Full English Journey</h2>
         <p className="subtle" style={{ fontSize: 13, margin: "0 0 14px" }}>This feature is included with your English Wizard subscription.</p>
 

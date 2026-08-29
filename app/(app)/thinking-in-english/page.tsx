@@ -216,7 +216,7 @@ export default function ThinkingInEnglishPage() {
               {!listening ? (
                 <button className="button secondary" onClick={dictate}>🎙️ Dictate instead</button>
               ) : (
-                <button className="button" style={{ background: "#ef4444" }} onClick={() => { if (recognitionRef.current?.stop) recognitionRef.current.stop(); setListening(false); }}>⏹ Stop mic</button>
+                <button className="button" style={{ background: "var(--danger)" }} onClick={() => { if (recognitionRef.current?.stop) recognitionRef.current.stop(); setListening(false); }}>⏹ Stop mic</button>
               )}
               <button className="button" disabled={!answer.trim() || busy} onClick={() => void submitReflection()}>{busy ? "Saving…" : "Submit reflection →"}</button>
             </div>

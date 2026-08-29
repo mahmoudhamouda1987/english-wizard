@@ -95,11 +95,11 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
         {/* Characters */}
         <div style={{ position: "absolute", bottom: 10, left: 24, textAlign: "center", transform: line?.speaker === "a" ? "scale(1.15)" : "scale(1)", transition: "transform .3s" }}>
           <div style={{ fontSize: 44, filter: line?.speaker === "a" ? "drop-shadow(0 0 8px rgba(255,255,255,.7))" : "none" }}>{scene.characters.a.emoji}</div>
-          <small style={{ color: "#fff", fontWeight: 600 }}>{scene.characters.a.name}</small>
+          <small style={{ color: "var(--bg-elevated)", fontWeight: 600 }}>{scene.characters.a.name}</small>
         </div>
         <div style={{ position: "absolute", bottom: 10, right: 24, textAlign: "center", transform: line?.speaker === "b" ? "scale(1.15)" : "scale(1)", transition: "transform .3s" }}>
           <div style={{ fontSize: 44, filter: line?.speaker === "b" ? "drop-shadow(0 0 8px rgba(255,255,255,.7))" : "none" }}>{scene.characters.b.emoji}</div>
-          <small style={{ color: "#fff", fontWeight: 600 }}>{scene.characters.b.name}</small>
+          <small style={{ color: "var(--bg-elevated)", fontWeight: 600 }}>{scene.characters.b.name}</small>
         </div>
 
         {/* Speech bubble */}
@@ -107,7 +107,7 @@ export function ScenePlayer({ scene }: { scene: LearningScene }) {
           role="status"
           aria-live="polite"
           style={{
-            margin: "34px auto 0", maxWidth: 520, background: "#ffffff", borderRadius: 14, padding: "12px 16px",
+            margin: "34px auto 0", maxWidth: 520, background: "var(--bg-elevated)", borderRadius: 14, padding: "12px 16px",
             boxShadow: "0 4px 14px rgba(0,0,0,.35)", color: "#1c2340", textAlign: "left",
             animation: "ew-bubble-in .25s ease-out",
           }}

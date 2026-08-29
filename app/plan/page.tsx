@@ -96,7 +96,7 @@ export default function PlanPage() {
           return (
             <section key={p.tier} className="panel" style={{ margin: 0, padding: 22, border: active ? "2px solid #6840d6" : undefined }}>
               <h3 style={{ fontSize: 18, margin: "0 0 4px" }}>{p.name}</h3>
-              <div style={{ fontSize: 34, fontWeight: 800, color: "#4626b8", margin: "6px 0" }}>{p.price}<small className="subtle" style={{ fontSize: 13 }}> {p.tag}</small></div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: "var(--accent-text)", margin: "6px 0" }}>{p.price}<small className="subtle" style={{ fontSize: 13 }}> {p.tag}</small></div>
               <p className="subtle" style={{ fontSize: 13.5, lineHeight: 1.6, minHeight: 64 }}>{p.desc}</p>
               <button onClick={() => void choose(p.tier)} disabled={changing !== null || active} className={active ? "button secondary" : "button"} style={{ width: "100%", textAlign: "center" }}>
                 {changing === p.tier ? "Updating…" : active ? "Current plan ✓" : p.cta}

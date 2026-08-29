@@ -30,7 +30,7 @@ export default function ReferralPage() {
         <>
           <section className="panel" style={{ padding: 28, textAlign: "center" }}>
             <p className="eyebrow">Your personal code</p>
-            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: ".12em", color: "#4626b8", margin: "10px 0 4px" }}>{data.code}</div>
+            <div style={{ fontSize: 44, fontWeight: 800, letterSpacing: ".12em", color: "var(--accent-text)", margin: "10px 0 4px" }}>{data.code}</div>
             <p className="subtle" style={{ marginBottom: 18 }}>Friends enter this on sign-up — or just open your link.</p>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
               <button className="button" onClick={() => void copyLink()}>{copied ? "✓ Link copied!" : "Copy invite link"}</button>

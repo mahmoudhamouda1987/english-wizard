@@ -108,7 +108,7 @@ export default function MockExamPage() {
             <button className="button secondary" onClick={() => speakText(mock.speakingPhrase, { lang: "en-GB", rate: 0.95 })}>🔊 Hear it</button>
             {!listening
               ? <button className="button" onClick={listenSpeaking}>🎙️ Record</button>
-              : <button className="button" style={{ background: "#ef4444" }} onClick={() => { recognitionRef.current?.stop(); setListening(false); }}>⏹ Stop</button>}
+              : <button className="button" style={{ background: "var(--danger)" }} onClick={() => { recognitionRef.current?.stop(); setListening(false); }}>⏹ Stop</button>}
           </div>
           {transcript && <p className="subtle" style={{ marginTop: 10 }}>Heard: “{transcript}”</p>}
           <div style={{ marginTop: 14 }}>
@@ -122,7 +122,7 @@ export default function MockExamPage() {
           <Celebration trigger="done" />
           <section className="result-box" style={{ padding: 28, textAlign: "center" }}>
             <p className="eyebrow">Internal estimate</p>
-            <div style={{ fontSize: 52, fontWeight: 800, color: "#4626b8" }}>{cefrFromPercent(overall)}</div>
+            <div style={{ fontSize: 52, fontWeight: 800, color: "var(--accent-text)" }}>{cefrFromPercent(overall)}</div>
             <p>IELTS-style band ≈ <strong>{ieltsBand(overall)}</strong> · overall evidence score <strong>{overall}%</strong></p>
             <div className="stat-strip">
               <div className="stat-tile"><strong>{readingPercent}%</strong><span>Reading</span></div>

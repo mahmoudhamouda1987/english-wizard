@@ -54,7 +54,7 @@ export default function PricingPage() {
               <section key={plan.tier} className="panel" style={{ margin: 0, padding: 28, border: highlight ? "2px solid #6840d6" : undefined, position: "relative" }}>
                 {highlight && <span className="streak-pill" style={{ position: "absolute", top: -14, left: 24 }}>Most popular</span>}
                 <h2 style={{ fontSize: 22 }}>{plan.name}</h2>
-                <div style={{ fontSize: 40, fontWeight: 800, color: "#4626b8", margin: "6px 0 14px" }}>
+                <div style={{ fontSize: 40, fontWeight: 800, color: "var(--accent-text)", margin: "6px 0 14px" }}>
                   {plan.tier === "FREE" ? "$0" : plan.priceLabel.replace(/[^0-9.]/g, "") ? `$${plan.priceLabel.replace(/[^0-9.]/g, "")}` : plan.priceLabel}
                   <small className="subtle" style={{ fontSize: 14, fontWeight: 400 }}>{plan.tier === "FREE" ? " forever" : " /month"}</small>
                 </div>
@@ -108,7 +108,7 @@ export default function PricingPage() {
         <section className="hero-band" style={{ marginTop: 64, textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(26px,4vw,40px)", letterSpacing: "-.02em", margin: "0 0 12px" }}>Hear yourself improve within weeks.</h2>
           <p style={{ opacity: .92, maxWidth: 560, margin: "0 auto 22px", fontSize: 17 }}>Record your voice today, compare it with your voice in three months — and carry a QR-verifiable certificate employers can check.</p>
-          <a href="/onboarding" style={{ background: "#fff", color: "#4626b8", padding: "14px 28px", borderRadius: 12, fontWeight: 800, display: "inline-block" }}>Start free — no card needed →</a>
+          <a href="/onboarding" style={{ background: "var(--bg-elevated)", color: "var(--accent-text)", padding: "14px 28px", borderRadius: 12, fontWeight: 800, display: "inline-block" }}>Start free — no card needed →</a>
         </section>
       </main>
     </>

@@ -56,7 +56,7 @@ export function TextSizeControl() {
   const size = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return (
-    <div role="group" aria-label="Text size" style={{ display: "inline-flex", gap: 6, alignItems: "center", background: "#0d1930", color: "#fff", padding: "6px 10px", borderRadius: 12 }}>
+    <div role="group" aria-label="Text size" style={{ display: "inline-flex", gap: 6, alignItems: "center", background: "var(--surface-inverse)", color: "var(--bg-elevated)", padding: "6px 10px", borderRadius: 12 }}>
       <span aria-hidden="true">Text size</span>
       {SIZES.map((option) => (
         <button

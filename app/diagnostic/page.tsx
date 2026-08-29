@@ -1,4 +1,7 @@
 "use client";
+
+import { ThemeToggle } from "@/app/components/theme-toggle";
+import Link from "next/link";
 import { Component, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { speakText, stopSpeaking, RECOGNITION_LANG } from "@/src/domain/tts";
@@ -244,7 +247,7 @@ export default function LevelQuestPage() {
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(160deg, #0f1535, #2a1a4a)", color: "white", textAlign: "center" }}>
       <div style={{ maxWidth: 640 }}>
         <LevelQuestMark />
-        <p className="eyebrow" style={{ color: "#93c5fd", marginTop: 14 }}>Adaptive English Placement Assessment</p>
+        <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>Adaptive English Placement Assessment</p>
         <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELQUEST</h1>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto 26px" }}>
           LevelQuest adapts to you. As your answers demonstrate stronger English ability, the challenge increases.
@@ -260,7 +263,7 @@ export default function LevelQuestPage() {
             { icon: "📄", label: "Personalised report" },
           ].map((m) => <div key={m.label} style={{ padding: "14px 10px", borderRadius: 12, background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.12)" }}><div style={{ fontSize: 24 }}>{m.icon}</div><div style={{ fontSize: 12.5, marginTop: 6, opacity: .85 }}>{m.label}</div></div>)}
         </div>
-        {error && <p style={{ color: "#fda4af", marginBottom: 12 }}>{error}</p>}
+        {error && <p style={{ color: "var(--danger)", marginBottom: 12 }}>{error}</p>}
         {error && <a className="button" href={`/auth?next=/diagnostic`}>Sign in to continue →</a>}
       </div>
     </main>
@@ -271,12 +274,12 @@ export default function LevelQuestPage() {
     <Centered>
       <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
         <LevelQuestMark />
-        <p className="eyebrow" style={{ color: "#6840d6", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Adaptive English Placement Assessment</p>
-        <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "#172033", letterSpacing: ".05em" }}>LEVELQUEST</h1>
-        <p style={{ fontSize: 16, lineHeight: 1.75, color: "#334155", maxWidth: 560, margin: "6px auto 20px" }}>
-          You&rsquo;ll have <strong style={{ color: "#172033" }}>30 minutes</strong>. Questions adapt to your demonstrated ability —
+        <p className="eyebrow" style={{ color: "var(--accent-primary)", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Adaptive English Placement Assessment</p>
+        <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: ".05em" }}>LEVELQUEST</h1>
+        <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--text-secondary)", maxWidth: 560, margin: "6px auto 20px" }}>
+          You&rsquo;ll have <strong style={{ color: "var(--text-primary)" }}>30 minutes</strong>. Questions adapt to your demonstrated ability —
           you can navigate back and forward, flag questions, and change answers before finishing.
-          {variantTheme ? <> This sitting&rsquo;s edition: <strong style={{ color: "#6840d6" }}>{variantTheme}</strong>.</> : ""}
+          {variantTheme ? <> This sitting&rsquo;s edition: <strong style={{ color: "var(--accent-primary)" }}>{variantTheme}</strong>.</> : ""}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px,1fr))", gap: 10, maxWidth: 560, margin: "0 auto 16px" }}>
           {[
@@ -287,7 +290,7 @@ export default function LevelQuestPage() {
             { icon: "❓", t: "Multiple choice" },
             { icon: "📄", t: "Downloadable report" },
           ].map((c) => (
-            <div key={c.t} style={{ padding: "13px 10px", borderRadius: 12, background: "#f4f0ff", border: "1px solid #e5dcff", color: "#4338ca" }}>
+            <div key={c.t} style={{ padding: "13px 10px", borderRadius: 12, background: "#f4f0ff", border: "1px solid var(--border-default)", color: "var(--accent-text)" }}>
               <div style={{ fontSize: 21 }}>{c.icon}</div>
               <div style={{ fontSize: 12.5, fontWeight: 700, marginTop: 4 }}>{c.t}</div>
             </div>
@@ -301,18 +304,20 @@ export default function LevelQuestPage() {
 
   /* Assessment view */
   return (
-    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f7f8fb" }}>
-      <header style={{ background: "white", borderBottom: "1px solid #e8ebf2", padding: "0 24px", position: "sticky", top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 880, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, minHeight: 62, flexWrap: "wrap", padding: "8px 0" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontWeight: 800, fontSize: 15 }}>🧙 English Wizard</span>
-            <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 6, background: "#6840d6", color: "white", fontWeight: 800, letterSpacing: ".08em" }}>LEVELQUEST</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            {progress && <span style={{ fontSize: 12.5, color: "#5b6272", fontWeight: 600 }}>{progress.objectiveAnswered + progress.speakingAnswered} / ~{progress.target} answered</span>}
+    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-muted)" }}>
+      <header className="journey-header">
+        <div className="journey-header-inner" style={{ maxWidth: 880 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+            <strong style={{ fontSize: 15 }}>English Wizard</strong>
+            <span className="pill">Level check</span>
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            {progress && <span style={{ fontSize: 12.5, color: "var(--text-secondary)", fontWeight: 600 }}>{progress.objectiveAnswered + progress.speakingAnswered} / ~{progress.target} answered</span>}
             <TimerDisplay mm={mm} ss={ss} state={timerState} />
             <button onClick={() => setShowNav((s) => !s)} className="button secondary" style={{ padding: "7px 12px", fontSize: 13 }} aria-expanded={showNav}>{showNav ? "Hide navigator" : "Navigator"}</button>
-          </div>
+            <ThemeToggle />
+            <Link href="/" className="button secondary" style={{ padding: "7px 12px", fontSize: 13 }}>Exit</Link>
+          </span>
         </div>
       </header>
 
@@ -323,13 +328,13 @@ export default function LevelQuestPage() {
           <span style={{ fontSize: 14, opacity: .6, fontWeight: 600 }}>Question {idx + 1}</span>
           {currentItem && <SkillChip skill={currentItem.skill} />}
           <AdaptiveBadge estimate={estimate} />
-          {flags.includes(currentItem?.id ?? "") && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#fbbf2422", color: "#b45309", fontWeight: 700 }}>⚑ Flagged</span>}
+          {flags.includes(currentItem?.id ?? "") && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#fbbf2422", color: "var(--warning)", fontWeight: 700 }}>⚑ Flagged</span>}
         </div>
 
         {error && (
-          <div role="alert" style={{ marginBottom: 14, padding: "12px 16px", borderRadius: 10, background: "#fee2e2", color: "#991b1b", fontSize: 13.5, border: "1px solid #fecaca" }}>
+          <div role="alert" style={{ marginBottom: 14, padding: "12px 16px", borderRadius: 10, background: "#fee2e2", color: "var(--danger)", fontSize: 13.5, border: "1px solid #fecaca" }}>
             <strong>Something went wrong:</strong> {error}
-            <button onClick={() => setError(null)} style={{ marginLeft: 10, background: "transparent", border: "none", color: "#991b1b", cursor: "pointer", textDecoration: "underline", fontSize: 12.5 }}>Dismiss</button>
+            <button onClick={() => setError(null)} style={{ marginLeft: 10, background: "transparent", border: "none", color: "var(--danger)", cursor: "pointer", textDecoration: "underline", fontSize: 12.5 }}>Dismiss</button>
           </div>
         )}
 
@@ -433,29 +438,29 @@ function ListeningPlayer({ item }: { item: ExposedItem }) {
 
   return (
     <div style={{ marginBottom: 18 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 14, background: "linear-gradient(135deg,#f4f0ff,#eef2ff)", border: "1px solid #e5dcff", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 14, background: "linear-gradient(135deg,#f4f0ff,#eef2ff)", border: "1px solid var(--border-default)", flexWrap: "wrap" }}>
         <button onClick={play} disabled={loading} style={{ width: 52, height: 52, borderRadius: "50%", border: 0, background: loading ? "#c3c9d6" : "#6840d6", color: "white", fontSize: 19, cursor: "pointer", flexShrink: 0 }} aria-label={playing ? "Pause audio" : "Play audio"} aria-busy={loading}>
           {loading ? "…" : playing ? "❚❚" : "▶"}
         </button>
         <div style={{ flex: 1, minWidth: 160 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <strong style={{ fontSize: 14 }}>🎧 Listening</strong>
-            <span style={{ fontSize: 11.5, color: "#5b6272" }}>Replays: {replays}/3</span>
+            <span style={{ fontSize: 11.5, color: "var(--text-secondary)" }}>Replays: {replays}/3</span>
           </div>
           <div style={{ height: 8, background: "#e2dcf5", borderRadius: 4, overflow: "hidden" }} role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="Audio progress">
             <div style={{ width: `${progressPct}%`, height: "100%", background: "linear-gradient(90deg,#6840d6,#8b5cf6)", borderRadius: 4, transition: "width .3s linear" }} />
           </div>
         </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#5b6272" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
           🔊
           <input type="range" min={0.2} max={1} step={0.1} value={volume} onChange={(e) => setVolume(Number(e.target.value))} aria-label="Volume" style={{ width: 72, accentColor: "#6840d6" }} />
         </label>
       </div>
       <div className="subtle" style={{ fontSize: 12.5, marginTop: 8 }}>Listen to the audio, then choose the best answer. You can replay it up to three times.</div>
       {audioFailed && (
-        <div role="status" style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "#fffbeb", border: "1px solid #fde68a", color: "#92400e", fontSize: 13 }}>
+        <div role="status" style={{ marginTop: 10, padding: "10px 14px", borderRadius: 10, background: "var(--warning-soft)", border: "1px solid var(--warning-border)", color: "var(--warning)", fontSize: 13 }}>
           ⚠️ Audio isn&rsquo;t available on this device. Read the text below instead — this won&rsquo;t affect your result.
-          <div style={{ marginTop: 8, padding: "10px 12px", background: "white", borderRadius: 8, border: "1px solid #fde68a", fontSize: 14, lineHeight: 1.6 }}>{item.audioText ?? item.prompt}</div>
+          <div style={{ marginTop: 8, padding: "10px 12px", background: "white", borderRadius: 8, border: "1px solid var(--warning-border)", fontSize: 14, lineHeight: 1.6 }}>{item.audioText ?? item.prompt}</div>
         </div>
       )}
     </div>
@@ -513,7 +518,7 @@ function SpeakingInterface({ item, onDone }: { item: ExposedItem; onDone: (t: st
         </div>
       </div>
       {micDenied && (
-        <div role="status" style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 10, background: "#fffbeb", border: "1px solid #fde68a", color: "#92400e", fontSize: 13 }}>
+        <div role="status" style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 10, background: "var(--warning-soft)", border: "1px solid var(--warning-border)", color: "var(--warning)", fontSize: 13 }}>
           🎙️ Microphone isn&rsquo;t available. That&rsquo;s fine — <strong>type your spoken answer below</strong> instead; it carries the same weight in your assessment.
         </div>
       )}
@@ -542,7 +547,7 @@ function TimerDisplay({ mm, ss, state }: { mm: string; ss: string; state: string
 }
 
 function SkillChip({ skill }: { skill: string }) {
-  return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, padding: "3px 10px", borderRadius: 8, background: "#eef2ff", color: "#4338ca", fontWeight: 600 }}>{SKILL_ICON[skill]} {SKILL_LABEL[skill]}</span>;
+  return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, padding: "3px 10px", borderRadius: 8, background: "#eef2ff", color: "var(--accent-text)", fontWeight: 600 }}>{SKILL_ICON[skill]} {SKILL_LABEL[skill]}</span>;
 }
 
 /**
@@ -552,7 +557,7 @@ function SkillChip({ skill }: { skill: string }) {
 function AdaptiveBadge({ estimate }: { estimate: number | null }) {
   const dots = estimate === null ? 2 : Math.max(1, Math.min(5, Math.round((estimate / 6) * 4) + 1));
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#0891b2", fontWeight: 600 }} title="The challenge adapts to your demonstrated ability">
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--info)", fontWeight: 600 }} title="The challenge adapts to your demonstrated ability">
       <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#0891b2" }} /> Adaptive Challenge
       <span aria-hidden="true" style={{ display: "inline-flex", gap: 2 }}>
         {[1, 2, 3, 4, 5].map((d) => <span key={d} style={{ width: 5, height: 5, borderRadius: "50%", background: d <= dots ? "#0891b2" : "#cbd5e1", transition: "background .4s" }} />)}
@@ -583,7 +588,7 @@ class QuestionBoundary extends Component<{ children: React.ReactNode }, { failed
 
 function NavGrid({ paper, answered, flags, idx, onGo }: { paper: ExposedItem[]; answered: Record<string, boolean>; flags: string[]; idx: number; onGo: (i: number) => void }) {
   return (
-    <div style={{ background: "white", borderBottom: "1px solid #e8ebf2", padding: "12px 24px" }}>
+    <div style={{ background: "white", borderBottom: "1px solid var(--border-subtle)", padding: "12px 24px" }}>
       <div style={{ maxWidth: 880, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: 8, maxHeight: 148, overflowY: "auto" }}>
         {paper.map((item, i) => {
           const isAnswered = answered[item.id] !== undefined;
@@ -601,10 +606,10 @@ function NavGrid({ paper, answered, flags, idx, onGo }: { paper: ExposedItem[]; 
         })}
       </div>
       <div style={{ maxWidth: 880, margin: "8px auto 0", display: "flex", gap: 16, flexWrap: "wrap", fontSize: 11.5, opacity: .75 }}>
-        <span><span style={{ color: "#10b981", fontWeight: 700 }}>■</span> Answered</span>
-        <span><span style={{ color: "#fbbf24", fontWeight: 700 }}>■</span> Flagged</span>
-        <span><span style={{ color: "#a855f7", fontWeight: 700 }}>■</span> Speaking</span>
-        <span><span style={{ color: "#6840d6", fontWeight: 700 }}>■</span> Current</span>
+        <span><span style={{ color: "var(--success)", fontWeight: 700 }}>■</span> Answered</span>
+        <span><span style={{ color: "var(--warning)", fontWeight: 700 }}>■</span> Flagged</span>
+        <span><span style={{ color: "var(--accent-secondary)", fontWeight: 700 }}>■</span> Speaking</span>
+        <span><span style={{ color: "var(--accent-primary)", fontWeight: 700 }}>■</span> Current</span>
       </div>
     </div>
   );
@@ -666,7 +671,7 @@ function ReportView({ report }: { report: Report }) {
     : new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f7f8fb", padding: "32px 16px" }}>
+    <main style={{ minHeight: "100vh", background: "var(--bg-muted)", padding: "32px 16px" }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <p className="eyebrow" style={{ margin: 6 }}>ENGLISH WIZARD · LEVELQUEST</p>
@@ -688,7 +693,7 @@ function ReportView({ report }: { report: Report }) {
           {report.boundary && (
             <div style={{ display: "inline-block", padding: "5px 14px", borderRadius: 999, background: "rgba(255,255,255,.12)", border: "1px solid rgba(255,255,255,.25)", fontSize: 13.5, fontWeight: 700, marginBottom: 8 }}>{report.boundary}</div>
           )}
-          <p className="subtle" style={{ color: "#cbd5e1", maxWidth: 520, margin: "0 auto", fontSize: 13 }}>
+          <p className="subtle" style={{ color: "var(--text-disabled)", maxWidth: 520, margin: "0 auto", fontSize: 13 }}>
             Adaptive estimate {report.estimate} · {report.answeredCount} responses analyzed{report.speakingSubmitted ? ` · speaking: indicative ${report.speakingBand ?? "—"}` : ""}
           </p>
         </div>
@@ -724,7 +729,7 @@ function ReportView({ report }: { report: Report }) {
                 return (
                   <div key={skill} style={{ display: "grid", gridTemplateColumns: "120px 42px 1fr 56px", gap: 12, alignItems: "center" }}>
                     <span style={{ fontWeight: 600, fontSize: 13.5 }}>{SKILL_ICON[skill]} {SKILL_LABEL[skill]}</span>
-                    <strong style={{ textAlign: "center", color: "#a855f7", fontSize: 13 }}>{report.speakingSubmitted ? (report.speakingBand ?? "Submitted") : "—"}</strong>
+                    <strong style={{ textAlign: "center", color: "var(--accent-secondary)", fontSize: 13 }}>{report.speakingSubmitted ? (report.speakingBand ?? "Submitted") : "—"}</strong>
                     <div className="subtle" style={{ fontSize: 12 }}>{fb ? fb.note : "Recorded & typed responses — reviewed in guided conversation."}</div>
                     <span style={{ fontSize: 12.5, opacity: .7, textAlign: "right" }}>{report.speakingSubmitted ? `${report.speakingResponses ?? 0} resp.` : "n/a"}</span>
                   </div>
@@ -734,7 +739,7 @@ function ReportView({ report }: { report: Report }) {
                 return (
                   <div key={skill} style={{ display: "grid", gridTemplateColumns: "120px 42px 1fr 56px", gap: 12, alignItems: "center" }}>
                     <span style={{ fontWeight: 600, fontSize: 13.5 }}>{SKILL_ICON[skill]} {SKILL_LABEL[skill]}</span>
-                    <strong style={{ textAlign: "center", color: "#94a3b8", fontSize: 13 }}>—</strong>
+                    <strong style={{ textAlign: "center", color: "var(--text-disabled)", fontSize: 13 }}>—</strong>
                     <div className="subtle" style={{ fontSize: 12 }}>Not attempted in this sitting.</div>
                     <span style={{ fontSize: 12.5, opacity: .7, textAlign: "right" }}>n/a</span>
                   </div>
@@ -771,7 +776,7 @@ function ReportView({ report }: { report: Report }) {
         <div className="panel" style={{ padding: 24, marginTop: 18, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)" }}>
           <h3 style={{ margin: "0 0 8px" }}>🧭 Recommended starting point</h3>
           <p style={{ margin: "0 0 6px", lineHeight: 1.7 }}>Your English Wizard journey begins at <strong>{report.level}</strong>{report.speakingBand ? <> with speaking developing at <strong>{report.speakingBand}</strong></> : ""}. Your path is personalised to reinforce focus areas while building on your strengths.</p>
-          <p style={{ margin: "0 0 14px", color: "#6840d6", fontWeight: 600, fontSize: 14.5 }}>Your level has been discovered. Now let&rsquo;s build your path.</p>
+          <p style={{ margin: "0 0 14px", color: "var(--accent-primary)", fontWeight: 600, fontSize: 14.5 }}>Your level has been discovered. Now let&rsquo;s build your path.</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button onClick={() => router.push("/dashboard")} className="button" style={{ padding: "14px 28px", fontSize: 15 }}>Continue to English Wizard →</button>
             <a href="/report" target="_blank" rel="noopener noreferrer" className="button secondary">📄 View My Report</a>

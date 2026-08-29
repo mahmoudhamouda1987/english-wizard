@@ -1,4 +1,6 @@
 "use client";
+
+import { JourneyHeader } from "@/app/components/journey-header";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { track } from "@/app/lib/track";
@@ -25,7 +27,7 @@ const SKILLS = [
 ];
 
 const JOURNEY = [
-  { icon: "🔍", label: "Discover", sub: "LevelQuest finds your level" },
+  { icon: "🔍", label: "Discover", sub: "The assessment finds your level" },
   { icon: "📗", label: "Learn", sub: "Lessons built for you" },
   { icon: "🛠️", label: "Practice", sub: "Skills become habits" },
   { icon: "🏅", label: "Master", sub: "Evidence you can show" },
@@ -79,7 +81,7 @@ export default function OnboardingPage() {
       });
       const profilePayload = await profile.json();
       if (!profile.ok) throw new Error(profilePayload.error ?? "Unable to save your profile.");
-      // Begin the 7-day guided trial (idempotent) so premium features are available during LevelQuest.
+      // Begin the 7-day guided trial (idempotent) so premium features are available during the assessment.
       try { await fetch("/api/trial", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }); } catch { /* trial start must never block onboarding */ }
       track("onboarding_completed", { targetLevel, dailyMinutes, goals });
       track("levelquest_started");
@@ -144,7 +146,7 @@ export default function OnboardingPage() {
                 </div>
               ))}
             </div>
-            <p className="ob-note">Illustration of a skill profile — yours will come from your own LevelQuest result.</p>
+            <p className="ob-note">Illustration of a skill profile — yours will come from your own assessment result.</p>
           </>
         )}
 
@@ -169,7 +171,7 @@ export default function OnboardingPage() {
         {step === 4 && (
           <>
             <p className="ob-eyebrow">Start Assessment</p>
-            <h1 className="ob-h1">Your first mission is <span className="ob-grad">LevelQuest</span> — our adaptive English placement assessment.</h1>
+            <h1 className="ob-h1">Your first mission is <span className="ob-grad">Check My English</span> — our adaptive placement assessment.</h1>
             <div className="ob-mission">
               <div className="ob-mission-grid">
                 <div><strong>⏱️ ~30 min</strong><span>adaptive maximum</span></div>
@@ -203,10 +205,12 @@ export default function OnboardingPage() {
 
   /* ── Setup screen ── */
   return (
-    <main id="main-content" style={{ minHeight: "100vh", padding: "48px 24px", maxWidth: 720, margin: "0 auto", background: "#f7f8fc" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)" }}>
+      <JourneyHeader context="Onboarding" />
+      <main id="main-content" style={{ padding: "40px 24px 56px", maxWidth: 720, margin: "0 auto" }}>
       <p className="eyebrow" style={{ textAlign: "center" }}>Almost there</p>
       <h1 style={{ textAlign: "center", fontSize: 30, margin: "8px 0 6px", fontWeight: 800 }}>Tell us a little about you</h1>
-      <p className="subtle" style={{ textAlign: "center", margin: "0 0 28px" }}>This lets English Wizard personalize your LevelQuest and learning path.</p>
+      <p className="subtle" style={{ textAlign: "center", margin: "0 0 28px" }}>This lets English Wizard personalise your assessment and learning path.</p>
 
       <section className="panel" style={{ display: "grid", gap: 16, padding: 28 }}>
         <label style={{ display: "grid", gap: 6 }}>
@@ -239,7 +243,7 @@ export default function OnboardingPage() {
               const active = goals.includes(goal);
               return (
                 <button key={goal} type="button" onClick={() => toggleGoal(goal)} aria-pressed={active} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderRadius: 10, border: active ? "2px solid #6840d6" : "1px solid #dfe3ec", background: active ? "#f0ebff" : "white", cursor: "pointer", textAlign: "left", fontSize: 13.5, transition: "all .15s" }}>
-                  <span>{GOAL_ICONS[i]}</span> {goal} {active && <span style={{ marginLeft: "auto", color: "#6840d6", fontWeight: 700 }}>✓</span>}
+                  <span>{GOAL_ICONS[i]}</span> {goal} {active && <span style={{ marginLeft: "auto", color: "var(--accent-primary)", fontWeight: 700 }}>✓</span>}
                 </button>
               );
             })}
@@ -248,10 +252,11 @@ export default function OnboardingPage() {
 
         {error && <p role="alert" style={{ color: "#a53b3b" }}>{error}</p>}
         <button className="button" disabled={busy || !name.trim() || goals.length === 0} onClick={startDiagnostic} style={{ padding: 15 }}>
-          {busy ? "Preparing your profile…" : "Start LevelQuest Assessment →"}
+          {busy ? "Preparing your profile…" : "Start the assessment"}
         </button>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }
 

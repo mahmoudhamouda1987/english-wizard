@@ -177,7 +177,7 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
               )}
 
               {isProfessional && lessonBodyData && (
-                <section style={{ padding: 22, background: "#f2f0fb", borderRadius: 14, borderLeft: "4px solid #7c3aed" }}>
+                <section style={{ padding: 22, background: "var(--accent-soft)", borderRadius: 14, borderLeft: "4px solid #7c3aed" }}>
                   <p className="eyebrow">Professional focus</p>
                   <p style={{ lineHeight: 1.7 }}>This lesson covers professional {lesson.skill} skills at {lesson.level} level. Complete the practice exercises to demonstrate your understanding.</p>
                 </section>
