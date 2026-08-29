@@ -63,7 +63,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <ServiceWorkerRegister />
         <ThemeApply />
-        <div style={{ position: "fixed", bottom: 12, right: 12, zIndex: 900 }}><TextSizeControl /></div>
+        <div className="text-size-fab"><TextSizeControl /></div>
         {children}
       </body>
     </html>
