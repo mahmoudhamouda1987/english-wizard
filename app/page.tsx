@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/app/components/home/hero";
-import { LevelQuestSection } from "@/app/components/home/levelcheck";
+import { LevelCheckSection } from "@/app/components/home/levelcheck";
 import { CefrJourney } from "@/app/components/home/cefr-journey";
 import { SkillsShowcase, ProductShowcase } from "@/app/components/home/skills-showcase";
 import {
@@ -42,7 +42,7 @@ export default function Home() {
     <div className="hp-root">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Hero />
-      <LevelQuestSection />
+      <LevelCheckSection />
       <CefrJourney />
       <SkillsShowcase />
       <ProductShowcase />

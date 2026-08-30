@@ -44,7 +44,7 @@ export default function CurriculumStudioPage() {
 
       {lqStats && (
         <section className="rounded-xl border p-4">
-          <h2 className="text-xl font-semibold">LevelQuest question bank</h2>
+          <h2 className="text-xl font-semibold">LevelCheck question bank</h2>
           <p className="mt-1 text-sm text-slate-600">Usage and success signals for future calibration — {lqStats.bankSize} bank items across 15 variants · {lqStats.sittings} sittings analysed · avg {lqStats.avgAnsweredPerSitting} answers/sitting · speaking submitted in {lqStats.speakingSubmissionRate}% of sittings.</p>
 
           <div className="mt-4 grid gap-3 md:grid-cols-7">

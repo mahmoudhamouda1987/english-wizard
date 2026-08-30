@@ -62,7 +62,7 @@ function orderOptions(paper: ExposedItem[], variant: number): Record<string, str
   return map;
 }
 
-export default function LevelQuestPage() {
+export default function LevelCheckPage() {
   const [paper, setPaper] = useState<ExposedItem[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variant, setVariant] = useState(0);
@@ -246,7 +246,7 @@ export default function LevelQuestPage() {
   if (paper.length === 0 && !started) return (
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(160deg, #0f1535, #2a1a4a)", color: "white", textAlign: "center" }}>
       <div style={{ maxWidth: 640 }}>
-        <LevelQuestMark />
+        <LevelCheckMark />
         <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>Adaptive English Placement Assessment</p>
         <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELCHECK</h1>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto 26px" }}>
@@ -273,7 +273,7 @@ export default function LevelQuestPage() {
   if (!started && paper.length > 0) return (
     <Centered>
       <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
-        <LevelQuestMark />
+        <LevelCheckMark />
         <p className="eyebrow" style={{ color: "var(--accent-primary)", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Adaptive English Placement Assessment</p>
         <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: ".05em" }}>LEVELCHECK</h1>
         <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--text-secondary)", maxWidth: 560, margin: "6px auto 20px" }}>
@@ -388,7 +388,7 @@ export default function LevelQuestPage() {
 }
 
 /* ── Brand mark ── */
-function LevelQuestMark() {
+function LevelCheckMark() {
   return (
     <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg,#6840d6,#8b5cf6)", boxShadow: "0 12px 30px rgba(104,64,214,.35)", fontSize: 34 }} aria-hidden="true">🧙</div>
   );

@@ -67,7 +67,7 @@ export default function PlanPage() {
           <p className="eyebrow" style={{ color: "#a5b4fc" }}>Your journey continues</p>
           <h1 style={{ fontSize: "clamp(28px,4.5vw,40px)", margin: "6px 0 10px", fontWeight: 900 }}>Continue Your English Journey</h1>
           <p style={{ fontSize: 15.5, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto" }}>
-            Your LevelQuest discovered where you are. Now continue building the skills that take you where you want to go.
+            Your LevelCheck discovered where you are. Now continue building the skills that take you where you want to go.
           </p>
         </section>
       )}

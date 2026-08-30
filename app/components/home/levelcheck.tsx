@@ -21,7 +21,7 @@ const QUESTIONS = [
   { diff: "Confirming · C1", q: "Complete the sentence:", opts: ["Far from ___ the deadline, the team delivered early.", "miss", "to miss", "missing", "missed"], correct: 2 },
 ];
 
-export function LevelQuestSection() {
+export function LevelCheckSection() {
   const [qi, setQi] = useState(0);
   const [phase, setPhase] = useState<"answering" | "graded">("answering");
   const [picked, setPicked] = useState<number | null>(null);
