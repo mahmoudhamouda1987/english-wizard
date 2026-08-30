@@ -138,7 +138,7 @@ export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open
             Continue Exploring
           </button>
         </div>
-        <p className="subtle" style={{ fontSize: 12, textAlign: "center", margin: 0 }}>Core lessons and review stay free forever. No credit card needed for the trial.</p>
+        <p className="subtle" style={{ fontSize: 12, textAlign: "center", margin: 0 }}>Core lessons and review stay included with every account. No credit card needed for the trial.</p>
         <style>{`@keyframes upModal{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}`}</style>
       </div>
     </div>

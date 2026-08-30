@@ -200,6 +200,7 @@ function metaCell(page: PDFPage, label: string, value: string, x: number, y: num
 function footer(page: PDFPage, doc: PlacementReportDoc, pageNo: number, totalPages: number, h: PDFFont, b: PDFFont) {
   page.drawLine({ start: { x: M, y: 46 }, end: { x: W - M, y: 46 }, thickness: 0.8, color: HAIR });
   text(page, "ENGLISH WIZARD", M, 34, 7.5, NAVY, b);
+  text(page, "Intelligent English. Measurable Progress.", M + tw("ENGLISH WIZARD", 7.5, b) + 8, 34, 6.4, FAINT, h);
   text(page, DOC_SUBTITLE, M, 24, 6.6, FAINT, h);
   const midX = M + tw(DOC_SUBTITLE, 6.6, h) + 24;
   text(page, `Student ID ${doc.studentId}   ·   Report ID ${doc.reportRef}`, midX, 34, 6.6, MUTED, h);

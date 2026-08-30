@@ -84,7 +84,8 @@ export function PricingPlans() {
         </div>
       </div>
 
-      {/* ── Choose your path: one price per product ── */}
+      {/* ── Choose your path: one price per product (brand spec Part 15) ── */}
+      <h2 style={{ textAlign: "center", fontSize: "clamp(20px,2.6vw,26px)", letterSpacing: ".08em", margin: "0 0 22px" }}>CHOOSE YOUR PATH</h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 18 }}>
         {products.map((p) => <PlanCard key={p.product} plan={p} period={period} />)}
       </div>

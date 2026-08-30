@@ -20,18 +20,19 @@ const body = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: { default: "English Wizard — Prove your progress", template: "%s · English Wizard" },
-  description: "Adaptive AI English learning platform — CEFR placement, a tutor that remembers you, verifiable certificates and progress you can hear.",
+  title: { default: "English Wizard | Intelligent English. Measurable Progress.", template: "%s · English Wizard" },
+  description: "Personalised English learning from Pre-A1 to C2 — adaptive assessment places your level, a guided path builds your skills, and every step is measured so your progress is provable.",
   openGraph: {
-    title: "English Wizard — Prove your progress",
-    description: "CEFR Pre-A1 to C2, AI tutor with persistent memory, reality checkpoints and QR-verifiable certificates.",
+    title: "English Wizard | Intelligent English. Measurable Progress.",
+    description: "Personalised English learning from Pre-A1 to C2 — adaptive CEFR assessment, a guided learning path, and professional reports that prove your progress.",
     type: "website",
+    siteName: "English Wizard",
     images: ["/og-image.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "English Wizard — Prove your progress",
-    description: "Most apps measure streaks. We prove progress.",
+    title: "English Wizard | Intelligent English. Measurable Progress.",
+    description: "Adaptive CEFR assessment, personalised learning from Pre-A1 to C2, and professional reports that prove your progress.",
     images: ["/og-image.png"],
   },
   appleWebApp: { capable: true, title: "English Wizard", statusBarStyle: "black-translucent" },

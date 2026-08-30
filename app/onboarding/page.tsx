@@ -113,6 +113,7 @@ export default function OnboardingPage() {
           <>
             <div className="ob-wizard" aria-hidden="true">🧙</div>
             <p className="ob-eyebrow">Welcome to English Wizard</p>
+            <p className="ob-slogan" style={{ margin: "2px 0 0", fontSize: 14, fontWeight: 600, letterSpacing: ".05em", color: "rgba(255,255,255,.72)" }}>Intelligent English. Measurable Progress.</p>
             <h1 className="ob-h1">Your personalised journey to<br /><span className="ob-grad">confident English</span> starts here.</h1>
             <p className="ob-sub">A smarter way to learn — built around your level, your goals, and your progress.</p>
             <div className="ob-words" aria-hidden="true">
@@ -188,7 +189,7 @@ export default function OnboardingPage() {
         <div className="ob-controls">
           {step > 0 && <button className="ob-back" onClick={() => setStep(step - 1)}>← Back</button>}
           <button className="ob-cta" onClick={() => { if (step < 4) setStep(step + 1); else setScreen("setup"); }}>
-            {step === 0 ? "Begin My Journey" : step === 1 ? "Discover My Level" : step === 2 ? "See How It Adapts" : step === 3 ? "Show My Path" : "Continue"} →
+            {step === 0 ? "Begin My Journey" : step === 1 ? "Check My Level" : step === 2 ? "See How It Adapts" : step === 3 ? "Show My Path" : "Continue"} →
           </button>
         </div>
 

@@ -40,9 +40,10 @@ function AuthCard() {
     <main id="main-content" className="auth-shell">
       <section className="auth-art">
         <div className="art-logo"><Image src="/logo.png" alt="" width={44} height={44} unoptimized /> English Wizard</div>
+        <p className="art-slogan" style={{ margin: "6px 0 0", fontSize: 13.5, fontWeight: 600, letterSpacing: ".04em", color: "rgba(255,255,255,.75)" }}>Intelligent English. Measurable Progress.</p>
         <h2>Learn English the way it is really spoken.</h2>
         <ul className="auth-points">
-          <li><span className="pt-icon">✓</span> A 5-minute diagnostic places your true CEFR level</li>
+          <li><span className="pt-icon">✓</span> A 40-question adaptive LevelCheck places your true CEFR level</li>
           <li><span className="pt-icon">✓</span> Every lesson builds real, measured evidence of progress</li>
           <li><span className="pt-icon">✓</span> Spaced review turns mistakes into lasting memory</li>
           <li><span className="pt-icon">✓</span> Speaking, listening, reading and writing in one journey</li>
@@ -56,7 +57,7 @@ function AuthCard() {
         <div className="auth-card">
           <Image src="/logo.png" alt="English Wizard logo" width={56} height={56} style={{ borderRadius: 13 }} unoptimized />
           <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-          <p className="subtle">{mode === "login" ? "Sign in to continue your journey." : "Start with a free placement check today."}</p>
+          <p className="subtle">{mode === "login" ? "Sign in to continue your journey." : "Start your English journey with English Wizard."}</p>
           <form onSubmit={submit}>
             {mode === "register" && (
               <div className="input-wrap">

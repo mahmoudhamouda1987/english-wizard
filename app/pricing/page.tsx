@@ -47,6 +47,7 @@ export default function PricingPage() {
       </header>
       <main id="main-content" style={{ maxWidth: 1080, margin: "0 auto", padding: "48px 24px 80px" }}>
         <p className="eyebrow" style={{ textAlign: "center" }}>Simple, honest pricing</p>
+        <p style={{ textAlign: "center", fontSize: 15, fontWeight: 600, letterSpacing: ".04em", margin: "0 0 10px", color: "var(--text-secondary)" }}>Intelligent English. Measurable Progress.</p>
         <h1 style={{ textAlign: "center", fontSize: "clamp(32px, 5vw, 52px)", letterSpacing: "-.02em", margin: "8px 0 12px" }}>
           One price per product.<br />One subscription for everything.
         </h1>

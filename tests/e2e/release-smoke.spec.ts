@@ -27,7 +27,10 @@ test("public production shell and security release contract", async ({ request, 
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Master English/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Discover My Level" }).first()).toBeVisible();
+  // Brand identity (final brand spec Parts 1/4): slogan signature + CHECK MY LEVEL as the single primary CTA.
+  await expect(page.getByText("Intelligent English. Measurable Progress.").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Check My Level" }).first()).toBeVisible();
+  await expect(page.getByText(/Discover My Level/i)).toHaveCount(0);
   // Part 83: homepage offers entry pricing ("Explore plans"), never free-forever claims.
   await expect(page.getByRole("link", { name: /Explore plans/i })).toBeVisible();
   await expect(page.getByText(/free forever/i)).toHaveCount(0);

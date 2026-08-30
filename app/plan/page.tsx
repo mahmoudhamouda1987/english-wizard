@@ -64,15 +64,15 @@ export default function PlanPage() {
       {/* Trial-expired presentation (Part 23): premium continuation headline */}
       {access.trialExpired && (
         <section style={{ marginBottom: 26, textAlign: "center", padding: "34px 24px", borderRadius: 20, background: "linear-gradient(135deg,#0f1535,#2a1a4a)", color: "white" }}>
-          <p className="eyebrow" style={{ color: "#a5b4fc" }}>Your journey continues</p>
+          <p className="eyebrow" style={{ color: "#a5b4fc" }}>English Wizard · Your journey continues</p>
           <h1 style={{ fontSize: "clamp(28px,4.5vw,40px)", margin: "6px 0 10px", fontWeight: 900 }}>Continue Your English Journey</h1>
           <p style={{ fontSize: 15.5, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto" }}>
             Your LevelCheck discovered where you are. Now continue building the skills that take you where you want to go.
           </p>
         </section>
       )}
-      <p className="eyebrow">Your plan</p>
-      <h1 style={{ fontSize: "clamp(28px,4vw,40px)", margin: "4px 0 6px" }}>Subscription &amp; trial</h1>
+      <p className="eyebrow">English Wizard · Your plan</p>
+      <h1 style={{ fontSize: "clamp(28px,4vw,40px)", margin: "4px 0 6px" }}>Continue your learning journey</h1>
       <p className="subtle" style={{ margin: "0 0 24px" }}>Manage access to English Wizard&rsquo;s premium practice features.</p>
 
       {/* Trial status card */}

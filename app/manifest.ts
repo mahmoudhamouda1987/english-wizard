@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "English Wizard",
     short_name: "English Wizard",
-    description: "Adaptive AI English learning platform — prove your progress, not just your streak.",
+    description: "Personalised English learning from Pre-A1 to C2 — adaptive assessment, guided practice, and progress you can prove.",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#0b1020",

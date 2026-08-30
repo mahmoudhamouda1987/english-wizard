@@ -31,7 +31,7 @@ export const WORLDS: LearningWorld[] = [
   { id: "world-1", number: 1, title: "Survival", level: "A1", purpose: "Handle introductions, simple requests and everyday exchanges.", missionIds: ["mission-a1-meet", "mission-a1-order"] },
   { id: "world-2", number: 2, title: "Everyday Life", level: "A2", purpose: "Manage practical interactions, plans and problems.", missionIds: ["mission-a2-real-life", "mission-a2-problem"] },
   { id: "world-3", number: 3, title: "Independent English", level: "B1", purpose: "Communicate independently across common personal and work situations.", missionIds: ["mission-b1-independent"] },
-  { id: "world-4", number: 4, title: "Professional English", level: "B2", purpose: "Lead, negotiate, present and defend ideas.", missionIds: ["mission-b2-professional", "boss-b2-proposal"] },
+  { id: "world-4", number: 4, title: "Business English", level: "B2", purpose: "Lead, negotiate, present and defend ideas.", missionIds: ["mission-b2-professional", "boss-b2-proposal"] },
   { id: "world-5", number: 5, title: "Advanced English", level: "C1", purpose: "Handle complex discussion, analysis and persuasion.", missionIds: ["mission-c1-analysis"] },
   { id: "world-6", number: 6, title: "Mastery", level: "C2", purpose: "Communicate with precision, nuance and rhetorical flexibility.", missionIds: ["mission-c2-nuance", "boss-c2-live-in-english"] },
 ];

@@ -349,7 +349,7 @@ export const WORLDS_V2: LearningWorldV2[] = [
 
   /* ---------------- B2 — confident complex communication (Part 35) ---------------- */
   {
-    id: "b2-professional-english", level: "B2", number: 1, title: "Professional English",
+    id: "b2-professional-english", level: "B2", number: 1, title: "Business English",
     purpose: "Operate at a professional standard: meetings, reports, persuasion and the register that commands respect.",
     topics: ["Meetings", "Reports", "Persuasion", "Register"],
     willLearn: ["Leading discussions", "Writing structured reports", "Choosing register deliberately"],

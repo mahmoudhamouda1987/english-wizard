@@ -81,7 +81,7 @@ export function Hero() {
         <div className={`hp-mobile-menu${open ? " open" : ""}`}>
           <nav aria-label="Mobile">
             <Link href="/diagnostic" onClick={() => setOpen(false)} style={{ fontWeight: 800, color: "#c9b8ff" }}>
-              Discover My Level
+              Check My Level
             </Link>
             {NAV.map((n) => (
               <Link key={n.label} href={n.href} onClick={() => setOpen(false)}>{n.label}</Link>
@@ -95,7 +95,8 @@ export function Hero() {
         <section className="hp-hero" aria-labelledby="hp-hero-title">
           <div className="hp-hero-inner">
             <div>
-              <span className="hp-hero-badge"><i aria-hidden="true" />English Wizard · CEFR Pre-A1 → C2</span>
+              <span className="hp-hero-badge"><i aria-hidden="true" />English Wizard</span>
+              <p className="hp-hero-slogan">Intelligent English. Measurable Progress.</p>
               <h1 id="hp-hero-title" className="hp-display hp-h1">
                 Master English.
                 <br />

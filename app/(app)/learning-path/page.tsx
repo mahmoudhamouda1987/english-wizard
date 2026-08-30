@@ -114,7 +114,7 @@ export default function LearningPathPage() {
           General English ({generalOrdered.length})
         </button>
         <button type="button" className="f-chip" data-active={tab === "professional"} onClick={() => setTab("professional")}>
-          Professional English ({professionalOrdered.length})
+          Business English ({professionalOrdered.length})
         </button>
       </div>
 

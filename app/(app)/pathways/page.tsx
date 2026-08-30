@@ -120,9 +120,9 @@ export default function PathwaysPage() {
           </section>
 
           <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>Professional English</h2><span>28 lessons</span></div>
-            <p className="subtle">28 professional English lessons covering emails, meetings, presentations, negotiations, leadership, and executive communication — B1 through C2, each with scenes, exercises, and vocabulary.</p>
-            <a className="button" href="/learning-path">Open the Professional English curriculum</a>
+            <div className="panel-title"><h2>Business English</h2><span>28 lessons</span></div>
+            <p className="subtle">28 Business English lessons covering emails, meetings, presentations, negotiations, leadership, and executive communication — B1 through C2, each with scenes, exercises, and vocabulary.</p>
+            <a className="button" href="/learning-path">Open the Business English curriculum</a>
           </section>
         </>
       )}

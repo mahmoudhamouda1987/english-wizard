@@ -152,7 +152,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mini-track" aria-hidden="true"><span style={{ width: `${level?.percent ?? 0}%` }} /></div>
         </div>
         <InstallButton />
-        <Link className="upgrade-btn" href="/plan">Go further with Premium</Link>
+        <Link className="upgrade-btn" href="/plan">Go further with All Access</Link>
       </aside>
 
       <div className="dash-host">
@@ -208,7 +208,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
         <SidebarNav pathname={pathname} compact onNavigate={() => setDrawer(false)} />
-        <Link className="upgrade-btn" href="/plan" style={{ marginTop: 16 }}>Go further with Premium</Link>
+        <Link className="upgrade-btn" href="/plan" style={{ marginTop: 16 }}>Go further with All Access</Link>
       </div>
     </div>
   );

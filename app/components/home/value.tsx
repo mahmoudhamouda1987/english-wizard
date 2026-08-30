@@ -249,7 +249,7 @@ const EW = ["Placement before anything else", "Adaptive path aimed at your gaps"
 export function WhyAndOrganizations() {
   return (
     <>
-      <section className="hp-section hp-band-paper" aria-labelledby="hp-why-title">
+      <section id="why" className="hp-section hp-band-paper" aria-labelledby="hp-why-title">
         <div className="hp-wrap-wide">
           <Reveal className="hp-head hp-center">
             <span className="hp-eyebrow">The difference</span>
@@ -381,7 +381,7 @@ export function Conversion() {
           </Reveal>
           <Reveal delay={2}>
             <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-              <Link className="hp-btn hp-btn-primary" href="/diagnostic">Discover My Level</Link>
+              <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My Level</Link>
               <Link className="hp-btn hp-btn-ghost" href="/plan" style={{ color: "var(--hp-text)" }}>Explore English Wizard</Link>
             </div>
             <p className="hp-hero-micro" style={{ textAlign: "center", color: "var(--hp-faint)" }}>Adaptive placement &bull; Pre-A1 to C2 &bull; About 30 minutes</p>
@@ -401,32 +401,35 @@ export function Footer() {
       <div className="hp-footer-inner">
         <div>
           <strong className="brand"><Image src="/logo.png" alt="" width={30} height={30} unoptimized /> English Wizard</strong>
+          <p className="hp-footer-slogan">Intelligent English. Measurable Progress.</p>
           <p>Evidence-based English learning on the CEFR scale. Measure where you stand, learn what you need, and prove how far you have come.</p>
         </div>
         <div>
           <h4>Learn</h4>
           <nav aria-label="Footer — learn">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/plan">Learning path</Link>
-            <Link href="/cambridge/course">Cambridge pathway</Link>
-            <Link href="/ielts/course">IELTS pathway</Link>
+            <Link href="/general-english">General English</Link>
+            <Link href="/business-english">Business English</Link>
+            <Link href="/fluency-track">Fluency Track</Link>
+            <Link href="/ielts">IELTS</Link>
+            <Link href="/cambridge">Cambridge</Link>
           </nav>
         </div>
         <div>
-          <h4>Product</h4>
-          <nav aria-label="Footer — product">
+          <h4>Assess</h4>
+          <nav aria-label="Footer — assess">
             <Link href="/diagnostic">LevelCheck</Link>
-            <Link href="/pricing">Pricing</Link>
             <Link href="/report">Reports</Link>
-            <Link href="/onboarding">Start free</Link>
+            <Link href="/#organizations">For Organisations</Link>
+            <Link href="/pricing">Pricing</Link>
           </nav>
         </div>
         <div>
           <h4>Company</h4>
           <nav aria-label="Footer — company">
-            <Link href="/#organizations">For Organisations</Link>
-            <Link href="/auth">Sign in</Link>
+            <Link href="/#why">About</Link>
             <Link href="/pricing">Contact</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
           </nav>
         </div>
       </div>
