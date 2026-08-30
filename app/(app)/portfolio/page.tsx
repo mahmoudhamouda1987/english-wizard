@@ -109,14 +109,22 @@ export default function PortfolioPage() {
                     <span className="ach-icon" aria-hidden="true"><IconCertificate size={17} /></span>
                     <span className="mi-body">
                       <strong>CEFR {c.level}</strong>
-                      <small>Issued {new Date(c.issuedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</small>
-                    </span>
+                      <small>Issued {new Date(c.issuedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</small>                    </span>
                     <span className="mi-meta">{c.overallPercent}% mastery · open →</span>
                   </Link>
                 ))}
               </div>
             </section>
           ) : null}
+
+          <section className="panel" aria-label="Fluency Passport">
+            <div className="panel-title"><h3>Fluency Passport</h3><span>Spoken-fluency evidence</span></div>
+            <p className="subtle" style={{ margin: "0 0 12px", lineHeight: 1.6 }}>
+              Fluency Track checkpoints build toward your shareable passport — verified level, skills and a checkable
+              report reference in one credential.
+            </p>
+            <Link className="button secondary" href="/fluency-passport">Open your Fluency Passport</Link>
+          </section>
 
           <div className="filters" role="group" aria-label="Filter your evidence by skill">
             <span className="f-label">Skill</span>

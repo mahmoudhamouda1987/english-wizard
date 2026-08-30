@@ -48,9 +48,9 @@ export function LevelQuestSection() {
     <section className="hp-section hp-band-paper" aria-labelledby="hp-lc-title" id="levelcheck">
       <div className="hp-wrap">
         <Reveal className="hp-head hp-center">
-          <span className="hp-eyebrow">Your first step · LevelQuest</span>
+          <span className="hp-eyebrow">Your first step · LevelCheck</span>
           <h2 id="hp-lc-title" className="hp-display hp-h2">Know your English.<br />Not just your score.</h2>
-          <p className="hp-lead">Most tests hand you a number. LevelQuest walks your ability boundary — question by question — until it knows exactly where you stand.</p>
+          <p className="hp-lead">Most tests hand you a number. LevelCheck walks your ability boundary — question by question — until it knows exactly where you stand.</p>
         </Reveal>
 
         <div className="hp-adapt">
@@ -69,7 +69,7 @@ export function LevelQuestSection() {
           </Reveal>
 
           <Reveal delay={1}>
-            <div className="hp-adapt-visual" role="img" aria-label="Illustrative preview of an adaptive LevelQuest assessment question">
+            <div className="hp-adapt-visual" role="img" aria-label="Illustrative preview of an adaptive LevelCheck assessment question">
               <div className="hp-assess-meta"><span>Live demo · Question {qi + 1} of {QUESTIONS.length}</span><span>{Math.round(((qi + 1) / QUESTIONS.length) * 100)}% explored</span></div>
               <span className="hp-assess-diff"><IconTarget size={13} /> {q.diff}</span>
               <p className="hp-assess-q" style={{ marginTop: 16 }}>{q.q}</p>
@@ -87,7 +87,7 @@ export function LevelQuestSection() {
                 )
               ))}
               <div className="hp-assess-foot">
-                <span>{phase === "graded" ? "Response recorded — recalibrating…" : "LevelQuest is listening to your answers…"}</span>
+                <span>{phase === "graded" ? "Response recorded — recalibrating…" : "LevelCheck is listening to your answers…"}</span>
                 <IconArrow size={16} />
               </div>
             </div>
@@ -95,7 +95,7 @@ export function LevelQuestSection() {
         </div>
 
         <Reveal className="hp-center" style={{ marginTop: 56 }}>
-          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
+          <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My Level</Link>
         </Reveal>
       </div>
 
@@ -111,7 +111,7 @@ export function LevelQuestSection() {
           <div className="hp-trans-flow">
             <div className="hp-trans-node hp-trans-b2">
               <span className="hp-big">B2</span>
-              <small>LevelQuest result</small>
+              <small>LevelCheck result</small>
             </div>
             <span className="hp-trans-arrow" aria-hidden="true">→</span>
             <div className="hp-trans-node hp-trans-b2">

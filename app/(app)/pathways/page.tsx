@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { UpgradeModal } from "@/app/components/upgrade-modal";
 import { PageHeader } from "@/app/components/page-header";
 
@@ -28,17 +28,11 @@ type ExamPathwayView = {
 type Selection = { pathway: string; domain?: string; track?: string; target?: string; selectedAt: string };
 
 export default function PathwaysPage() {
-  const router = useRouter();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [selected, setSelected] = useState<Selection | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [premium, setPremium] = useState<boolean | null>(null);
   const [gate, setGate] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/access", { cache: "no-store" }).then((r) => r.json()).then((a) => setPremium(Boolean(a.premium))).catch(() => setPremium(true));
-  }, []);
 
   useEffect(() => {
     fetch("/api/pathways", { cache: "no-store" })
@@ -85,10 +79,14 @@ export default function PathwaysPage() {
       <PageHeader
         eyebrow="Assess & prepare"
         title="Tests & Exams"
-        purpose="Choose the pathway that fits your goal. Each keeps its own readiness evidence, separate from general English mastery — preparation never implies official certification."
+        purpose="Assessment infrastructure: LevelCheck placement, module tests and full mock exams. Preparation products live in their own destinations — preparation never implies official certification."
         action="Take the mock exam"
         actionHref="/pathways/mock"
       />
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
+        <Link className="button secondary" href="/diagnostic">LevelCheck placement</Link>
+        <Link className="button secondary" href="/pathways/mock">Full mock exam</Link>
+      </div>
       <p className="subtle" style={{ margin: 0, fontSize: 13.5 }}>The mock exam covers reading, writing and speaking in ten minutes, with a transparent band estimate against CEFR descriptors.</p>
       {message && <p role="status" className="state-card">{message}</p>}
       {selected && (
@@ -109,7 +107,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
             <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
             <p className="muted">{catalog.ielts.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/ielts"); }}>Open IELTS preparation</button>
+            <Link className="button" href="/ielts">Open IELTS product</Link>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
           </section>
 
@@ -117,7 +115,7 @@ export default function PathwaysPage() {
             <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
             <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
             <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <button className="button" onClick={() => { if (premium === false) setGate("EXAM_PATHWAY"); else router.push("/pathways/cambridge"); }}>Open Cambridge preparation</button>
+            <Link className="button" href="/cambridge">Open Cambridge product</Link>
             <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
           </section>
 

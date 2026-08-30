@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { speakText } from "@/src/domain/tts";
 
 type WordInfo = { meaning: string; arabicMeaning: string; arabicAvailable?: boolean; pronunciation: string; partOfSpeech: string; source?: string };
@@ -13,27 +13,29 @@ export function WordPopover({ word }: { word: string }) {
   const clean = word.replace(/[^A-Za-z'-]/g, "").toLowerCase();
   const [info, setInfo] = useState<WordInfo | null>(null);
   const [open, setOpen] = useState(false);
+  // Lookup is deferred until the learner actually opens the popover — one
+  // request per word, only for words the learner asks about.
+  const [fetched, setFetched] = useState(false);
 
-  useEffect(() => {
-    if (!clean) return;
-    let active = true;
+  function ensureInfo() {
+    if (fetched || !clean) return;
+    setFetched(true);
     fetch(`/api/word?word=${encodeURIComponent(clean)}`, { cache: "force-cache" })
       .then((response) => response.ok ? response.json() : null)
       .then((payload: WordInfo | null) => {
-        if (active && payload) setInfo(payload);
+        if (payload) setInfo(payload);
       })
       .catch(() => undefined);
-    return () => { active = false; };
-  }, [clean]);
+  }
 
   if (!/^[a-z][a-z'-]*$/i.test(clean)) return <span>{word}</span>;
 
   return (
     <span
       tabIndex={0}
-      onFocus={() => setOpen(true)}
+      onFocus={() => { ensureInfo(); setOpen(true); }}
       onBlur={() => setOpen(false)}
-      onMouseEnter={() => setOpen(true)}
+      onMouseEnter={() => { ensureInfo(); setOpen(true); }}
       onMouseLeave={() => setOpen(false)}
       style={{ position: "relative", cursor: "help", textDecoration: "underline dotted", textDecorationThickness: 1 }}
     >

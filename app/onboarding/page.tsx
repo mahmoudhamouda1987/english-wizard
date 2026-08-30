@@ -171,7 +171,7 @@ export default function OnboardingPage() {
         {step === 4 && (
           <>
             <p className="ob-eyebrow">Start Assessment</p>
-            <h1 className="ob-h1">Your first mission is <span className="ob-grad">Check My English</span> — our adaptive placement assessment.</h1>
+            <h1 className="ob-h1">Your first mission is <span className="ob-grad">Check My Level</span> — our adaptive placement assessment.</h1>
             <div className="ob-mission">
               <div className="ob-mission-grid">
                 <div><strong>⏱️ ~30 min</strong><span>adaptive maximum</span></div>
@@ -248,6 +248,11 @@ export default function OnboardingPage() {
               );
             })}
           </div>
+          <p className="subtle" style={{ margin: "10px 0 0", fontSize: 12.5, lineHeight: 1.6 }}>
+            However you answer, LevelCheck places you first — then the platform routes you: General English for the core
+            journey, Business English for work outcomes, IELTS or Cambridge for exam targets, and the Fluency Track for
+            speaking. One profile, every product.
+          </p>
         </fieldset>
 
         {error && <p role="alert" style={{ color: "#a53b3b" }}>{error}</p>}

@@ -103,3 +103,38 @@ CREATE INDEX IF NOT EXISTS placement_reports_learner_idx ON placement_reports(le
 
 -- Student IDs
 ALTER TABLE learners ADD COLUMN IF NOT EXISTS student_id TEXT;
+
+-- ============ B2B ASSESSMENT INFRASTRUCTURE (2.0 Parts 94-96) ============
+CREATE TABLE IF NOT EXISTS b2b_organisations (
+  id UUID PRIMARY KEY,
+  name TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  api_key_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS b2b_assessments (
+  id UUID PRIMARY KEY,
+  organisation_id UUID NOT NULL REFERENCES b2b_organisations(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  system TEXT NOT NULL DEFAULT 'LEVELCHECK' CHECK (system IN ('LEVELCHECK','IELTS','CAMBRIDGE')),
+  link_token TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','COMPLETED','EXPIRED')),
+  candidate_email TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS b2b_results (
+  id UUID PRIMARY KEY,
+  assessment_id UUID NOT NULL REFERENCES b2b_assessments(id) ON DELETE CASCADE,
+  candidate_ref TEXT NOT NULL,
+  cefr_level TEXT NOT NULL,
+  skill_profile JSONB NOT NULL,
+  percent INTEGER NOT NULL,
+  report_id TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS b2b_assessments_org_idx ON b2b_assessments(organisation_id);
+CREATE INDEX IF NOT EXISTS b2b_results_assessment_idx ON b2b_results(assessment_id);

@@ -90,7 +90,7 @@ export default function LevelQuestPage() {
         const r = await fetch("/api/levelquest", { cache: "no-store" });
         const p = await r.json();
         if (!r.ok) {
-          setError(p.error ?? "Unable to load LevelQuest.");
+          setError(p.error ?? "Unable to load LevelCheck.");
           setLoading(false);
           return;
         }
@@ -109,7 +109,7 @@ export default function LevelQuestPage() {
         setOptions(orderOptions(p.paper ?? [], typeof p.variant === "number" ? p.variant : 0));
         setLoading(false);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Unable to load LevelQuest.");
+        setError(e instanceof Error ? e.message : "Unable to load LevelCheck.");
         setLoading(false);
       }
     })();
@@ -240,7 +240,7 @@ export default function LevelQuestPage() {
 
   if (report) return <ReportView report={report} />;
   if (processing) return <ProcessingView />;
-  if (loading) return <Centered><Spinner text="Preparing LevelQuest…" /></Centered>;
+  if (loading) return <Centered><Spinner text="Preparing LevelCheck…" /></Centered>;
 
   /* Auth gate when no session exists */
   if (paper.length === 0 && !started) return (
@@ -250,7 +250,7 @@ export default function LevelQuestPage() {
         <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>Adaptive English Placement Assessment</p>
         <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELQUEST</h1>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto 26px" }}>
-          LevelQuest adapts to you. As your answers demonstrate stronger English ability, the challenge increases.
+          LevelCheck adapts to you. As your answers demonstrate stronger English ability, the challenge increases.
           If questions become too difficult, the assessment adjusts to accurately identify your current level.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px,1fr))", gap: 12, maxWidth: 560, margin: "0 auto 28px" }}>
@@ -297,7 +297,7 @@ export default function LevelQuestPage() {
           ))}
         </div>
         <p className="subtle" style={{ fontSize: 12.5, marginBottom: 20 }}>Estimated completion: ~25 minutes &middot; your progress is saved automatically</p>
-        <button onClick={() => { setStarted(true); track("levelquest_started"); }} className="button" style={{ padding: "16px 44px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)", boxShadow: "0 10px 26px rgba(104,64,214,.35)", letterSpacing: ".03em" }}>Start LevelQuest →</button>
+        <button onClick={() => { setStarted(true); track("levelcheck_started"); }} className="button" style={{ padding: "16px 44px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)", boxShadow: "0 10px 26px rgba(104,64,214,.35)", letterSpacing: ".03em" }}>Start LevelCheck →</button>
       </div>
     </Centered>
   );
@@ -309,7 +309,7 @@ export default function LevelQuestPage() {
         <div className="journey-header-inner" style={{ maxWidth: 880 }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
             <strong style={{ fontSize: 15 }}>English Wizard</strong>
-            <span className="pill">Level check</span>
+            <span className="pill">LEVELCHECK</span>
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
             {progress && <span style={{ fontSize: 12.5, color: "var(--text-secondary)", fontWeight: 600 }}>{progress.objectiveAnswered + progress.speakingAnswered} / ~{progress.target} answered</span>}

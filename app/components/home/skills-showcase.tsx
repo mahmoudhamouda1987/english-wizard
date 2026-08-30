@@ -119,7 +119,7 @@ export function SkillsShowcase() {
                 <span className="hp-skill-ico"><s.icon size={22} /></span>
                 <strong>{s.label}</strong>
                 <p>{s.blurb}</p>
-                <small>LevelQuest range · {s.score}</small>
+                <small>LevelCheck range · {s.score}</small>
               </button>
             </Reveal>
           ))}
@@ -150,7 +150,7 @@ const SHOTS = [
     screen: "speaking", icon: IconMic,
   },
   {
-    n: "04", title: "LevelQuest", small: "The adaptive assessment behind it all",
+    n: "04", title: "LevelCheck", small: "The adaptive assessment behind it all",
     screen: "assessment", icon: IconTarget,
   },
   {
@@ -213,7 +213,7 @@ function Screen({ s }: { s: Screen }) {
   if (s === "assessment") {
     return (
       <div>
-        <div className="hp-assess-meta"><span>LevelQuest · adaptive</span><span>~30 min</span></div>
+        <div className="hp-assess-meta"><span>LevelCheck · adaptive</span><span>~30 min</span></div>
         <p className="hp-assess-q">The review described the method as rigorous but <em>contentious</em>. The method is most likely…</p>
         <span className="hp-assess-opt" data-state="correct">likely to cause disagreement</span>
         <span className="hp-assess-opt">out of date</span>

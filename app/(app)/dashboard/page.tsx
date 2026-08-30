@@ -213,7 +213,7 @@ export default function DashboardPage() {
           <h2>Start by checking your English</h2>
           <p>A short adaptive assessment finds your level across reading, writing and listening — then everything on this dashboard is built around you.</p>
           <div className="nba-actions">
-            <Link href="/diagnostic" className="button nba-btn">Check my English</Link>
+            <Link href="/diagnostic" className="button nba-btn">Check my level</Link>
             <Link href="/learning-path" className="button nba-btn-ghost">Preview the journey</Link>
           </div>
         </section>
@@ -222,7 +222,7 @@ export default function DashboardPage() {
           {/* 2 — Next best action (Part 20) */}
           <section className="nba-card" aria-label="Your next best step">
             <span className="nba-eyebrow">Your next best step</span>
-            <h2>{lesson ? `Continue: ${lesson.title}` : "Check my English"}</h2>
+            <h2>{lesson ? `Continue: ${lesson.title}` : "Check my level"}</h2>
             <p>
               {lesson
                 ? `${lesson.mission.charAt(0).toUpperCase()}${lesson.mission.slice(1)} — ${skillWhy(String(lesson.skill))}.`
@@ -234,7 +234,7 @@ export default function DashboardPage() {
             </div>
             <div className="nba-actions">
               <Link href={lesson ? `/learn?lesson=${encodeURIComponent(lesson.id)}` : "/diagnostic"} className="button nba-btn">
-                {lesson ? "Continue" : "Check my English"}
+                {lesson ? "Continue" : "Check my level"}
               </Link>
               <Link href="/learning-path" className="button nba-btn-ghost">View my journey</Link>
             </div>

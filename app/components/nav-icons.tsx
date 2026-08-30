@@ -44,3 +44,8 @@ export const IconSpark = base(<path d="M12 2.5 14 9l6.5 2-6.5 2-2 6.5-2-6.5L3.5 
 export const IconCheck = base(<path d="m4.5 12.5 5 5 10-11" />);
 export const IconChart = base(<><path d="M4 20V10M10 20V4M16 20v-7M21 20H3" /></>);
 export const IconFlag = base(<><path d="M5 21V4" /><path d="M5 4c4-2 7 2 11 0v9c-4 2-7-2-11 0" /></>);
+
+/** 2.0 product icons */
+export const IconBriefcase = base(<><rect x="3" y="7.5" width="18" height="13" rx="2" /><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5" /><path d="M3 12.5h18" /><path d="M12 11v3" /></>);
+export const IconBoard = base(<><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M7 9h6M7 12.5h4" /><circle cx="16.5" cy="10.5" r="2" /><path d="M12 17v3.5M8.5 20.5h7" /></>);
+export const IconFlame = base(<path d="M12 3c1 3-3.5 5-3.5 9a5.5 5.5 0 0 0 11 0c0-2.5-1.5-4-2.5-5-.3 1.2-1 2-2 2.3.6-2.3-.6-5-3-6.3z" />);

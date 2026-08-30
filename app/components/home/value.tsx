@@ -11,7 +11,7 @@ import {
 
 const ENGINE = [
   { t: "You", s: "start here" },
-  { t: "LevelQuest", s: "30-minute adaptive assessment" },
+  { t: "LevelCheck", s: "30-minute adaptive assessment" },
   { t: "Your level", s: "precise CEFR placement" },
   { t: "Your skills", s: "profiled across four dimensions" },
   { t: "Your gaps", s: "named, not guessed" },
@@ -60,7 +60,7 @@ export function LearningPath() {
           <Reveal>
             <span className="hp-eyebrow">A path, not a pile of lessons</span>
             <h2 id="hp-path-title" className="hp-display hp-h2" style={{ margin: "14px 0 18px" }}>Aspirational,<br />and tangible.</h2>
-            <p className="hp-lead">This is what an example learner at B2 sees after LevelQuest. Every bar is measured, every stop on the path has a reason.</p>
+            <p className="hp-lead">This is what an example learner at B2 sees after LevelCheck. Every bar is measured, every stop on the path has a reason.</p>
             <p className="hp-caption" style={{ marginTop: 14 }}>Example learner profile — your path is generated from your own assessment.</p>
           </Reveal>
           <Reveal delay={1}>
@@ -199,11 +199,11 @@ export function ReportSection() {
       <div className="hp-wrap">
         <div className="hp-report">
           <Reveal>
-            <div className="hp-report-doc" role="img" aria-label="Preview of an English Wizard LevelQuest assessment report">
+            <div className="hp-report-doc" role="img" aria-label="Preview of an English Wizard LevelCheck assessment report">
               <div className="hp-report-head">
                 <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
                   <Image src="/logo.png" alt="" width={34} height={34} unoptimized />
-                  <span><strong>LevelQuest Report</strong><small>English Wizard · CEFR-aligned assessment</small></span>
+                  <span><strong>LevelCheck Report</strong><small>English Wizard · CEFR-aligned assessment</small></span>
                 </span>
                 <span className="hp-report-qr" aria-hidden="true" />
               </div>
@@ -311,7 +311,7 @@ export function WhyAndOrganizations() {
 /* ---------------- §26 Pricing preview + §27 Trial + §28 Final CTA + §29 Footer ---------------- */
 
 const FREE = ["Full learning path, Pre-A1 → C2", "All four skills", "Vocabulary and grammar curriculum", "Review engine with spaced practice", "Reality checkpoints"];
-const FULL = ["Everything in Free, unlimited", "AI tutor that remembers you", "Speaking practice with evidence", "Adaptive LevelQuest assessments", "Professional PDF reports", "Exam preparation where available"];
+const FULL = ["Everything in Free, unlimited", "AI tutor that remembers you", "Speaking practice with evidence", "Adaptive LevelCheck assessments", "Professional PDF reports", "Exam preparation where available"];
 
 export function Conversion() {
   return (
@@ -410,14 +410,14 @@ export function Footer() {
           <nav aria-label="Footer — learn">
             <Link href="/dashboard">Dashboard</Link>
             <Link href="/plan">Learning path</Link>
-            <Link href="/pathways/cambridge">Cambridge pathway</Link>
-            <Link href="/pathways/ielts">IELTS pathway</Link>
+            <Link href="/cambridge/course">Cambridge pathway</Link>
+            <Link href="/ielts/course">IELTS pathway</Link>
           </nav>
         </div>
         <div>
           <h4>Product</h4>
           <nav aria-label="Footer — product">
-            <Link href="/diagnostic">LevelQuest</Link>
+            <Link href="/diagnostic">LevelCheck</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/report">Reports</Link>
             <Link href="/onboarding">Start free</Link>

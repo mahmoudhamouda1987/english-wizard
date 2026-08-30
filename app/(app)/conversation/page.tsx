@@ -52,26 +52,27 @@ function TooltipWord({ word }: { word: string }) {
     return hit ? { meaning: "Learner vocabulary", arabic: hit.arabic, pronunciation: hit.pronunciation, partOfSpeech: "word" } : null;
   });
   const [open, setOpen] = useState(false);
+  // Lookup is deferred until the learner actually opens the popover: fetching
+  // every word on mount floods the dictionary service for data most views
+  // never display. One request per word, cached in state afterwards.
+  const [fetched, setFetched] = useState(Boolean(CURATED[clean]));
 
-  useEffect(() => {
-    if (!clean || CURATED[clean] || info) return;
-    let active = true;
+  function ensureInfo() {
+    if (fetched || !clean || CURATED[clean]) return;
+    setFetched(true);
     fetch(`/api/word?word=${encodeURIComponent(clean)}`, { cache: "force-cache" })
       .then((r) => (r.ok ? r.json() : null))
       .then((p) => {
-        if (!active || !p) return;
+        if (!p) return;
         setInfo({ meaning: p.meaning, arabic: p.arabicMeaning, pronunciation: p.pronunciation, partOfSpeech: p.partOfSpeech });
       })
       .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [clean, info]);
+  }
 
   if (!/^[a-z][a-z'-]*$/i.test(clean)) return <span>{word}</span>;
 
   return (
-    <span className="word-help" tabIndex={0} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <span className="word-help" tabIndex={0} onFocus={() => { ensureInfo(); setOpen(true); }} onBlur={() => setOpen(false)} onMouseEnter={() => { ensureInfo(); setOpen(true); }} onMouseLeave={() => setOpen(false)}>
       {word}
       {open && (
         <span className="word-popover" role="tooltip">

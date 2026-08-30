@@ -13,7 +13,7 @@ const NAV = [
   { label: "Learn", href: "/dashboard" },
   { label: "Levels", href: "/#cefr" },
   { label: "Skills", href: "/#skills" },
-  { label: "Check My English", href: "/diagnostic" },
+  { label: "Check My Level", href: "/diagnostic" },
   { label: "For Organizations", href: "/#organizations" },
   { label: "Pricing", href: "/pricing" },
 ];
@@ -33,7 +33,7 @@ const TRUST = [
   { icon: IconTarget, text: "CEFR-aligned learning" },
   { icon: IconRoute, text: "Pre-A1 → C2" },
   { icon: IconChart, text: "4 core skills" },
-  { icon: IconShield, text: "Adaptive LevelQuest" },
+  { icon: IconShield, text: "Adaptive LevelCheck" },
   { icon: IconRoute, text: "Personalised learning path" },
   { icon: IconDoc, text: "Professional assessment report" },
 ];
@@ -69,7 +69,7 @@ export function Hero() {
           </nav>
           <div className="hp-nav-cta">
             <Link className="hp-nav-signin" href="/auth">Sign in</Link>
-            <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
+            <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My Level</Link>
             <ThemeToggle />
           </div>
           <button
@@ -109,7 +109,7 @@ export function Hero() {
                 and helps you progress from Pre-A1 to C2 — with proof, not promises.
               </p>
               <div className="hp-hero-ctas">
-                <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My English</Link>
+                <Link className="hp-btn hp-btn-primary" href="/diagnostic">Check My Level</Link>
                 <Link className="hp-btn hp-btn-ghost on-dark" href="/plan">Explore the Journey</Link>
               </div>
               <p className="hp-hero-micro">Adaptive placement &bull; Pre-A1 to C2 &bull; About 30 minutes</p>
@@ -127,7 +127,7 @@ export function Hero() {
             {/* Interactive learner ecosystem */}
             <div className="hp-eco" role="group" aria-label="Interactive preview of the English Wizard learner experience">
               <div className="hp-eco-card hp-eco-check" aria-hidden="true">
-                <div className="hp-eco-check-head"><span>LevelQuest</span><span style={{ color: "#2fbd8f" }}>done</span></div>
+                <div className="hp-eco-check-head"><span>LevelCheck</span><span style={{ color: "#2fbd8f" }}>done</span></div>
                 <div className="hp-eco-check-body">
                   <div style={{ fontSize: 13, fontWeight: 700 }}>Result: <span style={{ color: "#6a3fe0" }}>B2 · Upper-intermediate</span></div>
                   <div className="hp-cefr-sbar"><span>Reading</span><span className="track"><i style={{ width: "78%" }} /></span></div>

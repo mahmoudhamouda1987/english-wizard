@@ -3,7 +3,7 @@ import {
   IconHome, IconRoute, IconBook, IconGlobe, IconChat, IconMask, IconMic, IconWand,
   IconClock, IconShield, IconTarget, IconFolder, IconEar, IconFilm, IconPen,
   IconLetters, IconPuzzle, IconBulb, IconCertificate, IconTeacher, IconUsers,
-  IconGift, IconGear, IconChart,
+  IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame, IconSearch,
 } from "./nav-icons";
 
 export interface NavItem {
@@ -22,11 +22,12 @@ export interface NavGroup {
 }
 
 /**
- * Final information architecture (Part 99):
- * eight collapsible groups, one assessment destination, no duplicates.
- * Removed: Quick Practice, Leaderboard, LevelQuest duplicate navigation,
- * standalone Mistakes (folded into Review & Mastery) and Achievements
- * (folded into Portfolio & Evidence).
+ * 2.0 information architecture:
+ * nine collapsible groups — eight from 1.0 plus PRODUCTS (five distinct
+ * product destinations per the 2.0 contract, Parts 3/14/16).
+ * Tests & Exams is pure assessment infrastructure; products own their routes.
+ * Still absent by design: Quick Practice, Leaderboard, LevelQuest duplicate
+ * navigation, standalone Mistakes/Achievements (redirected).
  */
 export const NAV_GROUPS: NavGroup[] = [
   {
@@ -87,8 +88,20 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Assess & Prepare",
     desc: "Checkpoints and exams.",
     items: [
-      { label: "Tests & Exams", href: "/pathways", icon: IconCertificate },
+      { label: "Tests & Exams", href: "/pathways", icon: IconCertificate, desc: "LevelCheck, mocks and module tests" },
       { label: "Chunks & Mediation", href: "/chunks", icon: IconPuzzle },
+    ],
+  },
+  {
+    key: "products",
+    label: "Products",
+    desc: "Five focused programmes.",
+    items: [
+      { label: "General English", href: "/general-english", icon: IconGlobe, desc: "Pre-A1 → C2 core curriculum" },
+      { label: "Business English", href: "/business-english", icon: IconBriefcase, desc: "Real workplace outcomes" },
+      { label: "IELTS", href: "/ielts", icon: IconBoard, desc: "Academic & General Training" },
+      { label: "Cambridge", href: "/cambridge", icon: IconCertificate, desc: "A2 Key → C2 Proficiency" },
+      { label: "Fluency Track", href: "/fluency-track", icon: IconFlame, desc: "Spoken fluency, B1 → C2" },
     ],
   },
   {
@@ -96,6 +109,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Tools",
     desc: "Support and community.",
     items: [
+      { label: "Search", href: "/search", icon: IconSearch },
       { label: "Teacher AI", href: "/teacher-help", icon: IconTeacher },
       { label: "Community", href: "/community", icon: IconUsers },
       { label: "Invite Friends", href: "/referral", icon: IconGift },
