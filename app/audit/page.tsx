@@ -1,7 +1,7 @@
 import { isAuditMode } from "@/src/infrastructure/audit-mode";
 import { AuditPanel } from "./panel";
 
-export const metadata = { title: "Audit — English Wizard", robots: { index: false, follow: false } };
+export const metadata = { title: "Audit", robots: { index: false, follow: false } };
 
 /**
  * Developer audit control panel (spec Parts 94–99). The page itself is

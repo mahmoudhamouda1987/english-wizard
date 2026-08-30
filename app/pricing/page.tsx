@@ -5,7 +5,7 @@ import { PricingPlans } from "./plans";
 import { TRIAL_DURATION_DAYS } from "@/src/domain/trial";
 
 export const metadata = {
-  title: "Pricing — English Wizard",
+  title: "Pricing",
   description: "One price per product, or All Access. Start with a 7-day trial, then choose the path that fits your goal.",
 };
 

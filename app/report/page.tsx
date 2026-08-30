@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "English Proficiency Placement Report — English Wizard",
+  title: "English Proficiency Placement Report",
   description: "Your CEFR-aligned English proficiency placement report.",
 };
 

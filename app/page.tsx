@@ -9,11 +9,11 @@ import {
 } from "@/app/components/home/value";
 
 export const metadata: Metadata = {
-  title: "Master English. Know Exactly Where You Stand. — English Wizard",
+  title: "English Wizard | Intelligent English. Measurable Progress.",
   description:
     "English Wizard measures your English with an adaptive LevelCheck (Pre-A1 to C2), builds your personalised learning path, trains all four skills, and documents your progress with verifiable CEFR-aligned reports.",
   openGraph: {
-    title: "Master English. Know Exactly Where You Stand. — English Wizard",
+    title: "English Wizard | Intelligent English. Measurable Progress.",
     description:
       "Adaptive CEFR placement, a personalised learning path and verifiable progress reports — English for real life, Pre-A1 to C2.",
     type: "website",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Master English. Know Exactly Where You Stand.",
+    title: "English Wizard | Intelligent English. Measurable Progress.",
     description: "Adaptive LevelCheck, personalised path, four skills, verifiable reports — Pre-A1 to C2.",
     images: ["/og-image.png"],
   },
