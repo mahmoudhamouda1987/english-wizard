@@ -28,6 +28,8 @@ test("public production shell and security release contract", async ({ request, 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Master English/i })).toBeVisible();
   await expect(page.getByRole("link", { name: "Discover My Level" }).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: /Start learning free/i })).toBeVisible();
+  // Part 83: homepage offers entry pricing ("Explore plans"), never free-forever claims.
+  await expect(page.getByRole("link", { name: /Explore plans/i })).toBeVisible();
+  await expect(page.getByText(/free forever/i)).toHaveCount(0);
   expect(await page.locator('img[alt="English Wizard logo"]').first().isVisible()).toBeTruthy();
 });

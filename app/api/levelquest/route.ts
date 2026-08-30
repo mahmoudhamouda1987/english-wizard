@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
+import { isAuditMode } from "@/src/infrastructure/audit-mode";
 import {
   paperForVariant,
   variantForLearner,
@@ -160,6 +162,16 @@ export async function GET() {
       variant = state.variant;
     } else {
       variant = await pickVariedVariant(session.learnerId);
+      /* Audit mode (Part 95): honour a developer-selected variant for this
+       * sitting. Env-gated; the cookie is set only by /api/audit and is
+       * consumed once. Never honoured in production. */
+      if (isAuditMode()) {
+        const jar = await cookies();
+        const forced = Number(jar.get("ew-audit-variant")?.value ?? "");
+        if (Number.isInteger(forced) && forced >= 1 && forced <= VARIANT_THEMES.length) {
+          variant = forced;
+        }
+      }
     }
 
     if (!state) {

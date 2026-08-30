@@ -248,7 +248,7 @@ export default function LevelQuestPage() {
       <div style={{ maxWidth: 640 }}>
         <LevelQuestMark />
         <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>Adaptive English Placement Assessment</p>
-        <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELQUEST</h1>
+        <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELCHECK</h1>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto 26px" }}>
           LevelCheck adapts to you. As your answers demonstrate stronger English ability, the challenge increases.
           If questions become too difficult, the assessment adjusts to accurately identify your current level.
@@ -275,7 +275,7 @@ export default function LevelQuestPage() {
       <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
         <LevelQuestMark />
         <p className="eyebrow" style={{ color: "var(--accent-primary)", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Adaptive English Placement Assessment</p>
-        <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: ".05em" }}>LEVELQUEST</h1>
+        <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: ".05em" }}>LEVELCHECK</h1>
         <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--text-secondary)", maxWidth: 560, margin: "6px auto 20px" }}>
           You&rsquo;ll have <strong style={{ color: "var(--text-primary)" }}>30 minutes</strong>. Questions adapt to your demonstrated ability —
           you can navigate back and forward, flag questions, and change answers before finishing.
@@ -628,7 +628,7 @@ function ProcessingView() {
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(160deg, #0f1535, #2a1a4a)", color: "white", textAlign: "center", padding: 24 }}>
       <div>
         <div style={{ fontSize: 56, marginBottom: 18, animation: "wizardFloat 2.2s ease-in-out infinite" }}>🧙</div>
-        <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: ".04em" }}>LEVELQUEST</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, letterSpacing: ".04em" }}>LEVELCHECK</h1>
         <p style={{ opacity: .85, marginTop: 10, fontSize: 15, minHeight: 24, transition: "opacity .3s" }}>{STAGES[stage]}</p>
         <div style={{ width: 240, height: 6, background: "rgba(255,255,255,.15)", borderRadius: 3, margin: "18px auto 0", overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${((stage + 1) / STAGES.length) * 100}%`, background: "linear-gradient(90deg,#6840d6,#8b5cf6)", borderRadius: 3, transition: "width .5s ease" }} />
@@ -674,7 +674,7 @@ function ReportView({ report }: { report: Report }) {
     <main style={{ minHeight: "100vh", background: "var(--bg-muted)", padding: "32px 16px" }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <p className="eyebrow" style={{ margin: 6 }}>ENGLISH WIZARD · LEVELQUEST</p>
+          <p className="eyebrow" style={{ margin: 6 }}>ENGLISH WIZARD · LEVELCHECK</p>
           <h1 style={{ fontSize: 26, margin: "4px 0" }}>Your Placement Report</h1>
           <p className="subtle">Adaptive English Placement Assessment · Version {report.variant} of 15{report.variantTheme ? ` · ${report.variantTheme}` : ""}</p>
           {/* Student identity block (Part 16) */}
@@ -686,6 +686,18 @@ function ReportView({ report }: { report: Report }) {
           </div>
         </div>
 
+        {report.answeredCount === 0 ? (
+          /* Part 26: a level with zero responses is never shown — evidence, not invention. */
+          <div className="panel" style={{ padding: 28, textAlign: "center", borderRadius: 18, border: "1px solid var(--warning-border, var(--border-default))" }}>
+            <div style={{ fontSize: 12.5, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: ".12em" }}>Assessment incomplete</div>
+            <div style={{ fontSize: 34, fontWeight: 900, margin: "10px 0" }}>No placement result</div>
+            <p className="subtle" style={{ maxWidth: 520, margin: "0 auto 18px", fontSize: 14 }}>
+              This sitting closed before any answers were recorded, so there is no evidence to place you with.
+              Your profile and history are untouched — retake the assessment when you are ready.
+            </p>
+            <Link className="button" href="/diagnostic" style={{ textDecoration: "none" }}>Retake assessment</Link>
+          </div>
+        ) : (
         <div className="panel" style={{ padding: 28, textAlign: "center", background: "linear-gradient(135deg, #0f1535, #2a1a4a)", color: "white", borderRadius: 18 }}>
           <div style={{ fontSize: 12.5, opacity: .7, textTransform: "uppercase", letterSpacing: ".12em" }}>Your English Level</div>
           <div style={{ fontSize: 80, fontWeight: 900, margin: "8px 0", lineHeight: 1 }}>{report.level}</div>
@@ -694,9 +706,10 @@ function ReportView({ report }: { report: Report }) {
             <div style={{ display: "inline-block", padding: "5px 14px", borderRadius: 999, background: "rgba(255,255,255,.12)", border: "1px solid rgba(255,255,255,.25)", fontSize: 13.5, fontWeight: 700, marginBottom: 8 }}>{report.boundary}</div>
           )}
           <p className="subtle" style={{ color: "var(--text-disabled)", maxWidth: 520, margin: "0 auto", fontSize: 13 }}>
-            Adaptive estimate {report.estimate} · {report.answeredCount} responses analyzed{report.speakingSubmitted ? ` · speaking: indicative ${report.speakingBand ?? "—"}` : ""}
+            Adaptive estimate {report.estimate} · {report.answeredCount} responses analysed{report.speakingSubmitted ? ` · speaking: indicative ${report.speakingBand ?? "—"}` : ""}
           </p>
         </div>
+        )}
 
         <div className="panel" style={{ padding: "30px 24px 24px", marginTop: 18 }}>
           <h3 style={{ margin: "0 0 20px" }}>Your journey</h3>

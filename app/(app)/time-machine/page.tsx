@@ -5,12 +5,12 @@ import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 import { IconCheck, IconClock, IconMic, IconRoute } from "@/app/components/nav-icons";
 import { ComparePicker } from "./compare-picker";
+import { promptsForLevel } from "@/src/domain/voice-time-machine";
+import type { CEFRLevel } from "@/src/domain/learner";
 
-const CALIBRATION_PROMPTS = [
-  "The rain in Spain stays mainly on the plain, but I still walk to work every morning.",
-  "She sells sea shells by the sea shore, and I bought three of them last summer.",
-  "I would be grateful if we could discuss the report before Thursday afternoon.",
-];
+const VALID_LEVELS: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
+
+type LevelState = "loading" | "ready" | "error" | "unassessed";
 
 interface Sample { id: string; prompt: string; transcript: string | null; durationMs: number | null; createdAt: string }
 
@@ -37,14 +37,19 @@ export default function TimeMachinePage() {
   const [compare, setCompare] = useState<{ older: Sample; newer: Sample } | null>(null);
   const [compareUrls, setCompareUrls] = useState<{ older: string; newer: string } | null>(null);
   const [compareError, setCompareError] = useState<string | null>(null);
+  const [levelState, setLevelState] = useState<LevelState>("loading");
+  const [level, setLevel] = useState<CEFRLevel | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const startedAtRef = useRef(0);
 
-  const prompt = CALIBRATION_PROMPTS[promptIndex];
+  // Prompts stay hidden until the learner's band is known — no default pool while loading.
+  const prompts = useMemo(() => (level ? promptsForLevel(level) : []), [level]);
+  const prompt = prompts[promptIndex] ?? prompts[0];
+  const promptText = prompt?.phrase ?? "";
   const forPrompt = useMemo(
-    () => samples.filter((s) => s.prompt === prompt).sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
-    [samples, prompt],
+    () => samples.filter((s) => s.prompt === promptText).sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+    [samples, promptText],
   );
 
   const load = useCallback(async () => {
@@ -66,6 +71,26 @@ export default function TimeMachinePage() {
     void Promise.resolve().then(() => { if (!cancelled) return load(); });
     return () => { cancelled = true; };
   }, [load]);
+
+  const loadLevel = useCallback(async () => {
+    setLevelState("loading");
+    try {
+      const r = await fetch("/api/dashboard", { cache: "no-store" });
+      if (!r.ok) throw new Error("level-failed");
+      const d = (await r.json()) as { level?: string };
+      const lv = VALID_LEVELS.find((valid) => valid === d?.level);
+      setLevel(lv ?? null);
+      setLevelState(lv ? "ready" : "unassessed");
+    } catch {
+      setLevelState("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void Promise.resolve().then(() => { if (!cancelled) return loadLevel(); });
+    return () => { cancelled = true; };
+  }, [loadLevel]);
 
   async function startRecording() {
     setMicError(null);
@@ -103,7 +128,7 @@ export default function TimeMachinePage() {
       const r = await fetch("/api/voice-samples", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prompt, transcript: note.trim() || null, audioDataUrl: previewUrl, durationMs: Date.now() - startedAtRef.current }),
+        body: JSON.stringify({ prompt: promptText, transcript: note.trim() || null, audioDataUrl: previewUrl, durationMs: Date.now() - startedAtRef.current }),
       });
       if (!r.ok) throw new Error("save-failed");
       setSavedOnce(true);
@@ -129,6 +154,11 @@ export default function TimeMachinePage() {
 
   const longest = forPrompt.reduce((max, s) => Math.max(max, s.durationMs ?? 0), 0);
 
+  function sentenceLabel(phrase: string): string {
+    const i = prompts.findIndex((p) => p.phrase === phrase);
+    return i >= 0 ? `Sentence ${i + 1}` : "Earlier sentence";
+  }
+
   return (
     <main id="main-content" className="dash-main">
       <PageHeader
@@ -146,7 +176,28 @@ export default function TimeMachinePage() {
         </div>
       )}
 
-      {loading && !loadError && (
+      {levelState === "error" && (
+        <div className="state-card error" role="alert">
+          <strong>Your level could not be loaded.</strong>
+          <div style={{ marginTop: 10 }}>
+            <button className="button secondary" onClick={() => void loadLevel()}>Try again</button>
+          </div>
+        </div>
+      )}
+
+      {levelState === "unassessed" && (
+        <div className="state-card info">
+          <strong>Your level has not been assessed yet.</strong>
+          <p className="empty" style={{ marginTop: 8 }}>
+            The Voice Time Machine picks calibration sentences for your band, so it needs a level first. Take Check My Level — it takes a few minutes — then come back and record sentence 1.
+          </p>
+          <div style={{ marginTop: 10 }}>
+            <a className="button" href="/diagnostic">Check My Level</a>
+          </div>
+        </div>
+      )}
+
+      {(loading || levelState === "loading") && !loadError && (
         <section className="panel" aria-hidden="true">
           <div className="skeleton skeleton-title" />
           <div className="skeleton skeleton-text" style={{ width: "85%" }} />
@@ -156,14 +207,15 @@ export default function TimeMachinePage() {
         </section>
       )}
 
-      {!loading && !loadError && (
+      {!loading && !loadError && levelState === "ready" && (
         <>
           <section className="panel" aria-label="Record a new attempt">
             <div className="panel-title">
               <h3>Record today&rsquo;s attempt</h3>
-              <span>Calibration sentence {promptIndex + 1} of {CALIBRATION_PROMPTS.length}</span>
+              <span>Calibration sentence {promptIndex + 1} of {prompts.length}</span>
             </div>
-            <p style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px, 2vw, 23px)", lineHeight: 1.55, margin: "0 0 16px", fontWeight: 600 }}>“{prompt}”</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px, 2vw, 23px)", lineHeight: 1.55, margin: "0 0 6px", fontWeight: 600 }}>“{promptText}”</p>
+            <small className="subtle" style={{ display: "block", marginBottom: 16 }}>Focus: {prompt?.focus}</small>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               {!recording ? (
                 <button className="button" onClick={() => void startRecording()}><IconMic size={15} /> Record now</button>
@@ -174,9 +226,9 @@ export default function TimeMachinePage() {
                 aria-label="Choose calibration sentence"
                 value={promptIndex}
                 onChange={(e) => { setPromptIndex(Number(e.target.value)); setPreviewUrl(null); }}
-                style={{ maxWidth: 240 }}
+                style={{ maxWidth: 300 }}
               >
-                {CALIBRATION_PROMPTS.map((_, i) => <option key={i} value={i}>Sentence {i + 1}</option>)}
+                {prompts.map((p, i) => <option key={p.id} value={i}>Sentence {i + 1} · {p.focus}</option>)}
               </select>
             </div>
             {recording && <p className="empty" style={{ marginTop: 12 }} role="status">Recording… read the sentence at your natural pace, then stop.</p>}
@@ -282,7 +334,7 @@ export default function TimeMachinePage() {
                   <article key={s.id} className="mission-row" aria-label={`Recording from ${formatDate(s.createdAt)}`}>
                     <span className="mi-num" aria-hidden="true"><IconMic size={14} /></span>
                     <span className="mi-body">
-                      <strong>Sentence {CALIBRATION_PROMPTS.indexOf(s.prompt) + 1}</strong>
+                      <strong>{sentenceLabel(s.prompt)}</strong>
                       <small>
                         {new Date(s.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         {s.durationMs ? ` · ${formatSeconds(s.durationMs)}` : ""}

@@ -6,18 +6,25 @@ import { PageHeader } from "@/app/components/page-header";
 const TASKS = [
   { id: "w-prea1-form", title: "Fill in a form", prompt: "Write your name, country, and one thing you like. Three short lines.", level: "Pre-A1" },
   { id: "w-prea1-list", title: "Make a shopping list", prompt: "Write five foods you need from the shop.", level: "Pre-A1" },
+  { id: "w-prea1-thanks", title: "Thank a friend in a message", prompt: "A friend cooked dinner for you. Write two short lines: say thank you, and say one thing that was very good. Start with the chunk “Thank you for…”.", level: "Pre-A1" },
   { id: "w-email", title: "Write a short email", prompt: "Apologise to a colleague for missing a meeting and suggest a new time.", level: "A2" },
   { id: "w-a1-intro", title: "Introduce yourself", prompt: "Write 3–4 sentences about yourself: name, city, family or job, one hobby.", level: "A1" },
   { id: "w-a1-invite", title: "Send an invitation", prompt: "Invite a friend to your birthday. Say the day, the place, and the time.", level: "A1" },
+  { id: "w-a1-late", title: "Text a friend you are late", prompt: "You are 20 minutes late to meet a friend. Write 2–3 sentences: say sorry, give a simple reason, and say your new arrival time.", level: "A1" },
   { id: "w-a2-complaint", title: "Polite complaint", prompt: "Your hotel room had a problem. Write 4–5 sentences to the hotel explaining the issue and what you want.", level: "A2" },
   { id: "w-a2-review", title: "Write a review", prompt: "Review a café or restaurant you know: food, service, price. 4–5 sentences.", level: "A2" },
   { id: "w-opinion", title: "Give your opinion", prompt: "Some people think remote work is better. Write 4-5 sentences giving your view with reasons.", level: "B1" },
   { id: "w-b1-story", title: "Tell a story", prompt: "Write about a time something went wrong but ended well. Use past tenses and at least two time connectors (first, then, finally).", level: "B1" },
+  { id: "w-b1-forum", title: "Reply on a local forum", prompt: "A visitor asks on a local forum: “What should I do in your town for one day?” Write 5–6 sentences: suggest a route, one place to eat, and one thing to avoid.", level: "B1" },
   { id: "w-report", title: "Describe a trend", prompt: "Describe how technology changed daily life in your country. Use at least two linking words.", level: "B2" },
   { id: "w-b2-argument", title: "Balanced argument", prompt: "'Cities should ban private cars from their centres.' Present both sides in 6–8 sentences, then give your conclusion.", level: "B2" },
+  { id: "w-b2-summary", title: "Summarise for a busy manager", prompt: "Summarise a report or article you know well in 6–8 sentences for a busy manager: its purpose, two key findings, one risk, and one recommended action.", level: "B2" },
   { id: "w-c1-proposal", title: "Write a proposal", prompt: "Propose one improvement to your workplace or university. Problem → solution → expected benefit, in formal register (8–10 sentences).", level: "C1" },
   { id: "w-c1-critique", title: "Critical response", prompt: "Respond to this claim in 8–10 sentences: 'AI will improve education more than it harms it.' Acknowledge the strongest counter-argument.", level: "C1" },
+  { id: "w-c1-register", title: "Shift register for two audiences", prompt: "The launch will be delayed by three weeks. Deliver that bad news twice, in 4–5 sentences each: first to your own team in a direct, candid register; then to a key client in a formal, protective register.", level: "C1" },
   { id: "w-c2-editorial", title: "Editorial voice", prompt: "Write an opinion column opening (10–12 sentences) on a current issue in your field. Control tone precisely: authoritative but not aggressive.", level: "C2" },
+  { id: "w-c2-rebuttal", title: "Write a measured rebuttal", prompt: "A columnist calls your field “a failed experiment”. Write a 10–12 sentence rebuttal: concede one valid point, rebut two claims with precise evidence, and close without triumphalism.", level: "C2" },
+  { id: "w-c2-verdict", title: "Deliver a qualified verdict", prompt: "Write a 10–12 sentence evaluation of a policy, book, or product you know well. Weigh the evidence with scholarly hedging (“arguably”, “on balance”), avoid absolute claims, and end with a qualified verdict.", level: "C2" },
 ];
 
 export default function WritingPage() {

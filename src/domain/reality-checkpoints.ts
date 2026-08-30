@@ -7,7 +7,7 @@ export interface RealityCheckpoint {
   title: string;
   situation: string;
   task: string;
-  skill: string;
+  skill: "speaking" | "writing";
   rubric: RubricCriterion[];
 }
 
@@ -56,6 +56,46 @@ export const REALITY_CHECKPOINTS: RealityCheckpoint[] = [
     { id:"acknowledge", label:"Acknowledges without defensiveness", hint:"We understand the concern" },
     { id:"remediation", label:"Details concrete remediation", hint:"Specific actions taken" },
     { id:"trust", label:"Closes rebuilding trust", hint:"Forward-looking commitment" } ] },
+  { id:"rc-prea1-market", level:"Pre-A1", title:"Buy two things at the market", situation:"You are at a market stall. You want two apples and some bread.", task:"Write exactly what you say to the seller: ask for the two things, then ask the price.", skill:"speaking", rubric:[
+    { id:"items", label:"Asks for the two items", hint:"Two apples, please / Some bread, please" },
+    { id:"price", label:"Asks the price", hint:"How much is it?" },
+    { id:"polite", label:"Uses please or thank you", hint:"Politeness word present" } ] },
+  { id:"rc-prea1-thanks", level:"Pre-A1", title:"Thank a friend in a message", situation:"Your friend cooked dinner for you last night.", task:"Write a two-line message: thank your friend, and say one thing that was very good.", skill:"writing", rubric:[
+    { id:"thanks", label:"Says thank you", hint:"Thank you for the dinner" },
+    { id:"detail", label:"Names one thing you liked", hint:"The soup was very good" },
+    { id:"short", label:"Keeps it short and clear", hint:"Two lines, no more" } ] },
+  { id:"rc-a1-directions", level:"A1", title:"Ask for simple directions", situation:"You are at the school reception, but you cannot find the train station.", task:"Write exactly what you say: ask where the station is, check how far it is, and thank the clerk.", skill:"speaking", rubric:[
+    { id:"ask", label:"Asks for the place politely", hint:"Excuse me, where is the station?" },
+    { id:"check", label:"Checks distance or direction", hint:"Is it far from here?" },
+    { id:"thanks", label:"Thanks the person", hint:"Thank you very much" } ] },
+  { id:"rc-a1-cancel", level:"A1", title:"Cancel a plan by text", situation:"You cannot meet your friend tomorrow because you are ill.", task:"Write a short text: say sorry, say why you cannot come, and suggest another day.", skill:"writing", rubric:[
+    { id:"sorry", label:"Apologises simply", hint:"I am sorry" },
+    { id:"reason", label:"Gives the reason", hint:"I am ill" },
+    { id:"newplan", label:"Suggests another day", hint:"How about Friday?" } ] },
+  { id:"rc-a2-return", level:"A2", title:"Return a broken item in a shop", situation:"You bought a phone charger here last week, but it has stopped working.", task:"Write exactly what you say to the shop assistant: explain the problem, say when you bought it, and ask for a replacement or refund.", skill:"speaking", rubric:[
+    { id:"problem", label:"Explains the problem clearly", hint:"It has stopped working" },
+    { id:"when", label:"Says when and where you bought it", hint:"I bought it here last week" },
+    { id:"request", label:"Asks for replacement or refund", hint:"Can I have a replacement, please?" } ] },
+  { id:"rc-b1-landlord", level:"B1", title:"Report a repair to your landlord", situation:"The kitchen tap in your flat has been dripping for a week.", task:"Write a short email to your landlord: describe the problem, explain how it affects you, and ask for a repair this week.", skill:"writing", rubric:[
+    { id:"describe", label:"Describes the problem precisely", hint:"The tap has been dripping since…" },
+    { id:"impact", label:"Explains the impact on you", hint:"Wasted water / cannot use the sink" },
+    { id:"action", label:"Requests repair with a timescale", hint:"Could you arrange a repair this week?" } ] },
+  { id:"rc-b2-question", level:"B2", title:"Handle a hard question after a talk", situation:"After your presentation, an audience member challenges one of your key figures.", task:"Write what you say: thank them, answer the challenge with evidence, and offer a follow-up afterwards.", skill:"speaking", rubric:[
+    { id:"acknowledge", label:"Acknowledges the question professionally", hint:"That is a fair question" },
+    { id:"evidence", label:"Answers with concrete evidence", hint:"Our figures come from…" },
+    { id:"followup", label:"Offers a follow-up", hint:"I will send the full analysis after the session" } ] },
+  { id:"rc-c1-mediate", level:"C1", title:"Mediate a disagreement between teams", situation:"Design and engineering disagree openly about an unrealistic deadline.", task:"Write what you say to both teams together: restate each side's position fairly, name the real constraint, and propose a path both can accept.", skill:"speaking", rubric:[
+    { id:"fair", label:"Restates both positions fairly", hint:"Neither side dismissed" },
+    { id:"constraint", label:"Names the underlying constraint", hint:"The real limit is…" },
+    { id:"shared", label:"Frames the compromise as shared", hint:"What we both need is…" } ] },
+  { id:"rc-c2-keynote", level:"C2", title:"Open a keynote with authority", situation:"You are opening an industry conference on a contested topic.", task:"Write your opening (6–8 sentences): a hook that reframes the debate, a precise thesis, and a roadmap of the argument — controlled register, no clichés.", skill:"writing", rubric:[
+    { id:"hook", label:"Hook reframes rather than states the obvious", hint:"A fresh angle on the debate" },
+    { id:"thesis", label:"Thesis is precise and qualified", hint:"Exact claim, proper scope" },
+    { id:"roadmap", label:"Roadmap signals the structure", hint:"I will argue three points…" } ] },
+  { id:"rc-c2-refusal", level:"C2", title:"Deliver a diplomatic refusal", situation:"A partner asks your organisation to endorse a report you have serious reservations about.", task:"Write exactly what you say: value the partnership, decline without ambiguity, and leave the door open on clear conditions.", skill:"speaking", rubric:[
+    { id:"warmth", label:"Opens by valuing the partnership", hint:"Warm, but brief" },
+    { id:"clarity", label:"Declines without hedging", hint:"We are not able to endorse…" },
+    { id:"conditions", label:"Leaves a conditional door open", hint:"If the methodology is revised…" } ] },
 ];
 
 /** Spaced scheduling: a fresh checkpoint every 3rd day, rotating within level, skipping recently completed ones. */

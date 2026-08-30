@@ -13,7 +13,7 @@ const NAV = [
   { label: "Learn", href: "/dashboard" },
   { label: "Levels", href: "/#cefr" },
   { label: "Skills", href: "/#skills" },
-  { label: "For Organizations", href: "/#organizations" },
+  { label: "For Organisations", href: "/#organizations" },
   { label: "Pricing", href: "/pricing" },
 ];
 

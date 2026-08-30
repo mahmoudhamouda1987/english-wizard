@@ -3,7 +3,7 @@ import {
   IconHome, IconRoute, IconBook, IconGlobe, IconChat, IconMask, IconMic, IconWand,
   IconClock, IconShield, IconTarget, IconFolder, IconEar, IconFilm, IconPen,
   IconLetters, IconPuzzle, IconBulb, IconCertificate, IconTeacher, IconUsers,
-  IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame, IconSearch,
+  IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame,
 } from "./nav-icons";
 
 export interface NavItem {
@@ -22,12 +22,13 @@ export interface NavGroup {
 }
 
 /**
- * 2.0 information architecture:
- * nine collapsible groups — eight from 1.0 plus PRODUCTS (five distinct
- * product destinations per the 2.0 contract, Parts 3/14/16).
- * Tests & Exams is pure assessment infrastructure; products own their routes.
+ * 2.0 information architecture (spec Part 37 — normative group structure):
+ * nine collapsible groups. ASSESS is a pure assessment area (Tests & Exams);
+ * products own their routes in PRODUCTS (General English, Business English,
+ * Fluency Track, IELTS, Cambridge). TOOLS: Teacher AI, Community, Invite Friends.
  * Still absent by design: Quick Practice, Leaderboard, LevelQuest duplicate
- * navigation, standalone Mistakes/Achievements (redirected).
+ * navigation, standalone Mistakes/Achievements (redirected), Chunks & Mediation
+ * and Search (routes remain reachable; deliberately not in the sidebar).
  */
 export const NAV_GROUPS: NavGroup[] = [
   {
@@ -84,12 +85,11 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    key: "assess-prepare",
-    label: "Assess & Prepare",
+    key: "assess",
+    label: "Assess",
     desc: "Checkpoints and exams.",
     items: [
       { label: "Tests & Exams", href: "/pathways", icon: IconCertificate, desc: "LevelCheck, mocks and module tests" },
-      { label: "Chunks & Mediation", href: "/chunks", icon: IconPuzzle },
     ],
   },
   {
@@ -99,9 +99,9 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: "General English", href: "/general-english", icon: IconGlobe, desc: "Pre-A1 → C2 core curriculum" },
       { label: "Business English", href: "/business-english", icon: IconBriefcase, desc: "Real workplace outcomes" },
+      { label: "Fluency Track", href: "/fluency-track", icon: IconFlame, desc: "Spoken fluency, B1 → C2" },
       { label: "IELTS", href: "/ielts", icon: IconBoard, desc: "Academic & General Training" },
       { label: "Cambridge", href: "/cambridge", icon: IconCertificate, desc: "A2 Key → C2 Proficiency" },
-      { label: "Fluency Track", href: "/fluency-track", icon: IconFlame, desc: "Spoken fluency, B1 → C2" },
     ],
   },
   {
@@ -109,7 +109,6 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Tools",
     desc: "Support and community.",
     items: [
-      { label: "Search", href: "/search", icon: IconSearch },
       { label: "Teacher AI", href: "/teacher-help", icon: IconTeacher },
       { label: "Community", href: "/community", icon: IconUsers },
       { label: "Invite Friends", href: "/referral", icon: IconGift },

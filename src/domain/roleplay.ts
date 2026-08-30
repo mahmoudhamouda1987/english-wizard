@@ -1,5 +1,7 @@
 import type { CEFRLevel } from "./learner";
 
+import { ROLEPLAY_SCENARIOS_EXTRA } from "./roleplay-expansion";
+
 export interface RoleplayScenario {
   id: string;
   title: string;
@@ -12,7 +14,7 @@ export interface RoleplayScenario {
   targetPhrases: string[];
 }
 
-export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
+const BASE_SCENARIOS: RoleplayScenario[] = [
   {
     id: "rp-cafe",
     title: "Order at a café",
@@ -91,6 +93,8 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     targetPhrases: ["I see the appeal, however", "The data suggests", "May I offer an alternative"],
   },
 ];
+
+export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [...BASE_SCENARIOS, ...ROLEPLAY_SCENARIOS_EXTRA];
 
 export function scenarioById(id: string): RoleplayScenario | undefined {
   return ROLEPLAY_SCENARIOS.find((s) => s.id === id);

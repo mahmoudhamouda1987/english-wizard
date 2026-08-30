@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Reveal } from "./reveal";
+import { entryPrice } from "@/src/domain/pricing";
 import {
   IconBriefcase, IconPlane, IconGraduation, IconUsers, IconBuilding,
   IconCheck, IconDoc, IconShield, IconRoute, IconChart, IconSparkle,
@@ -286,7 +287,7 @@ export function WhyAndOrganizations() {
                   <span key={t} style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 14.5, color: "var(--hp-muted)" }}><IconCheck size={17} style={{ color: "var(--hp-green)", flex: "none", marginTop: 2 }} /> {t}</span>
                 ))}
               </div>
-              <Link className="hp-btn hp-btn-primary" href="/onboarding">For Organizations</Link>
+              <Link className="hp-btn hp-btn-primary" href="/onboarding">For Organisations</Link>
             </Reveal>
             <Reveal delay={1}>
               <div className="hp-card" style={{ padding: "clamp(22px,3vw,34px)" }}>
@@ -310,36 +311,33 @@ export function WhyAndOrganizations() {
 
 /* ---------------- §26 Pricing preview + §27 Trial + §28 Final CTA + §29 Footer ---------------- */
 
-const FREE = ["Full learning path, Pre-A1 → C2", "All four skills", "Vocabulary and grammar curriculum", "Review engine with spaced practice", "Reality checkpoints"];
-const FULL = ["Everything in Free, unlimited", "AI tutor that remembers you", "Speaking practice with evidence", "Adaptive LevelCheck assessments", "Professional PDF reports", "Exam preparation where available"];
 
 export function Conversion() {
+  /* Part 83: simple entry pricing from the commercial configuration — no
+   * free-forever claims. Region-aware; worldwide is the static default. */
+  const entry = entryPrice("WW");
   return (
     <>
       <section className="hp-section" aria-labelledby="hp-pricing-title" id="pricing-preview">
-        <div className="hp-wrap">
+        <div className="hp-wrap hp-center">
           <Reveal className="hp-head hp-center">
-            <span className="hp-eyebrow">Value first, price second</span>
-            <h2 id="hp-pricing-title" className="hp-display hp-h2">Start free.<br />Upgrade when it matters.</h2>
+            <span className="hp-eyebrow">One price per product</span>
+            <h2 id="hp-pricing-title" className="hp-display hp-h2">Start your 7-day journey.<br />Then choose your path.</h2>
+            <p className="hp-lead" style={{ color: "rgba(233,236,255,.7)" }}>
+              Every new learner begins with a full 7-day trial. After that, one subscription per product —
+              or All Access for the complete ecosystem.
+            </p>
           </Reveal>
-          <div className="hp-plans">
-            <Reveal>
-              <div className="hp-plan hp-plan-free">
-                <small className="tier">Free · forever</small>
-                <h3>Learn</h3>
-                <ul>{FREE.map((f) => <li key={f}><IconCheck size={16} /> {f}</li>)}</ul>
-                <Link className="hp-btn hp-btn-ghost" href="/onboarding" style={{ justifyContent: "center" }}>Start learning free</Link>
-              </div>
-            </Reveal>
-            <Reveal delay={1}>
-              <div className="hp-plan hp-plan-full">
-                <small className="tier">Full English Wizard</small>
-                <h3>Prove your progress</h3>
-                <ul>{FULL.map((f) => <li key={f}><IconCheck size={16} /> {f}</li>)}</ul>
-                <Link className="hp-btn hp-btn-gold" href="/pricing" style={{ justifyContent: "center" }}>Choose your path</Link>
-              </div>
-            </Reveal>
-          </div>
+          <Reveal className="hp-center" style={{ marginTop: 8 }}>
+            <div className="hp-entry-price" style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "center", gap: 12, padding: "18px 28px", borderRadius: 16, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)" }}>
+              <span style={{ fontWeight: 700, fontSize: 17 }}>{entry.product}</span>
+              <span style={{ fontSize: 13, opacity: .75 }}>from</span>
+              <strong style={{ fontSize: 30, letterSpacing: "-.02em" }}>{entry.price}</strong>
+            </div>
+          </Reveal>
+          <Reveal className="hp-center" style={{ marginTop: 26 }}>
+            <Link className="hp-btn hp-btn-gold" href="/pricing">Explore plans</Link>
+          </Reveal>
         </div>
       </section>
 
@@ -426,7 +424,7 @@ export function Footer() {
         <div>
           <h4>Company</h4>
           <nav aria-label="Footer — company">
-            <Link href="/#organizations">For Organizations</Link>
+            <Link href="/#organizations">For Organisations</Link>
             <Link href="/auth">Sign in</Link>
             <Link href="/pricing">Contact</Link>
           </nav>

@@ -23,9 +23,9 @@ test.describe("Public site (Part 5)", () => {
     expect(main).not.toMatch(/Check My English/i);
   });
 
-  test("public header offers Learn, Levels, Skills, For Organizations, Pricing and Sign in", async ({ page }) => {
+  test("public header offers Learn, Levels, Skills, For Organisations, Pricing and Sign in", async ({ page }) => {
     await page.goto("/");
-    for (const label of ["Learn", "Levels", "Skills", "For Organizations", "Pricing", "Sign in"]) {
+    for (const label of ["Learn", "Levels", "Skills", "For Organisations", "Pricing", "Sign in"]) {
       await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
     }
   });

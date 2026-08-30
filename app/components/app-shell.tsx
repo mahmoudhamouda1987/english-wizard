@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 import { InstallButton } from "@/app/components/install-button";
@@ -27,12 +27,41 @@ function groupDefaultOpen(pathname: string, group: NavGroup) {
   return group.items.some((i) => isActive(pathname, i.href));
 }
 
+/* Persisted sidebar group state (spec Part 37: state remembered).
+ * localStorage is an external store, so we read it through
+ * useSyncExternalStore — the server snapshot is empty defaults, and React
+ * re-renders with the stored value after hydration without a mismatch. */
+const navOverridesCache: { raw: string | null; value: Record<string, boolean> } = { raw: null, value: {} };
+
+function readNavOverrides(): Record<string, boolean> {
+  let raw: string | null = null;
+  try { raw = window.localStorage.getItem("ew-nav-groups"); } catch { /* storage unavailable */ }
+  if (raw !== navOverridesCache.raw) {
+    navOverridesCache.raw = raw;
+    try { navOverridesCache.value = raw ? JSON.parse(raw) : {}; } catch { navOverridesCache.value = {}; }
+  }
+  return navOverridesCache.value;
+}
+
+const navStore = {
+  listeners: new Set<() => void>(),
+  subscribe(listener: () => void) {
+    navStore.listeners.add(listener);
+    return () => { navStore.listeners.delete(listener); };
+  },
+  set(next: Record<string, boolean>) {
+    try { window.localStorage.setItem("ew-nav-groups", JSON.stringify(next)); } catch { /* session-only */ }
+    navOverridesCache.raw = null; // invalidate so the next read reparses
+    navStore.listeners.forEach((l) => l());
+  },
+};
+
 function SidebarNav({ pathname, compact, onNavigate }: { pathname: string; compact?: boolean; onNavigate?: () => void }) {
-  // User overrides only; a group is open by default when it holds the active route.
-  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+  // User overrides persist across visits; a group is open by default when it holds the active route.
+  const overrides = useSyncExternalStore<Record<string, boolean>>(navStore.subscribe, readNavOverrides, () => ({}));
 
   function toggle(key: string, defaultValue: boolean) {
-    setOverrides((prev) => ({ ...prev, [key]: !(prev[key] ?? defaultValue) }));
+    navStore.set({ ...overrides, [key]: !(overrides[key] ?? defaultValue) });
   }
 
   return (

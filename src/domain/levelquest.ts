@@ -216,10 +216,11 @@ export function estimateToLevel(estimate: number): { level: CEFRLevel; confidenc
  * band windows, skill balancing, anti-jump guards and a 30-minute-fit budget.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Sitting budget sized so a complete sitting fits the 30:00 timer with speaking. */
+/** Sitting budget sized so a complete sitting fits the 30:00 timer with speaking.
+ *  Spec Part 22: 40 adaptive questions per 30-minute sitting (36 objective + 4 speaking). */
 export const SESSION_BUDGET = {
   /** Maximum objective (mcq/listening) items presented in one sitting. */
-  objective: 30,
+  objective: 36,
   /** Speaking tasks per sitting (drawn from the variant's 7 level-keyed prompts). */
   speaking: 4,
   /** Minimum objective evidence before adaptive early-stop is allowed. */
