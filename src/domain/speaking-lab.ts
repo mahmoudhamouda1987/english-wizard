@@ -1,9 +1,10 @@
+import { LAB_PHRASES_EXTRA } from "./speaking-lab-expansion";
 import type { CEFRLevel } from "./learner";
 
 export interface LabPhrase { id: string; level: CEFRLevel; focus: string; text: string }
 
 /** Calibration phrases per level for the Speaking Coach. */
-export const LAB_PHRASES: LabPhrase[] = [
+const BASE_LAB_PHRASES: LabPhrase[] = [
   { id: "sl-prea1-1", level: "Pre-A1", focus: "greetings", text: "Hello. My name is Omar." },
   { id: "sl-prea1-2", level: "Pre-A1", focus: "polite requests", text: "One coffee and one cake, please." },
   { id: "sl-prea1-3", level: "Pre-A1", focus: "numbers", text: "That is three pounds fifty." },
@@ -26,6 +27,9 @@ export const LAB_PHRASES: LabPhrase[] = [
   { id: "sl-c2-2", level: "C2", focus: "rhetoric", text: "Responsible argument requires attention to what the wording permits audiences to infer." },
   { id: "sl-c2-3", level: "C2", focus: "crisis tone", text: "We acknowledge the concern, remediation is underway, and trust will be rebuilt." },
 ];
+
+/** Part 100: 20 Speaking Coach phrases per CEFR band (base bank + expansion wave). */
+export const LAB_PHRASES: LabPhrase[] = [...BASE_LAB_PHRASES, ...LAB_PHRASES_EXTRA];
 
 export function phrasesForLevel(level: CEFRLevel): LabPhrase[] {
   const pool = LAB_PHRASES.filter((p) => p.level === level);

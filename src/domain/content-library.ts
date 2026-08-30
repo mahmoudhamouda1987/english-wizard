@@ -1,8 +1,10 @@
 import type { CEFRLevel } from "./learner";
 import type { EarActivity, ReadingActivity, SayItBetterExercise } from "./learning-systems";
 import { rotate } from "./variety";
+import { READING_ACTIVITIES_EXTRA } from "./reading-expansion";
+import { EAR_ACTIVITIES_EXTRA } from "./ear-expansion";
 
-export const READING_ACTIVITIES: ReadingActivity[] = [
+const BASE_READING_ACTIVITIES: ReadingActivity[] = [
   // Pre-A1
   { id:"read-prea1-signs", level:"Pre-A1", title:"Read the Sign", passage:"EXIT. OPEN. CLOSED. BUS STOP.", wordRecognitionTargets:["EXIT","OPEN","CLOSED","BUS STOP"], comprehensionQuestions:[{id:"q1",question:"Which phrase tells you where the bus stops?",answer:"BUS STOP",skill:"detail"}], contentId:"original-read-prea1-signs" },
   { id:"read-prea1-airport", level:"Pre-A1", title:"At the Airport", passage:"GATE 5. PASSPORT CONTROL. ARRIVALS. DEPARTURES. BAGGAGE.", wordRecognitionTargets:["GATE","PASSPORT","ARRIVALS","DEPARTURES"], comprehensionQuestions:[{id:"q1",question:"Which word tells you where people leave from?",answer:"DEPARTURES",skill:"detail"},{id:"q2",question:"You need this document to travel. Which one?",answer:"PASSPORT",skill:"detail"}], contentId:"original-read-prea1-airport" },
@@ -33,7 +35,7 @@ export const READING_ACTIVITIES: ReadingActivity[] = [
   { id:"read-c2-literary", level:"C2", title:"On Unreliable Narration", passage:"The unreliable narrator does not lie to us so much as invite us to lie to ourselves alongside them. Our complicity is the point: we assemble the flattering version because we recognise the technique. Criticism that merely exposes the narrator's deception misses the deeper design — the text has been auditing the reader all along.", wordRecognitionTargets:["complicity","flattering","deception","auditing"], comprehensionQuestions:[{id:"q1",question:"What does the critic say readers do alongside unreliable narrators?",answer:"lie to themselves; build the flattering version together",skill:"inference"},{id:"q2",question:"Why does exposing the deception miss the point?",answer:"because the reader's willingness to be deceived is the true subject",skill:"inference"},{id:"q3",question:"What does 'auditing the reader' mean?",answer:"the text tests and reveals the reader's own self-serving interpretations",skill:"inference"}], transferPrompt:"Name a book or film that made you complicit in its narrator's self-deception, and explain how.", contentId:"original-read-c2-literary" },
 ];
 
-export const EAR_ACTIVITIES: EarActivity[] = [
+const BASE_EAR_ACTIVITIES: EarActivity[] = [
   // Pre-A1
   { id:"ear-prea1-im", level:"Pre-A1", patternType:"contractions", spokenForm:"I'm", writtenForm:"I am", explanation:"In natural speech, I am commonly contracts to I'm.", replayCountTarget:3, discriminationQuestion:"Which written form matches what you hear?" },
   { id:"ear-prea1-dont", level:"Pre-A1", patternType:"contractions", spokenForm:"don't", writtenForm:"do not", explanation:"Don't is the spoken contraction of do not — the o disappears.", replayCountTarget:3, discriminationQuestion:"Which written form matches what you hear?" },
@@ -102,3 +104,7 @@ export function levelContent(level: CEFRLevel) {
     sayItBetter: rotate(pool.sayItBetter, level, "sib"),
   };
 }
+
+/** Part 100: English Ear 20 / Reading 6 per CEFR band (base bank + expansion wave). */
+export const READING_ACTIVITIES: ReadingActivity[] = [...BASE_READING_ACTIVITIES, ...READING_ACTIVITIES_EXTRA];
+export const EAR_ACTIVITIES: EarActivity[] = [...BASE_EAR_ACTIVITIES, ...EAR_ACTIVITIES_EXTRA];

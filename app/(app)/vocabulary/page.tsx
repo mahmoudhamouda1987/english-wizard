@@ -4,10 +4,12 @@ import { useMemo, useState } from "react";
 import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 import { speakText } from "@/src/domain/tts";
+import { VOCAB_PAGE_EXPANSION_A } from "@/src/domain/vocab-page-expansion-a";
+import { VOCAB_PAGE_EXPANSION_B } from "@/src/domain/vocab-page-expansion-b";
 
 interface WordEntry { word: string; type: string; meaning: string; ar: string; example: string }
 
-const BANK: Record<string, WordEntry[]> = {
+const BANK_BASE: Record<string, WordEntry[]> = {
   A1: [
     { word: "appointment", type: "noun", meaning: "an arranged meeting at a fixed time", ar: "موعد", example: "I have a dentist appointment on Monday." },
     { word: "routine", type: "noun", meaning: "things you do regularly in the same order", ar: "روتين", example: "My morning routine starts with coffee." },
@@ -66,7 +68,10 @@ const BANK: Record<string, WordEntry[]> = {
   ],
 };
 
-const LEVELS = ["A1", "A2", "B1", "B2"] as const;
+/** Part 100: 100 vocabulary entries per CEFR band (base bank + expansion waves). */
+const BANK: Record<string, WordEntry[]> = { ...BANK_BASE, ...VOCAB_PAGE_EXPANSION_A, ...VOCAB_PAGE_EXPANSION_B };
+
+const LEVELS = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"] as const;
 
 export default function VocabularyPage() {
   const [level, setLevel] = useState<(typeof LEVELS)[number]>("A1");

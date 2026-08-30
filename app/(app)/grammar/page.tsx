@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { CEFRLevel } from "@/src/domain/learner";
 import { rotatedPool } from "@/src/domain/variety";
+import { GRAMMAR_DRILLS_EXTRA } from "@/src/domain/grammar-drills-expansion";
 import { PageHeader } from "@/app/components/page-header";
 import { Celebration } from "@/app/components/celebration";
 
@@ -17,7 +18,7 @@ interface GrammarDrill {
   extra: string[];
 }
 
-const DRILLS: GrammarDrill[] = [
+const BASE_DRILLS: GrammarDrill[] = [
   // Pre-A1 — be, articles, this/that
   { id: "g-prea1-be", level: "Pre-A1", pattern: "am / is / are", explanation: "Use am with I, is with he/she/it, are with you/we/they.", sentence: "I ___ a student.", answer: "am", options: ["am", "is"], extra: [] },
   { id: "g-prea1-is", level: "Pre-A1", pattern: "am / is / are", explanation: "He, she and it always take is.", sentence: "She ___ my sister.", answer: "is", options: ["is", "are"], extra: [] },
@@ -53,6 +54,9 @@ const DRILLS: GrammarDrill[] = [
   { id: "g-c2-participle", level: "C2", pattern: "Participle clauses", explanation: "-ing/-ed clauses compress two sentences into one elegant structure.", sentence: "___ the data, the team revised its forecast. (see)", answer: "Having seen", options: ["Having seen", "Seen"], extra: [] },
   { id: "g-c2-whatever", level: "C2", pattern: "Concessive wh-clauses", explanation: "Whatever/however/no matter intensify concession elegantly.", sentence: "___ hard they tried, the deadline held firm.", answer: "However", options: ["However", "Whatever"], extra: [] },
 ];
+
+/** Part 100: 30 grammar drills per CEFR band (base bank + expansion wave). */
+const DRILLS: GrammarDrill[] = [...BASE_DRILLS, ...GRAMMAR_DRILLS_EXTRA];
 
 const LEVELS: CEFRLevel[] = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
 
