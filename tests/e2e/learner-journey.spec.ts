@@ -96,9 +96,9 @@ test("new learning surfaces render from the authenticated dashboard", async ({ p
     await expect(page.locator("main")).toBeVisible();
   }
   await page.goto("/dashboard");
-  // Expand the LEARN group in the desktop sidebar, then the skill links are present.
+  // Expand the LEARNING PATHS group in the desktop sidebar, then the skill links are present.
   const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
-  await sidebar.getByRole("button", { name: "Learn" }).click();
+  await sidebar.getByRole("button", { name: "Learning Paths" }).click();
   await sidebar.getByRole("button", { name: "Skills" }).click();
   await sidebar.getByRole("button", { name: "Practise" }).click();
   await expect(sidebar.getByRole("link", { name: /Worlds & Missions/i })).toBeVisible();

@@ -9,6 +9,20 @@ function validTargetLevel(value: unknown): value is LearnerProfile["targetLevel"
   return typeof value === "string" && ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"].includes(value);
 }
 
+/** Profile-picture payloads: a bounded image data URL (uploaded photo or preset avatar SVG). */
+const MAX_AVATAR_BYTES = 500_000;
+const AVATAR_PATTERN = /^data:image\/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$/;
+
+function validAvatar(value: unknown): value is { url: string; kind: "photo" | "avatar" } {
+  return (
+    typeof value === "object" && value !== null &&
+    typeof (value as { url?: unknown }).url === "string" &&
+    (value as { url: string }).url.length <= MAX_AVATAR_BYTES &&
+    AVATAR_PATTERN.test((value as { url: string }).url) &&
+    ((value as { kind?: unknown }).kind === "photo" || (value as { kind?: unknown }).kind === "avatar")
+  );
+}
+
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -28,6 +42,21 @@ export async function POST(request: Request) {
   }
   const targetLevel = validTargetLevel(body.targetLevel) ? body.targetLevel : "B1";
   const existing = await getProfile(session.learnerId);
+
+  // Avatar update (standalone use is fine — the other profile fields are
+  // optional in the body and fall back to current values).
+  let avatarUrl = existing?.avatarUrl ?? null;
+  let avatarKind = existing?.avatarKind ?? "initials";
+  if (body.avatar === "RESET") {
+    avatarUrl = null;
+    avatarKind = "initials";
+  } else if (validAvatar(body.avatar)) {
+    avatarUrl = body.avatar.url;
+    avatarKind = body.avatar.kind;
+  } else if (body.avatar !== undefined) {
+    return NextResponse.json({ error: "avatar must be RESET or an image data URL under 500 KB (png, jpeg, webp or svg)." }, { status: 400 });
+  }
+
   const profile = await upsertProfile({
     learnerId: session.learnerId,
     displayName: typeof body.displayName === "string" && body.displayName.trim() ? body.displayName.trim() : session.displayName,
@@ -35,6 +64,8 @@ export async function POST(request: Request) {
     targetLevel,
     dailyMinutes,
     goals: Array.isArray(body.goals) ? body.goals.filter((item): item is string => typeof item === "string").slice(0, 8) : (existing?.goals ?? []),
+    avatarUrl,
+    avatarKind,
     englishDna: existing?.englishDna ?? { overallLevel: "Not assessed", strengths: [], focusAreas: [], preferredSkills: [], confidence: 0 },
     updatedAt: new Date().toISOString(),
   });

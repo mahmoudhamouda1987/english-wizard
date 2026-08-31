@@ -216,17 +216,17 @@ export default function OnboardingPage() {
       <section className="panel" style={{ display: "grid", gap: 16, padding: 28 }}>
         <label style={{ display: "grid", gap: 6 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>Your name</span>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" style={{ padding: 12, borderRadius: 10, border: "1px solid #dfe3ec", fontSize: 15 }} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" style={{ padding: 12, borderRadius: 10, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", fontSize: 15 }} />
         </label>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
           <label style={{ display: "grid", gap: 6 }}>
             <span style={{ fontWeight: 600, fontSize: 14 }}>Native language</span>
-            <input value={nativeLanguage} onChange={(e) => setNativeLanguage(e.target.value)} style={{ padding: 12, borderRadius: 10, border: "1px solid #dfe3ec", fontSize: 15 }} />
+            <input value={nativeLanguage} onChange={(e) => setNativeLanguage(e.target.value)} style={{ padding: 12, borderRadius: 10, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", fontSize: 15 }} />
           </label>
           <label style={{ display: "grid", gap: 6 }}>
             <span style={{ fontWeight: 600, fontSize: 14 }}>Your goal level</span>
-            <select value={targetLevel} onChange={(e) => setTargetLevel(e.target.value)} style={{ padding: 12, borderRadius: 10, border: "1px solid #dfe3ec", fontSize: 15 }}>
+            <select value={targetLevel} onChange={(e) => setTargetLevel(e.target.value)} style={{ padding: 12, borderRadius: 10, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", fontSize: 15 }}>
               {["A1", "A2", "B1", "B2", "C1", "C2"].map((x) => <option key={x}>{x}</option>)}
             </select>
           </label>
@@ -234,7 +234,7 @@ export default function OnboardingPage() {
 
         <label style={{ display: "grid", gap: 6 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>Minutes per day</span>
-          <input type="number" min="5" max="180" value={dailyMinutes} onChange={(e) => setDailyMinutes(Number(e.target.value))} style={{ padding: 12, borderRadius: 10, border: "1px solid #dfe3ec", fontSize: 15 }} />
+          <input type="number" min="5" max="180" value={dailyMinutes} onChange={(e) => setDailyMinutes(Number(e.target.value))} style={{ padding: 12, borderRadius: 10, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", fontSize: 15 }} />
         </label>
 
         <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
             {GOALS.map((goal, i) => {
               const active = goals.includes(goal);
               return (
-                <button key={goal} type="button" onClick={() => toggleGoal(goal)} aria-pressed={active} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderRadius: 10, border: active ? "2px solid #6840d6" : "1px solid #dfe3ec", background: active ? "#f0ebff" : "white", cursor: "pointer", textAlign: "left", fontSize: 13.5, transition: "all .15s" }}>
+                <button key={goal} type="button" onClick={() => toggleGoal(goal)} aria-pressed={active} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderRadius: 10, border: active ? "2px solid var(--accent-primary)" : "1px solid var(--border-strong)", background: active ? "var(--accent-soft)" : "var(--surface-card)", color: "var(--text-primary)", cursor: "pointer", textAlign: "left", fontSize: 13.5, transition: "all .15s" }}>
                   <span>{GOAL_ICONS[i]}</span> {goal} {active && <span style={{ marginLeft: "auto", color: "var(--accent-primary)", fontWeight: 700 }}>✓</span>}
                 </button>
               );
@@ -256,7 +256,7 @@ export default function OnboardingPage() {
           </p>
         </fieldset>
 
-        {error && <p role="alert" style={{ color: "#a53b3b" }}>{error}</p>}
+        {error && <p role="alert" style={{ color: "var(--danger)" }}>{error}</p>}
         <button className="button" disabled={busy || !name.trim() || goals.length === 0} onClick={startDiagnostic} style={{ padding: 15 }}>
           {busy ? "Preparing your profile…" : "Start the assessment"}
         </button>

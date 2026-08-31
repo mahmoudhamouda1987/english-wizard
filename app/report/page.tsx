@@ -40,12 +40,15 @@ interface ReportRow {
   duration_seconds: string | number | null;
 }
 
-const ACCENT = "#6840d6";
-const NAVY = "#0f1535";
-const INK = "#1c2233";
-const MUTED = "#6a7080";
-const FAINT = "#98a0ae";
-const HAIR = "#d9dce4";
+/* Theme tokens: the report follows the learner's theme (light values in light, dark in dark).
+   ACCENT_BG is the fill-safe accent (white text sits on it in both themes). */
+const ACCENT = "var(--accent-text)";
+const ACCENT_BG = "var(--accent-primary)";
+const NAVY = "var(--text-primary)";
+const INK = "var(--text-primary)";
+const MUTED = "var(--text-secondary)";
+const FAINT = "var(--text-tertiary)";
+const HAIR = "var(--border-default)";
 
 export default async function ReportPage() {
   const user = await currentUser();
@@ -136,7 +139,7 @@ export default async function ReportPage() {
 
       {doc.status === "INCOMPLETE" ? (
         <>
-          <section aria-label="Assessment status" style={{ margin: "26px 0", border: `1px solid ${HAIR}`, borderLeft: `4px solid ${NAVY}`, borderRadius: 10, background: "#fbfbfe", padding: "22px 24px" }}>
+          <section aria-label="Assessment status" style={{ margin: "26px 0", border: `1px solid ${HAIR}`, borderLeft: `4px solid ${NAVY}`, borderRadius: 10, background: "var(--bg-muted)", padding: "22px 24px" }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".08em", color: MUTED }}>STATUS</div>
             <p style={{ margin: "8px 0 6px", fontSize: 15, color: INK, lineHeight: 1.6 }}>{INCOMPLETE_MESSAGE}</p>
             <p style={{ margin: 0, fontSize: 12.5, color: MUTED, lineHeight: 1.6 }}>
@@ -154,7 +157,7 @@ export default async function ReportPage() {
       ) : (
         <>
           {/* ── Overall result ── */}
-          <section aria-label="Overall English proficiency" style={{ margin: "26px 0", border: `1px solid ${HAIR}`, borderLeft: `4px solid ${ACCENT}`, borderRadius: 10, background: "#fbfbfe", padding: "24px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+          <section aria-label="Overall English proficiency" style={{ margin: "26px 0", border: `1px solid ${HAIR}`, borderLeft: `4px solid ${ACCENT}`, borderRadius: 10, background: "var(--bg-muted)", padding: "24px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
             <div>
               <SectionTitle>OVERALL ENGLISH PROFICIENCY</SectionTitle>
               <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginTop: 6 }}>
@@ -192,7 +195,7 @@ export default async function ReportPage() {
               {CEFR_ORDER.map((lv) => {
                 const placed = lv === doc.result!.level;
                 return (
-                  <div key={lv} style={{ height: 34, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4, background: placed ? ACCENT : "#eef0f6", color: placed ? "white" : NAVY, fontWeight: 800, fontSize: 12.5 }}>
+                  <div key={lv} style={{ height: 34, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4, background: placed ? ACCENT_BG : "var(--bg-secondary)", color: placed ? "var(--accent-contrast)" : NAVY, fontWeight: 800, fontSize: 12.5 }}>
                     {lv}
                   </div>
                 );
@@ -217,7 +220,7 @@ export default async function ReportPage() {
             <SectionTitle>SKILL PROFILE</SectionTitle>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
               <thead>
-                <tr style={{ background: "#eef0f6", color: NAVY, textAlign: "left" }}>
+                <tr style={{ background: "var(--bg-secondary)", color: NAVY, textAlign: "left" }}>
                   <th style={cellHead("16%")}>Skill</th>
                   <th style={cellHead("18%")}>CEFR Level</th>
                   <th style={cellHead("12%")}>Score</th>
@@ -226,7 +229,7 @@ export default async function ReportPage() {
               </thead>
               <tbody>
                 {doc.skills.map((s, i) => (
-                  <tr key={s.skill} style={{ background: i % 2 ? "#fafbfd" : "white", borderBottom: `1px solid ${HAIR}` }}>
+                  <tr key={s.skill} style={{ background: i % 2 ? "var(--bg-muted)" : "var(--surface-card)", borderBottom: `1px solid ${HAIR}` }}>
                     <td style={cell()}><strong style={{ color: INK }}>{s.label}</strong></td>
                     <td style={cell()}>{s.assessed ? <strong style={{ color: ACCENT }}>{s.level}</strong> : <span style={{ color: FAINT }}>Not assessed</span>}</td>
                     <td style={cell()}>{s.assessed ? (s.score != null ? `${s.score}%` : "—") : <span style={{ color: FAINT }}>—</span>}</td>
@@ -269,7 +272,7 @@ export default async function ReportPage() {
             <SectionTitle>RECOMMENDED STARTING POINT</SectionTitle>
             <div style={{ fontSize: 15.5, fontWeight: 700, color: NAVY, margin: "6px 0 14px" }}>{doc.programme}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap" }}>
-              <div style={{ background: ACCENT, color: "white", borderRadius: 8, padding: "10px 22px", textAlign: "center" }}>
+              <div style={{ background: ACCENT_BG, color: "var(--accent-contrast)", borderRadius: 8, padding: "10px 22px", textAlign: "center" }}>
                 <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: ".08em", opacity: .85 }}>CURRENT LEVEL</div>
                 <div style={{ fontSize: 21, fontWeight: 800 }}>{doc.result!.level}</div>
               </div>

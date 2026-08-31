@@ -35,20 +35,20 @@ function QuickPractice({ exercises }: { exercises: Array<{ q: string; choices?: 
           const value = typed[qi] ?? "";
           const correct = (ex.accept ?? []).some((a) => normalise(a) === normalise(value));
           return (
-            <div key={qi} style={{ padding: "12px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+            <div key={qi} style={{ padding: "12px 14px", background: "var(--bg-secondary)", borderRadius: 10, border: "1px solid var(--border-default)" }}>
               <p style={{ margin: "0 0 8px" }}><strong>{qi + 1}.</strong> {ex.q}</p>
               <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <input aria-label={`Answer for question ${qi + 1}`} value={value} disabled={picked[qi] !== undefined} onChange={(e) => setTyped((p) => ({ ...p, [qi]: e.target.value.slice(0, 60) }))} onKeyDown={(e) => { if (e.key === "Enter" && value.trim()) setPicked((p) => ({ ...p, [qi]: correct ? 1 : 0 })); }} style={{ maxWidth: 320, padding: "10px 14px", borderRadius: 8, border: "1px solid #d0daf0", fontSize: 14 }} placeholder="Type your answer…" />
+                <input aria-label={`Answer for question ${qi + 1}`} value={value} disabled={picked[qi] !== undefined} onChange={(e) => setTyped((p) => ({ ...p, [qi]: e.target.value.slice(0, 60) }))} onKeyDown={(e) => { if (e.key === "Enter" && value.trim()) setPicked((p) => ({ ...p, [qi]: correct ? 1 : 0 })); }} style={{ maxWidth: 320, padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", fontSize: 14 }} placeholder="Type your answer…" />
                 {picked[qi] === undefined && <button type="button" className="button secondary" disabled={!value.trim()} onClick={() => setPicked((p) => ({ ...p, [qi]: correct ? 1 : 0 }))}>Check</button>}
               </div>
-              {picked[qi] !== undefined && <p style={{ margin: "6px 0 0", fontWeight: 600, color: picked[qi] === 1 ? "#16a34a" : "#dc2626" }}>{picked[qi] === 1 ? "✓ Correct!" : `✗ The answer was "${ex.accept?.[0]}"`}</p>}
+              {picked[qi] !== undefined && <p style={{ margin: "6px 0 0", fontWeight: 600, color: picked[qi] === 1 ? "var(--success)" : "var(--danger)" }}>{picked[qi] === 1 ? "✓ Correct!" : `✗ The answer was "${ex.accept?.[0]}"`}</p>}
             </div>
           );
         }
         const choices = ex.choices ?? [];
         const chosen = picked[qi];
         return (
-          <div key={qi} style={{ padding: "12px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+          <div key={qi} style={{ padding: "12px 14px", background: "var(--bg-secondary)", borderRadius: 10, border: "1px solid var(--border-default)" }}>
             <p style={{ margin: "0 0 8px" }}><strong>{qi + 1}.</strong> {ex.q}</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {choices.map((c, ci) => (
@@ -58,7 +58,7 @@ function QuickPractice({ exercises }: { exercises: Array<{ q: string; choices?: 
               ))}
             </div>
             {chosen !== undefined && chosen !== ex.answer && ex.choices && (
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "#dc2626" }}>Correct answer: {ex.choices[ex.answer ?? 0]}</p>
+              <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--danger)" }}>Correct answer: {ex.choices[ex.answer ?? 0]}</p>
             )}
           </div>
         );
@@ -131,7 +131,7 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
         <span style={{ display: "inline-block", padding: "4px 12px", borderRadius: 8, background: `${color}22`, color, fontWeight: 700, fontSize: 13 }}>{lesson.level}</span>
         <span style={{ fontSize: 13, opacity: 0.6, textTransform: "capitalize" }}>{lesson.skill}</span>
-        {isProfessional && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "#7c3aed22", color: "#7c3aed", fontWeight: 600 }}>Professional</span>}
+        {isProfessional && <span style={{ fontSize: 12, padding: "2px 8px", borderRadius: 6, background: "var(--accent-soft)", color: "var(--accent-text)", fontWeight: 600 }}>Professional</span>}
       </div>
       <h1 style={{ fontSize: 26, margin: "0 0 6px" }}>{lesson.title}</h1>
       <p style={{ fontSize: 16, lineHeight: 1.6, margin: "0 0 20px", opacity: 0.85 }}>{lesson.mission}</p>
@@ -143,7 +143,7 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
       </div>
 
       {done ? (
-        <div style={{ padding: 32, background: "#f0faf5", borderRadius: 14, border: "1px solid #10b98133", textAlign: "center" }}>
+        <div className="tint-success" style={{ padding: 32, borderRadius: 14, textAlign: "center" }}>
           <span style={{ fontSize: 48 }}>🎉</span>
           <h2 style={{ margin: "8px 0" }}>Lesson complete!</h2>
           <p style={{ margin: "4px 0 16px", opacity: 0.7 }}>Great work on &ldquo;{lesson.title}&rdquo;.</p>
@@ -166,18 +166,18 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
               ) : <p className="subtle">Teaching content loading…</p>}
 
               {mission && (
-                <section style={{ padding: 22, background: "#f6f2ff", borderRadius: 14, borderLeft: "4px solid #6840d6" }}>
+                <section className="tint-accent" style={{ padding: 22, borderRadius: 14, borderLeft: "4px solid var(--accent-primary)" }}>
                   <p className="eyebrow">Stage · {mission.stageName}</p>
                   <p style={{ margin: "4px 0 12px", lineHeight: 1.7 }}><em>{mission.stageClaim}</em></p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>{mission.topicTitles.map((t) => <span key={t} className="chip">{t}</span>)}</div>
                   <p className="eyebrow" style={{ margin: "0 0 4px" }}>Characters</p>
                   <ul style={{ margin: "0 0 12px", paddingLeft: 20, lineHeight: 1.8 }}>{mission.cast.map((c) => <li key={c}>{c}</li>)}</ul>
-                  {mission.roleplay && <div style={{ padding: 14, background: "white", borderRadius: 12 }}><p style={{ margin: "0 0 8px", fontWeight: 700 }}>🎭 Role-play: {mission.roleplay.scenarioId.replace("rp-", "")}</p><p style={{ margin: 0, lineHeight: 1.6, fontSize: 14 }}>{mission.roleplay.situation}<br /><strong>You:</strong> {mission.roleplay.yourRole} · <strong>Partner:</strong> {mission.roleplay.partnerRole}</p></div>}
+                  {mission.roleplay && <div style={{ padding: 14, background: "var(--surface-card)", borderRadius: 12, border: "1px solid var(--border-subtle)" }}><p style={{ margin: "0 0 8px", fontWeight: 700 }}>🎭 Role-play: {mission.roleplay.scenarioId.replace("rp-", "")}</p><p style={{ margin: 0, lineHeight: 1.6, fontSize: 14 }}>{mission.roleplay.situation}<br /><strong>You:</strong> {mission.roleplay.yourRole} · <strong>Partner:</strong> {mission.roleplay.partnerRole}</p></div>}
                 </section>
               )}
 
               {isProfessional && lessonBodyData && (
-                <section style={{ padding: 22, background: "var(--accent-soft)", borderRadius: 14, borderLeft: "4px solid #7c3aed" }}>
+                <section style={{ padding: 22, background: "var(--accent-soft)", borderRadius: 14, borderLeft: "4px solid var(--accent-primary)" }}>
                   <p className="eyebrow">Professional focus</p>
                   <p style={{ lineHeight: 1.7 }}>This lesson covers professional {lesson.skill} skills at {lesson.level} level. Complete the practice exercises to demonstrate your understanding.</p>
                 </section>
@@ -222,23 +222,23 @@ export default function LearnLessonPage(props: { params: Promise<{ lessonId: str
         <section style={{ marginTop: 24, padding: 22, background: "var(--surface)", borderRadius: 14, border: "1px solid var(--border)" }}>
           <h3 style={{ margin: "0 0 8px" }}>✍️ Production task</h3>
           <p style={{ margin: "0 0 10px", lineHeight: 1.6, fontSize: 14 }}>Complete this task to finish the lesson: <strong>{lesson.mission}</strong></p>
-          <textarea value={production} onChange={(e) => setProduction(e.target.value.slice(0, 5000))} rows={5} style={{ width: "100%", fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid #d0daf0", padding: 12 }} placeholder="Write your response here…" />
+          <textarea value={production} onChange={(e) => setProduction(e.target.value.slice(0, 5000))} rows={5} style={{ width: "100%", fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", padding: 12 }} placeholder="Write your response here…" />
           <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center" }}>
             <button className="button" disabled={busy || production.length < 20} onClick={() => void handleComplete()}>{busy ? "Saving…" : "Complete lesson ✓"}</button>
             {production.length < 20 && <span className="subtle" style={{ fontSize: 12 }}>Write at least 20 characters</span>}
           </div>
-          {error && <p role="alert" style={{ color: "#a53b3b", marginTop: 8 }}>{error}</p>}
+          {error && <p role="alert" style={{ color: "var(--danger)", marginTop: 8 }}>{error}</p>}
         </section>
       )}
 
       {tab === "practice" && !done && (
         <section style={{ marginTop: 24, padding: 22, background: "var(--surface)", borderRadius: 14, border: "1px solid var(--border)" }}>
           <h3 style={{ margin: "0 0 8px" }}>✍️ Complete the lesson</h3>
-          <textarea value={production} onChange={(e) => setProduction(e.target.value.slice(0, 5000))} rows={4} style={{ width: "100%", fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid #d0daf0", padding: 12 }} placeholder="Write a summary of what you learned…" />
+          <textarea value={production} onChange={(e) => setProduction(e.target.value.slice(0, 5000))} rows={4} style={{ width: "100%", fontSize: 14, lineHeight: 1.6, borderRadius: 8, border: "1px solid var(--border-strong)", background: "var(--surface-card)", color: "var(--text-primary)", padding: 12 }} placeholder="Write a summary of what you learned…" />
           <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
             <button className="button" disabled={busy || production.length < 20} onClick={() => void handleComplete()}>{busy ? "Saving…" : "Complete lesson ✓"}</button>
           </div>
-          {error && <p role="alert" style={{ color: "#a53b3b", marginTop: 8 }}>{error}</p>}
+          {error && <p role="alert" style={{ color: "var(--danger)", marginTop: 8 }}>{error}</p>}
         </section>
       )}
     </main>

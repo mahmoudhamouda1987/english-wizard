@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS learner_chunk_states (
 CREATE INDEX IF NOT EXISTS learner_chunk_review_idx ON learner_chunk_states(learner_id, next_review_at);
 CREATE TABLE IF NOT EXISTS learner_profiles (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,display_name TEXT NOT NULL DEFAULT 'Learner',native_language TEXT NOT NULL DEFAULT 'Arabic',target_level TEXT NOT NULL DEFAULT 'B1',daily_minutes INTEGER NOT NULL DEFAULT 20 CHECK (daily_minutes BETWEEN 5 AND 180),goals JSONB NOT NULL DEFAULT '[]'::jsonb,english_dna JSONB NOT NULL DEFAULT '{}'::jsonb,pathway_selection JSONB,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS pathway_selection JSONB;
+-- Profile identity: learner-chosen profile picture — an uploaded photo or a
+-- preset avatar, stored as a data URL; 'initials' renders the name monogram.
+ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS avatar_kind TEXT NOT NULL DEFAULT 'initials';
 CREATE TABLE IF NOT EXISTS diagnostic_attempts (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,answers JSONB NOT NULL,scores JSONB NOT NULL,cefr_level TEXT NOT NULL,english_dna JSONB NOT NULL DEFAULT '{}'::jsonb,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS learning_events (id UUID PRIMARY KEY,learner_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,event_type TEXT NOT NULL,payload JSONB NOT NULL,occurred_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS user_accounts (id UUID PRIMARY KEY,learner_id UUID UNIQUE NOT NULL REFERENCES learners(id) ON DELETE CASCADE,email TEXT UNIQUE NOT NULL,display_name TEXT NOT NULL,password_hash TEXT NOT NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());

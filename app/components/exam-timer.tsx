@@ -51,7 +51,7 @@ export function ExamTimer({ durationMinutes, attemptKey, onTimeUp }: ExamTimerPr
   const low = remaining <= 60;
 
   return (
-    <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 700, fontSize: 15, color: low ? "#c0392b" : "#1c2340" }}>
+    <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 700, fontSize: 15, color: low ? "var(--danger)" : "var(--text-primary)" }}>
       {low && <span aria-hidden="true">⚠</span>}
       <span>{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}</span>
       <span className="subtle" style={{ fontWeight: 400 }}>remaining</span>

@@ -5,6 +5,7 @@ import {
   IconLetters, IconPuzzle, IconBulb, IconCertificate, IconTeacher, IconUsers,
   IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame,
 } from "./nav-icons";
+import type { CatalogueProduct } from "@/src/domain/entitlements";
 
 export interface NavItem {
   label: string;
@@ -12,6 +13,8 @@ export interface NavItem {
   icon: ComponentType<{ size?: number }>;
   /** One-line description shown under group headings and in the mobile drawer. */
   desc?: string;
+  /** When set, the item is a subscribable product — the shell renders a lock/unlock badge from the subscription. */
+  product?: CatalogueProduct;
 }
 
 export interface NavGroup {
@@ -22,11 +25,13 @@ export interface NavGroup {
 }
 
 /**
- * 2.0 information architecture (spec Part 37 — normative group structure):
- * nine collapsible groups. ASSESS is a pure assessment area (Tests & Exams);
- * products own their routes in PRODUCTS (General English, Business English,
- * Fluency Track, IELTS, Cambridge). TOOLS: Teacher AI, Community, Invite Friends.
- * Still absent by design: Quick Practice, Leaderboard, LevelQuest duplicate
+ * 2.0 information architecture (Part 37 + learning-paths consolidation):
+ * LEARNING PATHS is the commercial spine — the five products are its
+ * sub-tabs (lock badges reflect the subscription; during AUDIT_MODE every
+ * path stays accessible). ASSESS is a pure assessment area (Tests & Exams:
+ * Full Check placement and full mock exams only). The former standalone
+ * PRODUCTS group is retired — its five courses live under Learning Paths.
+ * Still absent by design: Quick Practice, Leaderboard, LevelCheck duplicate
  * navigation, standalone Mistakes/Achievements (redirected), Chunks & Mediation
  * and Search (routes remain reachable; deliberately not in the sidebar).
  */
@@ -39,11 +44,15 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     key: "learn",
-    label: "Learn",
-    desc: "Your path, lessons and worlds.",
+    label: "Learning Paths",
+    desc: "Five products, one journey.",
     items: [
+      { label: "General English", href: "/general-english", icon: IconGlobe, product: "general-english", desc: "Pre-A1 → C2 core curriculum" },
+      { label: "Business English", href: "/business-english", icon: IconBriefcase, product: "business-english", desc: "Real workplace outcomes" },
+      { label: "Fluency Track (Conversation)", href: "/fluency-track", icon: IconFlame, product: "fluency-track", desc: "Spoken fluency, B1 → C2" },
+      { label: "IELTS Preparation", href: "/ielts", icon: IconBoard, product: "ielts", desc: "Academic & General Training" },
+      { label: "Cambridge English Qualifications", href: "/cambridge", icon: IconCertificate, product: "cambridge", desc: "A2 Key → C2 Proficiency" },
       { label: "My Journey", href: "/learning-path", icon: IconRoute, desc: "Your level-by-level path" },
-      { label: "Lessons", href: "/learn", icon: IconBook, desc: "Guided lessons in sequence" },
       { label: "Worlds & Missions", href: "/worlds", icon: IconGlobe, desc: "Learn through worlds" },
     ],
   },
@@ -90,18 +99,6 @@ export const NAV_GROUPS: NavGroup[] = [
     desc: "Checkpoints and exams.",
     items: [
       { label: "Tests & Exams", href: "/pathways", icon: IconCertificate, desc: "LevelCheck, mocks and module tests" },
-    ],
-  },
-  {
-    key: "products",
-    label: "Products",
-    desc: "Five focused programmes.",
-    items: [
-      { label: "General English", href: "/general-english", icon: IconGlobe, desc: "Pre-A1 → C2 core curriculum" },
-      { label: "Business English", href: "/business-english", icon: IconBriefcase, desc: "Real workplace outcomes" },
-      { label: "Fluency Track", href: "/fluency-track", icon: IconFlame, desc: "Spoken fluency, B1 → C2" },
-      { label: "IELTS", href: "/ielts", icon: IconBoard, desc: "Academic & General Training" },
-      { label: "Cambridge", href: "/cambridge", icon: IconCertificate, desc: "A2 Key → C2 Proficiency" },
     ],
   },
   {

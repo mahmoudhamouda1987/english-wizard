@@ -8,13 +8,15 @@ import type { ReactNode } from "react";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 import { InstallButton } from "@/app/components/install-button";
 import { NAV_GROUPS, NAV_FLAT } from "@/app/components/nav-config";
-import type { NavGroup } from "@/app/components/nav-config";
-import { IconChevron, IconMenu, IconClose, IconSearch, IconHome, IconRoute, IconChat, IconChart, IconBulb } from "@/app/components/nav-icons";
+import type { NavGroup, NavItem } from "@/app/components/nav-config";
+import type { PlanTier } from "@/src/domain/entitlements";
+import { isProductUnlockedFor } from "@/src/domain/entitlements";
+import { IconChevron, IconMenu, IconClose, IconSearch, IconHome, IconRoute, IconChat, IconChart, IconBulb, IconLock } from "@/app/components/nav-icons";
 
 /** Mobile bottom tab bar — five calm destinations, everything else in More. */
 const TABBAR = [
   { label: "Home", href: "/dashboard", icon: IconHome },
-  { label: "Learn", href: "/learning-path", icon: IconRoute },
+  { label: "Paths", href: "/learning-path", icon: IconRoute },
   { label: "Practise", href: "/conversation", icon: IconChat },
   { label: "Progress", href: "/progress", icon: IconChart },
 ];
@@ -56,7 +58,16 @@ const navStore = {
   },
 };
 
-function SidebarNav({ pathname, compact, onNavigate }: { pathname: string; compact?: boolean; onNavigate?: () => void }) {
+/** Name monogram: "John Smith" → JS; single name → its first two letters. */
+function initialsFor(name: string | undefined | null): string {
+  const trimmed = (name ?? "").trim();
+  if (!trimmed) return "EW";
+  const parts = trimmed.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return trimmed.slice(0, 2).toUpperCase();
+}
+
+function SidebarNav({ pathname, compact, onNavigate, tier }: { pathname: string; compact?: boolean; onNavigate?: () => void; tier: PlanTier | null }) {
   // User overrides persist across visits; a group is open by default when it holds the active route.
   const overrides = useSyncExternalStore<Record<string, boolean>>(navStore.subscribe, readNavOverrides, () => ({}));
 
@@ -82,9 +93,10 @@ function SidebarNav({ pathname, compact, onNavigate }: { pathname: string; compa
             </button>
             {!compact && <div className="snav-group-desc">{group.desc}</div>}
             <div id={`nav-group-${group.key}`} className="snav-group-items" style={{ display: isOpen ? "grid" : "none" }}>
-              {group.items.map((item) => {
+              {group.items.map((item: NavItem) => {
                 const active = isActive(pathname, item.href);
                 const Icon = item.icon;
+                const locked = item.product && tier ? !isProductUnlockedFor(tier, item.product) : false;
                 return (
                   <Link
                     key={item.label}
@@ -94,7 +106,12 @@ function SidebarNav({ pathname, compact, onNavigate }: { pathname: string; compa
                     title={item.desc ?? item.label}
                   >
                     <span className="snav-icon" aria-hidden="true"><Icon /></span>
-                    {item.label}
+                    <span className="snav-label">{item.label}</span>
+                    {locked && (
+                      <span className="snav-lock" role="img" aria-label={`${item.label} is not in your subscription`} title="Not in your subscription — included with this product or All Access">
+                        <IconLock size={12} />
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -112,6 +129,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [drawer, setDrawer] = useState(false);
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState<{ cefr: string; percent: number } | null>(null);
+  const [tier, setTier] = useState<PlanTier | null>(null);
+  const [avatar, setAvatar] = useState<{ initials: string; photoUrl: string | null }>({ initials: "EW", photoUrl: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -121,10 +140,40 @@ export function AppShell({ children }: { children: ReactNode }) {
         if (cancelled || !d?.level) return;
         const next = { cefr: String(d.level), percent: Math.min(100, Math.max(0, Number(d.overallPercent) || 0)) };
         setLevel(next);
+        setAvatar((a) => (a.initials === "EW" && d.firstName ? { ...a, initials: initialsFor(String(d.firstName)) } : a));
         try { sessionStorage.setItem("ew-level", JSON.stringify(next)); } catch { /* ignore */ }
       })
       .catch(() => { /* widget keeps its resting state */ });
+    // Subscription tier drives the lock badges; profile drives the avatar.
+    fetch("/api/subscription", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier); })
+      .catch(() => { /* badges stay neutral */ });
+    fetch("/api/profile", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => {
+        if (cancelled || !p?.profile) return;
+        const name = String(p.profile.displayName ?? "");
+        setAvatar({ initials: initialsFor(name), photoUrl: typeof p.profile.avatarUrl === "string" && p.profile.avatarKind !== "initials" ? p.profile.avatarUrl : null });
+      })
+      .catch(() => { /* avatar keeps the monogram */ });
     return () => { cancelled = true; };
+  }, []);
+
+  // Settings can update the profile picture — refresh the header avatar instantly.
+  useEffect(() => {
+    function onAvatarChanged() {
+      fetch("/api/profile", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((p) => {
+          if (!p?.profile) return;
+          const name = String(p.profile.displayName ?? "");
+          setAvatar({ initials: initialsFor(name), photoUrl: typeof p.profile.avatarUrl === "string" && p.profile.avatarKind !== "initials" ? p.profile.avatarUrl : null });
+        })
+        .catch(() => { /* keep current avatar */ });
+    }
+    window.addEventListener("ew-avatar-changed", onAvatarChanged);
+    return () => window.removeEventListener("ew-avatar-changed", onAvatarChanged);
   }, []);
 
   function search(e: React.FormEvent) {
@@ -145,7 +194,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Image src="/logo.png" alt="" width={34} height={34} className="brand-logo" unoptimized />
           <strong>English Wizard</strong>
         </Link>
-        <SidebarNav pathname={pathname} />
+        <SidebarNav pathname={pathname} tier={tier} />
         <div className="cefr-widget" aria-label="Current level">
           <div className="cefr-top"><span>Current level</span></div>
           <div className="cefr-level">{level?.cefr ?? "—"}</div>
@@ -174,7 +223,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             <IconTargetIcon />
           </Link>
           <ThemeToggle />
-          <Link className="avatar" href="/settings" aria-label="Your account">EW</Link>
+          <Link className="avatar" href="/settings" aria-label="Your account">
+            {avatar.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data-URL profile pictures only
+              <img src={avatar.photoUrl} alt="" className="avatar-img" />
+            ) : (
+              avatar.initials
+            )}
+          </Link>
         </header>
         {children}
       </div>
@@ -207,7 +263,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <IconClose />
           </button>
         </div>
-        <SidebarNav pathname={pathname} compact onNavigate={() => setDrawer(false)} />
+        <SidebarNav pathname={pathname} compact onNavigate={() => setDrawer(false)} tier={tier} />
         <Link className="upgrade-btn" href="/plan" style={{ marginTop: 16 }}>Go further with All Access</Link>
       </div>
     </div>

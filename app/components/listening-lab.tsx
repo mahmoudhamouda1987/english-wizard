@@ -140,8 +140,8 @@ export function ListeningLab({ items, onComplete }: { items: Item[]; onComplete?
             {diff!.map((w, wi) => (
               <span key={wi} style={{
                 padding: "3px 8px", borderRadius: 8, fontWeight: 600,
-                background: w.ok ? "#dcf5e2" : "#fde3e3",
-                color: w.ok ? "#14532d" : "#7f1d1d",
+                background: w.ok ? "var(--success-soft)" : "var(--danger-soft)",
+                color: w.ok ? "var(--success)" : "var(--danger)",
                 textDecoration: w.ok ? "none" : "line-through",
               }}>{w.word}</span>
             ))}

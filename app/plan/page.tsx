@@ -109,7 +109,7 @@ export default function PlanPage() {
       {error && access && <p role="status" className="state-card" style={{ marginBottom: 18 }}>{error}</p>}
 
       {/* Trial status card */}
-      <section className="panel" style={{ padding: 24, marginBottom: 24, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)" }}>
+      <section className="panel tint-accent" style={{ padding: 24, marginBottom: 24 }}>
         {access.inTrial ? (
           <TrialActive trial={trial} />
         ) : access.trialExpired ? (
@@ -179,7 +179,7 @@ export default function PlanPage() {
             const yearly = period === "yearly";
             const pct = annualSavingPct(p);
             return (
-              <section key={p.product} className="panel" style={{ margin: 0, padding: 22, position: "relative", border: isCurrent ? "2px solid #6840d6" : undefined }}>
+              <section key={p.product} className="panel" style={{ margin: 0, padding: 22, position: "relative", border: isCurrent ? "2px solid var(--accent-primary)" : undefined }}>
                 {p.product === "all-access" && <span className="streak-pill" style={{ position: "absolute", top: -14, left: 22 }}>Best value</span>}
                 <h3 style={{ fontSize: 18, margin: "0 0 4px" }}>{p.name}</h3>
                 <p className="subtle" style={{ fontSize: 13, margin: "0 0 8px", minHeight: 36 }}>{p.positioning}</p>
@@ -207,7 +207,7 @@ export default function PlanPage() {
       </div>
 
       {/* Included with every account (the free base state — never a "forever" sales card) */}
-      <section className="panel" style={{ padding: 22, marginTop: 24, background: "linear-gradient(135deg,#f6f2ff,#f0f4ff)" }}>
+      <section className="panel tint-accent" style={{ padding: 22, marginTop: 24 }}>
         <h2 style={{ fontSize: 18, margin: "0 0 6px" }}>Included with every account</h2>
         <p className="subtle" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.7 }}>
           LevelCheck placement, your personalised learning path, the core curriculum with spaced review, daily plan and progress
@@ -221,7 +221,7 @@ export default function PlanPage() {
       <section className="panel" style={{ padding: 0, overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 560 }}>
           <thead>
-            <tr style={{ textAlign: "left", borderBottom: "2px solid #e4e8f0" }}>
+            <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border-default)" }}>
               <th style={{ padding: "12px 16px" }}>Feature</th>
               <th style={{ padding: "12px 16px" }}>Included free</th>
               <th style={{ padding: "12px 16px" }}>Any product</th>
@@ -239,8 +239,8 @@ export default function PlanPage() {
               ["Boss Missions", "—", "1 / day", "Unlimited"],
               ["All five products, one subscription", "—", "—", "✓"],
             ].map((row) => (
-              <tr key={row[0]} style={{ borderBottom: "1px solid #eef1f6" }}>
-                {row.map((cell, ci) => <td key={ci} style={{ padding: "11px 16px", fontWeight: ci === 0 ? 600 : 400, color: cell === "—" ? "#b6bdcc" : undefined }}>{cell}</td>)}
+              <tr key={row[0]} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                {row.map((cell, ci) => <td key={ci} style={{ padding: "11px 16px", fontWeight: ci === 0 ? 600 : 400, color: cell === "—" ? "var(--text-tertiary)" : undefined }}>{cell}</td>)}
               </tr>
             ))}
           </tbody>
@@ -266,7 +266,7 @@ function TrialActive({ trial }: { trial: Access["trial"] }) {
         </div>
         <span className="streak-pill" style={{ marginLeft: "auto", fontSize: 14 }}>{days} day{days === 1 ? "" : "s"} left</span>
       </div>
-      <div style={{ position: "relative", height: 14, background: "#e6e0ff", borderRadius: 8, marginTop: 18, overflow: "hidden" }}>
+      <div style={{ position: "relative", height: 14, background: "var(--accent-softer)", borderRadius: 8, marginTop: 18, overflow: "hidden" }}>
         <div style={{ width: `${Math.min(100, Math.max(0, fraction * 100))}%`, height: "100%", background: "linear-gradient(90deg,#6840d6,#8b5cf6)", borderRadius: 8 }} />
       </div>
       <p className="subtle" style={{ fontSize: 12.5, margin: "10px 0 0" }}>When your trial ends, premium features pause automatically — your progress and data are always kept.</p>

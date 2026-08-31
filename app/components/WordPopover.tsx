@@ -41,7 +41,7 @@ export function WordPopover({ word }: { word: string }) {
     >
       {word}
       {open && (
-        <span role="tooltip" style={{ position: "absolute", zIndex: 20, left: 0, top: "calc(100% + 8px)", width: 260, padding: 14, borderRadius: 12, border: "1px solid #dfe3ec", background: "var(--bg-elevated)", boxShadow: "0 10px 30px rgba(20,20,40,.14)", display: "grid", gap: 7, color: "#25253a" }}>
+        <span role="tooltip" style={{ position: "absolute", zIndex: 20, left: 0, top: "calc(100% + 8px)", width: 260, padding: 14, borderRadius: 12, border: "1px solid var(--border-default)", background: "var(--bg-elevated)", boxShadow: "0 10px 30px rgba(20,20,40,.14)", display: "grid", gap: 7, color: "var(--text-primary)" }}>
           <strong>{clean}</strong>
           <span style={{ fontSize: 12, opacity: 0.7 }}>{info?.partOfSpeech ?? "word"}{info?.source ? ` · ${info.source}` : ""}</span>
           <span>{info?.meaning ?? "Looking up meaning…"}</span>

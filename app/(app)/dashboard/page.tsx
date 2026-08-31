@@ -5,7 +5,60 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
 import { track } from "@/app/lib/track";
-import { IconCheck, IconBulb, IconFlag } from "@/app/components/nav-icons";
+import { IconCheck, IconBulb, IconFlag, IconGlobe, IconBriefcase, IconFlame, IconBoard, IconCertificate, IconLock } from "@/app/components/nav-icons";
+import { PRODUCT_CATALOGUE, type ProductIconKey } from "@/src/domain/product-catalogue";
+import type { PlanTier } from "@/src/domain/entitlements";
+import { isProductUnlockedFor } from "@/src/domain/entitlements";
+
+const PATH_ICONS: Record<ProductIconKey, (props: { size?: number }) => React.JSX.Element> = {
+  globe: IconGlobe,
+  briefcase: IconBriefcase,
+  flame: IconFlame,
+  board: IconBoard,
+  certificate: IconCertificate,
+};
+
+/** The five products as a premium showcase — the commercial spine of the dashboard. */
+function LearningPathsShowcase() {
+  const [tier, setTier] = useState<PlanTier | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/subscription", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier); })
+      .catch(() => { /* cards stay neutral */ });
+    return () => { cancelled = true; };
+  }, []);
+  return (
+    <section aria-label="Your learning paths" style={{ display: "grid", gap: 12 }}>
+      <div className="panel-title" style={{ marginBottom: 0 }}>
+        <h3>Your learning paths</h3>
+        <Link href="/learning-path">My journey</Link>
+      </div>
+      <p className="path-audit-note"><span className="dot" aria-hidden="true" /> Every path is open while English Wizard 2.0 is in build — explore freely.</p>
+      <div className="path-grid">
+        {PRODUCT_CATALOGUE.map((p) => {
+          const Icon = PATH_ICONS[p.icon];
+          const unlocked = tier ? isProductUnlockedFor(tier, p.id) : true;
+          return (
+            <Link key={p.id} href={p.href} className="path-card">
+              <span className="path-icon" style={{ background: p.gradient }} aria-hidden="true"><Icon size={22} /></span>
+              <h3>{p.name}</h3>
+              <p className="path-tag">{p.tagline}</p>
+              <div className="path-meta">
+                <span className={`path-state ${unlocked ? "unlocked" : "locked"}`}>
+                  {unlocked ? <IconCheck size={12} /> : <IconLock size={11} />}
+                  {unlocked ? "Open" : "Locked"}
+                </span>
+                <span className="path-open">Open path →</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 interface Dash {
   firstName: string;
@@ -205,6 +258,8 @@ export default function DashboardPage() {
       </header>
 
       <TrialBanner />
+
+      <LearningPathsShowcase />
 
       {isNewLearner ? (
         /* New learner: one clear first step (Parts 71/92) */

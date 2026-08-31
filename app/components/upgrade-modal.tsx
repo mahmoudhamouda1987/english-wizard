@@ -17,7 +17,7 @@ const OVERLAY: React.CSSProperties = {
   alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20, backdropFilter: "blur(2px)",
 };
 const MODAL: React.CSSProperties = {
-  maxWidth: 500, width: "100%", background: "white", borderRadius: 18, padding: "28px 26px",
+  maxWidth: 500, width: "100%", background: "var(--surface-card)", borderRadius: 18, padding: "28px 26px",
   boxShadow: "0 24px 60px rgba(15,21,53,.35)", position: "relative", animation: "upModal .25s ease",
   maxHeight: "90vh", overflowY: "auto",
 };
@@ -121,13 +121,13 @@ export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open
           <p style={{ margin: 0 }}><strong>Why it matters:</strong> {info.why}</p>
         </div>
 
-        <div style={{ background: "#f6f4ff", borderRadius: 12, padding: "12px 14px", marginBottom: 16, fontSize: 13 }}>
+        <div className="tint-accent" style={{ borderRadius: 12, padding: "12px 14px", marginBottom: 16, fontSize: 13 }}>
           <div style={{ fontWeight: 700, marginBottom: 6 }}>✓ Already unlocked for you</div>
-          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.8, color: "#3c3557" }}>
+          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.8, color: "var(--text-secondary)" }}>
             {ALREADY_UNLOCKED.map((item) => <li key={item}>{item}</li>)}
           </ul>
           <div style={{ fontWeight: 700, margin: "10px 0 2px" }}>⭐ A subscription unlocks</div>
-          <div style={{ color: "#3c3557" }}>{info.value}</div>
+          <div style={{ color: "var(--text-secondary)" }}>{info.value}</div>
         </div>
 
         <div style={{ display: "grid", gap: 10, marginBottom: 8 }}>

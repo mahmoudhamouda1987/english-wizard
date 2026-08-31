@@ -37,6 +37,8 @@ export const IconUsers = base(<><circle cx="9" cy="8" r="3.2" /><path d="M3.5 20
 export const IconGift = base(<><rect x="3.5" y="8" width="17" height="4.5" rx="1" /><path d="M5 12.5V20a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 20v-7.5" /><path d="M12 8v13.5" /><path d="M12 8s-4.5.3-4.5-2.5C7.5 3.5 10 3 11 4c.9.9 1 4 1 4z" /><path d="M12 8s4.5.3 4.5-2.5C16.5 3.5 14 3 13 4c-.9.9-1 4-1 4z" /></>);
 export const IconGear = base(<><circle cx="12" cy="12" r="3.2" /><path d="M19 12a7 7 0 0 0-.14-1.4l2-1.55-2-3.46-2.35.95a7 7 0 0 0-2.42-1.4L13.73 2.5h-3.46l-.36 2.64a7 7 0 0 0-2.42 1.4L5.14 5.6l-2 3.46 2 1.55A7 7 0 0 0 5 12c0 .48.05.94.14 1.4l-2 1.55 2 3.46 2.35-.95a7 7 0 0 0 2.42 1.4l.36 2.64h3.46l.36-2.64a7 7 0 0 0 2.42-1.4l2.35.95 2-3.46-2-1.55c.09-.46.14-.92.14-1.4z" /></>);
 export const IconChevron = base(<path d="m6 9 6 6 6-6" />);
+export const IconLock = base(<><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></>);
+export const IconCamera = base(<><path d="M4 8.5h3l1.5-2h7L17 8.5h3a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1z" /><circle cx="12" cy="13.5" r="3.4" /></>);
 export const IconMenu = base(<path d="M4 7h16M4 12h16M4 17h16" />);
 export const IconClose = base(<path d="M6 6l12 12M18 6 6 18" />);
 export const IconSearch = base(<><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></>);

@@ -123,18 +123,32 @@ test.describe("Route closures (audit dispositions)", () => {
   });
 });
 
-test.describe("Sidebar PRODUCTS group (Parts 3/14/16)", () => {
-  test("app sidebar shows Products group with five product destinations", async ({ page }) => {
+test.describe("Sidebar LEARNING PATHS group (Parts 3/14/16 + learning-paths consolidation)", () => {
+  test("app sidebar shows Learning Paths group with five product destinations and lock badges", async ({ page }) => {
     await register(page, "nav");
     await page.goto("/dashboard");
-    const productsToggle = page.getByRole("button", { name: "Products", exact: true });
-    await expect(productsToggle).toBeVisible();
-    if ((await productsToggle.getAttribute("aria-expanded")) === "false") {
-      await productsToggle.click();
+    const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
+    const pathsToggle = sidebar.getByRole("button", { name: "Learning Paths", exact: true });
+    await expect(pathsToggle).toBeVisible();
+    if ((await pathsToggle.getAttribute("aria-expanded")) === "false") {
+      await pathsToggle.click();
     }
-    for (const product of ["General English", "Business English", "IELTS", "Cambridge", "Fluency Track"]) {
-      await expect(page.getByRole("link", { name: new RegExp(`^\\s*${product}\\s*$`) })).toBeVisible();
+    for (const product of ["General English", "Business English", "Fluency Track (Conversation)", "IELTS Preparation", "Cambridge English Qualifications"]) {
+      await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${product.replace(/[()]/g, "\\$&")}`) })).toBeVisible();
     }
+    // A free account subscribes to no product — the five product rows carry lock badges.
+    await expect(sidebar.getByRole("img", { name: /is not in your subscription/ }).first()).toBeVisible();
+  });
+
+  test("Assess group keeps Tests & Exams as a pure assessment area", async ({ page }) => {
+    await register(page, "assess");
+    await page.goto("/pathways");
+    await expect(page.getByRole("link", { name: /Start Full Check/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Take the mock exam/i })).toBeVisible();
+    // The former product preparation panels have moved to Learning Paths (scope to main content).
+    const main = page.locator("main");
+    await expect(main.getByText("IELTS preparation")).toHaveCount(0);
+    await expect(main.getByText("Cambridge preparation")).toHaveCount(0);
   });
 });
 

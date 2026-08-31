@@ -2,131 +2,77 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UpgradeModal } from "@/app/components/upgrade-modal";
 import { PageHeader } from "@/app/components/page-header";
 
-type Readiness = { ready: boolean; missing: string[] };
-type DomainSummary = { id: string; label: string; blurb: string; trackCount: number; tracks: Array<{ id: string; label: string }> };
-type Catalog = {
-  generalEnglish: { pathway: string; description: string };
-  ielts: ExamPathwayView;
-  cambridge: ExamPathwayView;
-  professional: { domains: DomainSummary[] };
-};
-type ExamPathwayView = {
-  exam: string;
-  skills: string[];
-  practiceTypes: string[];
-  scoreModel: string;
-  disclaimer: string;
-  readinessCriteria: string[];
-  readiness: Readiness;
-  variants?: string[];
-  bands?: number[];
-  qualifications?: string[];
-};
 type Selection = { pathway: string; domain?: string; track?: string; target?: string; selectedAt: string };
 
+/**
+ * Tests & Exams (Assess) — assessment infrastructure only: LevelCheck (Full
+ * Check) placement and the full mock exam. Product-level preparation lives in
+ * its own destination under Learning Paths, never here — and preparation
+ * never implies official certification.
+ */
 export default function PathwaysPage() {
-  const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [selected, setSelected] = useState<Selection | null>(null);
-  const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [gate, setGate] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/pathways", { cache: "no-store" })
       .then((r) => r.json())
       .then((payload) => {
-        if (payload.catalog) {
-          setCatalog(payload.catalog);
-          setSelected(payload.selected ?? null);
-        } else {
-          setMessage(payload.error ?? "Sign in to choose your learning pathway.");
-        }
+        if (payload.selected) setSelected(payload.selected);
       })
-      .catch(() => setMessage("Unable to load pathways."));
+      .catch(() => { /* the active-pathway card simply stays hidden */ });
   }, []);
-
-  async function select(pathway: string, extra: Record<string, string> = {}) {
-    setBusy(true);
-    setMessage("");
-    try {
-      const response = await fetch("/api/pathways", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ pathway, ...extra }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error ?? "Unable to save selection.");
-      setSelected(payload.selection);
-      setMessage("Pathway saved. Your daily missions now follow this path.");
-      const refreshed = await fetch("/api/pathways", { cache: "no-store" }).then((r) => r.json());
-      if (refreshed.catalog) setCatalog(refreshed.catalog);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to save selection.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  function readinessLabel(readiness: Readiness) {
-    return readiness.ready ? "Ready" : `Building: ${readiness.missing.slice(0, 3).join(", ")}`;
-  }
 
   return (
     <main id="main-content" className="dash-main">
       <PageHeader
-        eyebrow="Assess & prepare"
+        eyebrow="Assess"
         title="Tests & Exams"
-        purpose="Assessment infrastructure: LevelCheck placement, module tests and full mock exams. Preparation products live in their own destinations — preparation never implies official certification."
-        action="Take the mock exam"
-        actionHref="/pathways/mock"
+        purpose="Two honest instruments: the Full Check placement that discovers your level, and full mock exams that rehearse the real thing. Product practice lives in Learning Paths."
       />
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
-        <Link className="button secondary" href="/diagnostic">LevelCheck placement</Link>
-        <Link className="button secondary" href="/pathways/mock">Full mock exam</Link>
+
+      <div className="exam-hero-grid" style={{ marginTop: 8 }}>
+        <section className="exam-card" aria-label="Full Check placement">
+          <span className="ex-eyebrow">Full Check · Placement</span>
+          <h3>Discover your level</h3>
+          <p>
+            The adaptive Full Check places you on the CEFR scale across reading, writing and listening —
+            40 questions, about 30 minutes, with a personalised report and Student ID at the end.
+          </p>
+          <div className="ex-cta">
+            <Link className="button" href="/diagnostic">Start Full Check →</Link>
+          </div>
+        </section>
+
+        <section className="exam-card" aria-label="Full mock exam">
+          <span className="ex-eyebrow">Full mock · Rehearsal</span>
+          <h3>Rehearse the real exam</h3>
+          <p>
+            A complete mock covering reading, writing and speaking with a transparent band estimate against
+            CEFR descriptors — the calm, honest rehearsal before any official test day.
+          </p>
+          <div className="ex-cta">
+            <Link className="button" href="/pathways/mock">Take the mock exam →</Link>
+          </div>
+        </section>
       </div>
-      <p className="subtle" style={{ margin: 0, fontSize: 13.5 }}>The mock exam covers reading, writing and speaking in ten minutes, with a transparent band estimate against CEFR descriptors.</p>
-      {message && <p role="status" className="state-card">{message}</p>}
+
       {selected && (
         <section className="panel" style={{ marginTop: 20 }}>
           <div className="panel-title"><h2>Active pathway</h2><span>Selected {new Date(selected.selectedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span></div>
           <p><strong>{selected.pathway.replaceAll("_", " ")}</strong>{selected.domain ? ` · ${selected.domain.replaceAll("_", " ")}` : ""}{selected.track ? ` · ${selected.track.replaceAll("_", " ")}` : ""}{selected.target ? ` · target ${selected.target}` : ""}</p>
+          <p className="subtle" style={{ margin: 0, fontSize: 13 }}>
+            Product-level practice — General, Business, Fluency, IELTS and Cambridge — lives under <Link href="/learning-path">Learning Paths</Link>.
+          </p>
         </section>
       )}
-      {catalog && (
-        <>
-          <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>General English</h2><span>The default path</span></div>
-            <p>{catalog.generalEnglish.description}</p>
-            <button className="button secondary" disabled={busy} onClick={() => select("GENERAL_ENGLISH")}>Follow general mastery</button>
-          </section>
 
-          <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>IELTS preparation</h2><span>{readinessLabel(catalog.ielts.readiness)}</span></div>
-            <p>Skills: {catalog.ielts.skills.join(" · ")}</p>
-            <p className="muted">{catalog.ielts.scoreModel}</p>
-            <Link className="button" href="/ielts">Open IELTS product</Link>
-            <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.ielts.disclaimer}</p>
-          </section>
-
-          <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>Cambridge preparation</h2><span>{readinessLabel(catalog.cambridge.readiness)}</span></div>
-            <p>Skills: {catalog.cambridge.skills.join(" · ")}</p>
-            <p className="muted">{catalog.cambridge.scoreModel}</p>
-            <Link className="button" href="/cambridge">Open Cambridge product</Link>
-            <p style={{ fontSize: 13, opacity: 0.75 }}>{catalog.cambridge.disclaimer}</p>
-          </section>
-
-          <section className="panel" style={{ marginTop: 20 }}>
-            <div className="panel-title"><h2>Business English</h2><span>28 lessons</span></div>
-            <p className="subtle">28 Business English lessons covering emails, meetings, presentations, negotiations, leadership, and executive communication — B1 through C2, each with scenes, exercises, and vocabulary.</p>
-            <a className="button" href="/learning-path">Open the Business English curriculum</a>
-          </section>
-        </>
+      {!selected && (
+        <p className="subtle" style={{ margin: "18px 0 0", fontSize: 13.5 }}>
+          Product-level practice — General, Business, Fluency, IELTS and Cambridge — lives under <Link href="/learning-path">Learning Paths</Link>.
+        </p>
       )}
-      <UpgradeModal open={Boolean(gate)} onClose={() => setGate(null)} feature="EXAM_PATHWAY" />
     </main>
   );
 }

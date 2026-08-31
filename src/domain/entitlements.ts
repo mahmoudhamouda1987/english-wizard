@@ -93,3 +93,43 @@ export function canUseFeature(tier: PlanTier, feature: Feature, usedToday = 0): 
   const entitlement = entitlementFor(tier, feature);
   return entitlement.enabled && (entitlement.dailyQuota === undefined || usedToday < entitlement.dailyQuota);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * PRODUCT ACCESS — display state vs enforcement.
+ *
+ * The lock/unlock badge shown in the navigation and on product cards reflects
+ * the learner's subscription: a product is unlocked when it is the subscribed
+ * line, or when All Access (or the 7-day trial, which gates as All Access)
+ * covers it.
+ *
+ * AUDIT_MODE is the build-phase master switch: while English Wizard 2.0 is
+ * being audited, EVERY surface stays accessible regardless of the badge, so
+ * reviewers can walk all lessons, all paths and all products. Flip it to
+ * false at commercial launch and the same function starts enforcing.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Build-phase audit switch: true = badges show intent, but nothing is enforced. */
+export const AUDIT_MODE = true;
+
+export type CatalogueProduct = Exclude<ProductId, "all-access">;
+
+/** The five learning-path products a learner can subscribe to individually. */
+export const CATALOGUE_PRODUCTS: CatalogueProduct[] = [
+  "general-english",
+  "business-english",
+  "fluency-track",
+  "ielts",
+  "cambridge",
+];
+
+/** Badge state: is this product inside the learner's subscription? */
+export function isProductUnlockedFor(tier: PlanTier, product: CatalogueProduct): boolean {
+  if (tier === "all-access") return true;
+  return tier === product;
+}
+
+/** Enforcement: may the learner open this product's content right now? */
+export function productAccessible(tier: PlanTier, product: CatalogueProduct): boolean {
+  if (AUDIT_MODE) return true;
+  return isProductUnlockedFor(tier, product);
+}
