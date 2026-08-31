@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const guard = await checkFeature(context.session.learnerId, tier, "AI_TEACHER");
   if (!guard.allowed) {
     return NextResponse.json({
-      error: `You've used today's free AI sessions (${guard.quota}/day). Upgrade to PLUS for 30 a day — your learning data and progress are never limited.`,
+      error: `You've used today's free AI sessions (${guard.quota}/day). Upgrade your plan for 30 a day — your learning data and progress are never limited.`,
       upgrade: { feature: "AI_TEACHER", neededTier: "SUBSCRIBED", usedToday: guard.usedToday, quota: guard.quota },
     }, { status: 402 });
   }
