@@ -12,11 +12,21 @@ describe("lemonsqueezy webhook mapping", () => {
     expect(mapLemonEventName(undefined)).toBe("IGNORED");
   });
 
-  it("derives plan tier from variant names", () => {
-    expect(tierFromVariant("Pro Monthly")).toBe("PRO");
-    expect(tierFromVariant("plus-annual")).toBe("PLUS");
-    expect(tierFromVariant("Premium Plan")).toBe("PLUS");
-    expect(tierFromVariant(undefined)).toBe("PLUS");
+  it("derives catalogue products from variant names", () => {
+    expect(tierFromVariant("IELTS Monthly")).toBe("ielts");
+    expect(tierFromVariant("cambridge-annual")).toBe("cambridge");
+    expect(tierFromVariant("General English Plan")).toBe("general-english");
+    expect(tierFromVariant("Business English Pro")).toBe("business-english");
+    expect(tierFromVariant("Fluency Track")).toBe("fluency-track");
+    expect(tierFromVariant("All Access")).toBe("all-access");
+  });
+
+  it("treats legacy and unknown paid variants as the complete catalogue", () => {
+    expect(tierFromVariant("Pro Monthly")).toBe("all-access");
+    expect(tierFromVariant("plus-annual")).toBe("all-access");
+    expect(tierFromVariant("Premium Plan")).toBe("all-access");
+    expect(tierFromVariant(undefined)).toBe("all-access");
+    expect(tierFromVariant("Mystery Bundle")).toBe("all-access");
   });
 
   it("computes a seven-day grace deadline", () => {
@@ -26,9 +36,9 @@ describe("lemonsqueezy webhook mapping", () => {
   });
 
   it("keeps premium access during dunning grace, then downgrades", () => {
-    const record = { status: "PAST_DUE" as const, tier: "PLUS" as const, periodEnd: "2026-01-10T00:00:00Z" };
+    const record = { status: "PAST_DUE" as const, tier: "all-access" as const, periodEnd: "2026-01-10T00:00:00Z" };
     const during = effectiveTierWithGrace(record, new Date("2026-01-12T00:00:00Z"));
-    expect(during.tier).toBe("PLUS");
+    expect(during.tier).toBe("all-access");
     expect(during.inGrace).toBe(true);
 
     const after = effectiveTierWithGrace(record, new Date("2026-01-20T00:00:00Z"));
@@ -37,9 +47,9 @@ describe("lemonsqueezy webhook mapping", () => {
   });
 
   it("never grants access for cancelled or paused records even with a fresh period end", () => {
-    const cancelled = { status: "CANCELLED" as const, tier: "PRO" as const, periodEnd: "2999-01-01T00:00:00Z" };
+    const cancelled = { status: "CANCELLED" as const, tier: "ielts" as const, periodEnd: "2999-01-01T00:00:00Z" };
     expect(effectiveTierWithGrace(cancelled).tier).toBe("FREE");
-    const paused = { status: "PAUSED" as const, tier: "PRO" as const, periodEnd: "2999-01-01T00:00:00Z" };
+    const paused = { status: "PAUSED" as const, tier: "cambridge" as const, periodEnd: "2999-01-01T00:00:00Z" };
     expect(effectiveTierWithGrace(paused).tier).toBe("FREE");
   });
 });

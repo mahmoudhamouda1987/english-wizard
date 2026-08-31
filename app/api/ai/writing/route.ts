@@ -2,20 +2,19 @@ import { NextResponse } from "next/server";
 import { callAI, recordLearnerFeedbackEvidence, requireLearnerContext, validateWritingResponse } from "../_shared";
 
 export const dynamic = "force-dynamic";
-import { getSubscription } from "@/src/infrastructure/subscription-repository";
-import { effectiveTier } from "@/src/domain/subscription";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 import { checkFeature, recordUsage } from "@/src/infrastructure/usage-guard";
 
 
 export async function POST(request: Request) {
   const context = await requireLearnerContext();
   if ("error" in context) return NextResponse.json({ error: context.error }, { status: context.status });
-  const tier = effectiveTier(await getSubscription(context.session.learnerId));
+  const tier = await resolveGatingTier(context.session.learnerId);
   const guard = await checkFeature(context.session.learnerId, tier, "AI_TEACHER");
   if (!guard.allowed) {
     return NextResponse.json({
       error: `You've used today's free AI sessions (${guard.quota}/day). Upgrade to PLUS for 30 a day — your learning data and progress are never limited.`,
-      upgrade: { feature: "AI_TEACHER", neededTier: "PLUS", usedToday: guard.usedToday, quota: guard.quota },
+      upgrade: { feature: "AI_TEACHER", neededTier: "SUBSCRIBED", usedToday: guard.usedToday, quota: guard.quota },
     }, { status: 402 });
   }
 

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   if (!guard.allowed) {
     return NextResponse.json({
       error: `You've used today's free AI sessions (${guard.quota}/day). Upgrade to PLUS for 30 a day — your learning data and progress are never limited.`,
-      upgrade: { feature: "AI_TEACHER", neededTier: "PLUS", usedToday: guard.usedToday, quota: guard.quota },
+      upgrade: { feature: "AI_TEACHER", neededTier: "SUBSCRIBED", usedToday: guard.usedToday, quota: guard.quota },
     }, { status: 402 });
   }
 

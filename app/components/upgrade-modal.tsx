@@ -36,28 +36,28 @@ const FEATURE_COPY: Record<GateFeature, { icon: string; eyebrow: string; what: s
     eyebrow: "Exam pathways",
     what: "Full IELTS and Cambridge pathways with real exam-format questions, timed practice and band-accurate scoring.",
     why: "If you're aiming at an official exam goal, pathway practice is the bridge between your current level and your target band.",
-    value: "Both exam families, readiness estimates and full mock experiences.",
+    value: "Included with IELTS, Cambridge or All Access — every product is open during your 7-day trial.",
   },
   DEEP_STUDY: {
     icon: "🧠",
     eyebrow: "Deep study",
     what: "Longer, focused sessions that go beyond the daily loop — sustained reading, listening and production blocks.",
     why: "Depth is how intermediate learners break through plateaus: more context, more challenge, faster growth.",
-    value: "Up to 3 deep sessions daily on Plus, unlimited on Pro.",
+    value: "3 deep sessions daily with any product subscription — unlimited with All Access.",
   },
   BOSS_MISSION: {
     icon: "🏆",
     eyebrow: "Boss missions",
     what: "Hard challenge missions that stretch every skill at once and prove what you can do under pressure.",
     why: "Mastery needs stretch. Boss missions are the premium version of 'a little beyond comfortable'.",
-    value: "Daily boss challenges on Plus, unlimited on Pro.",
+    value: "A daily boss challenge with any product subscription — unlimited with All Access.",
   },
   SPEAKING_COACH: {
     icon: "🎙️",
     eyebrow: "Speaking coach",
     what: "Extra guided speaking checks with structured feedback on fluency, range and delivery.",
     why: "Speaking improves with frequent, low-stakes practice — the coach keeps those reps coming.",
-    value: "10 checks/day on Plus, unlimited on Pro.",
+    value: "10 guided checks daily with any product subscription — unlimited with All Access.",
   },
 };
 
@@ -126,7 +126,7 @@ export function UpgradeModal({ open, onClose, feature = "EXAM_PATHWAY" }: { open
           <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.8, color: "#3c3557" }}>
             {ALREADY_UNLOCKED.map((item) => <li key={item}>{item}</li>)}
           </ul>
-          <div style={{ fontWeight: 700, margin: "10px 0 2px" }}>⭐ Plus unlocks</div>
+          <div style={{ fontWeight: 700, margin: "10px 0 2px" }}>⭐ A subscription unlocks</div>
           <div style={{ color: "#3c3557" }}>{info.value}</div>
         </div>
 

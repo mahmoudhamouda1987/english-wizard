@@ -5,8 +5,8 @@ import { getProfile } from "@/src/infrastructure/profile-repository";
 import { getLearnerState } from "@/src/infrastructure/learner-repository";
 import { buildEvidence, type EvidenceModality } from "@/src/domain/learning-evidence";
 import { routeAITask, fingerprintRequest, type AITask, type ModelRoute } from "@/src/domain/ai-operations";
-import { checkFeature } from "@/src/domain/subscription";
-import { getSubscription } from "@/src/infrastructure/subscription-repository";
+import { canUseFeature, entitlementFor } from "@/src/domain/entitlements";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 import { rankKnowledgeDocuments, type RagRights } from "@/src/domain/rag";
 import type { LearningLevel } from "@/src/domain/advanced-learning";
 
@@ -117,10 +117,10 @@ export async function callAI(system: string, user: string, options: AICallOption
 
   if (options.learnerId) {
     try {
-      const [subscription, usedToday] = await Promise.all([getSubscription(options.learnerId), aiRequestsToday(options.learnerId)]);
-      const gate = checkFeature(subscription, "AI_TEACHER", usedToday);
-      if (!gate.allowed) {
-        return { error: "Your plan's daily AI limit is reached. Your saved learning data is safe; upgrade or continue tomorrow.", status: 429 as const, requestId, planTier: gate.tier, quota: gate.quota ?? 0 };
+      const [tier, usedToday] = await Promise.all([resolveGatingTier(options.learnerId), aiRequestsToday(options.learnerId)]);
+      const quota = entitlementFor(tier, "AI_TEACHER").dailyQuota;
+      if (!canUseFeature(tier, "AI_TEACHER", usedToday)) {
+        return { error: "Your plan's daily AI limit is reached. Your saved learning data is safe; upgrade or continue tomorrow.", status: 429 as const, requestId, planTier: tier, quota: quota ?? 0 };
       }
     } catch {
       // quota enforcement is fail-open only when subscription tables are unavailable

@@ -1,4 +1,5 @@
 import { PLAN_ENTITLEMENTS, canUseFeature, entitlementFor, type Feature, type PlanTier } from "./entitlements";
+import { PRICE_CATALOGUE, formatPrice } from "./pricing";
 
 export type SubscriptionStatus = "ACTIVE" | "CANCELLED" | "PAUSED" | "PAST_DUE" | "TRIALING";
 
@@ -14,17 +15,35 @@ export interface SubscriptionRecord {
   updatedAt: string;
 }
 
-export const SUBSCRIPTION_PLANS: Array<{ tier: PlanTier; name: string; priceLabel: string; highlights: string[] }> = [
-  { tier: "FREE", name: "Free", priceLabel: "0", highlights: ["Daily mission + core lessons", "5 AI teacher messages/day", "2 speaking self-checks/day"] },
-  { tier: "PLUS", name: "Plus", priceLabel: "Plus plan", highlights: ["Exam pathways (IELTS & Cambridge)", "30 AI teacher messages/day", "Deep Study and Boss Missions"] },
-  { tier: "PRO", name: "Pro", priceLabel: "Pro plan", highlights: ["Unlimited AI teacher and speaking coach", "Full professional pathways", "Priority new surfaces"] },
-];
+/**
+ * The subscribable catalogue as plan cards (Parts 77-79): five products plus
+ * All Access, derived from the authoritative price configuration — never
+ * hardcoded in components. FREE is not a card here; it is the base state
+ * every account starts on.
+ */
+export const SUBSCRIPTION_PLANS: Array<{ tier: PlanTier; name: string; priceLabel: string; highlights: string[] }> =
+  PRICE_CATALOGUE.filter((entry) => entry.region === "WW").map((entry) => ({
+    tier: entry.product,
+    name: entry.name,
+    priceLabel: `${formatPrice(entry.monthly, entry.currency)}/month`,
+    highlights: entry.entitlements.features,
+  }));
 
 export function effectiveTier(subscription: SubscriptionRecord | null, now = new Date()): PlanTier {
   if (!subscription) return "FREE";
   if (subscription.status === "PAST_DUE" || subscription.status === "CANCELLED") return "FREE";
-  if (subscription.periodEnd && new Date(subscription.periodEnd) <= now) return subscription.cancelAtPeriodEnd ? "FREE" : "FREE";
+  if (subscription.periodEnd && new Date(subscription.periodEnd) <= now) return "FREE";
   return subscription.tier;
+}
+
+/**
+ * Resolve the plan used for feature gating: an ACTIVE 7-day trial counts as
+ * All Access (meaningful trial access, Parts 18/22), otherwise the effective
+ * subscribed product applies. Daily AI cost hard caps still protect spend.
+ */
+export function gatingTier(input: { subscription: SubscriptionRecord | null; trialActive: boolean }): PlanTier {
+  if (input.trialActive) return "all-access";
+  return effectiveTier(input.subscription);
 }
 
 export function checkFeature(subscription: SubscriptionRecord | null, feature: Feature, usedToday = 0): { allowed: boolean; tier: PlanTier; quota?: number } {

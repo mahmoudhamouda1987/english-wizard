@@ -7,6 +7,7 @@ import { getTrial } from "@/src/infrastructure/trial-repository";
 import { effectiveTrialStatus } from "@/src/domain/trial";
 import { effectiveTier } from "@/src/domain/subscription";
 import { effectiveTierWithGrace } from "@/src/domain/billing-webhooks";
+import { EXAM_PRODUCTS } from "@/src/domain/entitlements";
 import {
   CAMBRIDGE_PATHWAY,
   IELTS_PATHWAY,
@@ -23,18 +24,19 @@ export const dynamic = "force-dynamic";
 const PATHWAY_KINDS: PathwayKind[] = ["GENERAL_ENGLISH", "PROFESSIONAL", "IELTS", "CAMBRIDGE"];
 
 /**
- * Server-side premium enforcement (Parts 13/19): exam pathways (IELTS,
- * Cambridge) are a Plus/Pro feature — also unlocked during the 7-day trial.
- * General English and Professional pathways stay free. Fail-open only on
- * entitlement-read errors so an infrastructure hiccup never locks learners out.
+ * Server-side premium enforcement (Parts 13/19): exam pathway selection is an
+ * IELTS / Cambridge surface — unlocked by those products, by All Access, or by
+ * the active 7-day trial. General English and Professional pathways stay free.
+ * Fail-open only on entitlement-read errors so an infrastructure hiccup never
+ * locks learners out.
  */
-async function premiumAccess(learnerId: string): Promise<boolean> {
+async function examAccess(learnerId: string): Promise<boolean> {
   try {
     const [subscription, trial] = await Promise.all([getSubscription(learnerId), getTrial(learnerId)]);
     const paid = effectiveTierWithGrace(subscription ? { status: subscription.status, tier: subscription.tier, periodEnd: subscription.periodEnd } : null);
     const paidTier = paid.inGrace ? paid.tier : effectiveTier(subscription);
-    const inTrial = effectiveTrialStatus(trial) === "ACTIVE";
-    return paidTier !== "FREE" || inTrial;
+    if (effectiveTrialStatus(trial) === "ACTIVE") return true;
+    return (EXAM_PRODUCTS as string[]).includes(paidTier);
   } catch {
     return true;
   }
@@ -91,10 +93,10 @@ export async function POST(request: Request) {
   }
   const profile = await getProfile(session.learnerId);
   if (!profile) return NextResponse.json({ error: "Learner profile not found." }, { status: 404 });
-  if ((body.pathway === "IELTS" || body.pathway === "CAMBRIDGE") && !(await premiumAccess(session.learnerId))) {
+  if ((body.pathway === "IELTS" || body.pathway === "CAMBRIDGE") && !(await examAccess(session.learnerId))) {
     return NextResponse.json(
       {
-        error: "Exam pathways are included with Plus — start your free 7-day trial to unlock them.",
+        error: "Exam pathways are included with IELTS, Cambridge or All Access — start your free 7-day trial to unlock them.",
         upgrade: { feature: "EXAM_PATHWAY", plansUrl: "/pricing?from=upgrade" },
       },
       { status: 402 },

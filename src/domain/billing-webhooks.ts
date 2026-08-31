@@ -26,12 +26,23 @@ export function mapLemonEventName(eventName: string | undefined): SubscriptionSt
   return STATUS_MAP[eventName] ?? "IGNORED";
 }
 
+/**
+ * Map a payment-provider variant name onto a catalogue product (Parts 77-79).
+ * Provider variant names are matched against the product identifiers; an
+ * unrecognised paid variant resolves to All Access (the safest complete
+ * grant) rather than silently narrowing a paying learner's entitlements.
+ */
 export function tierFromVariant(variantName: string | undefined): PlanTier {
-  if (!variantName) return "PLUS";
+  if (!variantName) return "all-access";
   const name = variantName.toLowerCase();
-  if (name.includes("pro")) return "PRO";
-  if (name.includes("plus") || name.includes("premium")) return "PLUS";
-  return "FREE";
+  if (name.includes("all access") || name.includes("all-access")) return "all-access";
+  if (name.includes("cambridge")) return "cambridge";
+  if (name.includes("ielts")) return "ielts";
+  if (name.includes("fluency")) return "fluency-track";
+  if (name.includes("business")) return "business-english";
+  if (name.includes("general")) return "general-english";
+  // Legacy Plus/Pro and any unknown paid variant: treat as the complete catalogue.
+  return "all-access";
 }
 
 export function graceDeadline(periodEnd: string | Date | null | undefined, now = new Date()): string | null {

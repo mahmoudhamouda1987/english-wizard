@@ -16,7 +16,7 @@ export function UpgradePrompt({ info, onClose }: { info: UpgradeInfo; onClose: (
       </div>
       <p style={{ lineHeight: 1.7 }}>
         You&rsquo;ve used <strong>{info.usedToday ?? info.quota}</strong> of your {info.quota ?? "limited"} free sessions for this tool today.
-        The core curriculum stays included with every account — but <strong>{info.neededTier} unlocks 30 daily AI sessions</strong>,
+        The core curriculum stays included with every account — but <strong>a subscription unlocks 30 daily AI sessions with any product, unlimited with All Access</strong>,
         exam pathways, deep study and boss missions.
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6 }}>

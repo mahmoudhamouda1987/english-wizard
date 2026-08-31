@@ -3,8 +3,7 @@ import { currentUser } from "@/src/infrastructure/auth";
 import { getLearnerState } from "@/src/infrastructure/learner-repository";
 import { getProfile } from "@/src/infrastructure/profile-repository";
 import { chooseTeachingMove, explainDifferently, thinkingInEnglishPrompt } from "@/src/domain/teacher-adaptation";
-import { getSubscription } from "@/src/infrastructure/subscription-repository";
-import { effectiveTier } from "@/src/domain/subscription";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 import { checkFeature, recordUsage } from "@/src/infrastructure/usage-guard";
 import type { CEFRLevel, Skill } from "@/src/domain/learner";
 
@@ -17,12 +16,12 @@ export async function POST(req: Request){
   if(!user) return NextResponse.json({error:"Unauthorized"},{status:401});
   const body = await req.json().catch(()=>null) as Record<string,unknown>|null;
   if(!body) return NextResponse.json({error:"JSON body required."},{status:400});
-  const tier = effectiveTier(await getSubscription(user.learnerId));
+  const tier = await resolveGatingTier(user.learnerId);
   const guard = await checkFeature(user.learnerId, tier, "AI_TEACHER");
   if(!guard.allowed){
     return NextResponse.json({
       error:`You've used today's free Teacher AI sessions (${guard.quota}/day). Upgrade to PLUS for 30 a day.`,
-      upgrade:{feature:"AI_TEACHER",neededTier:"PLUS",usedToday:guard.usedToday,quota:guard.quota},
+      upgrade:{feature:"AI_TEACHER",neededTier:"SUBSCRIBED",usedToday:guard.usedToday,quota:guard.quota},
     },{status:402});
   }
   await recordUsage(user.learnerId, "AI_TEACHER");

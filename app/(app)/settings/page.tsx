@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PRODUCT_NAMES } from "@/src/domain/entitlements";
 
 type Profile = { displayName: string; nativeLanguage: string; targetLevel: string; dailyMinutes: number };
 type Privacy = { analytics: boolean; personalized_ai: boolean; voice_processing: boolean; voice_retention_days: number; share_for_human_review: boolean };
@@ -151,7 +152,7 @@ export default function SettingsPage() {
       {plan && (
         <section className="panel" style={{ display: "grid", gap: 12, marginTop: 18 }}>
           <h2>Plan</h2>
-          <p className="subtle">Current plan: <strong>{plan.effectiveTier}</strong>{plan.subscription?.status === "CANCELLED" ? " (cancels at period end)" : ""}. Changing plans never touches your learning data.</p>
+          <p className="subtle">Current plan: <strong>{PRODUCT_NAMES[plan.effectiveTier as keyof typeof PRODUCT_NAMES] ?? plan.effectiveTier}</strong>{plan.subscription?.status === "CANCELLED" ? " (cancels at period end)" : ""}. Changing plans never touches your learning data.</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12 }}>
             {plan.plans.map((item) => (
               <article className={plan.effectiveTier === item.tier ? "panel" : "panel"} key={item.tier} style={{ margin: 0 }}>

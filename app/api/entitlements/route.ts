@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
-import { PLAN_ENTITLEMENTS, type PlanTier } from "@/src/domain/entitlements";
+import { PLAN_ENTITLEMENTS, isPlanTier, type PlanTier } from "@/src/domain/entitlements";
 
 export const dynamic = "force-dynamic";
 
 function validTier(value: unknown): value is PlanTier {
-  return value === "FREE" || value === "PLUS" || value === "PRO";
+  return isPlanTier(value);
 }
 
 export async function GET() {

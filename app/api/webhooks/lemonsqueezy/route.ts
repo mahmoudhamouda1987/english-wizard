@@ -60,7 +60,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, note: `Event ${eventName} requires no state change.` });
   }
 
-  const tier = tierFromVariant(attributes?.variant_name) === "FREE" ? (existing?.tier && existing.tier !== "FREE" ? existing.tier : "PLUS") : tierFromVariant(attributes?.variant_name);
+  // tierFromVariant resolves any paid variant onto a catalogue product (unknown
+  // names map to All Access — the safest complete grant), so the fallback chain
+  // for FREE-mapped variants no longer exists.
+  const tier = tierFromVariant(attributes?.variant_name);
   const periodEnd = attributes?.ends_at ?? attributes?.renews_at ?? existing?.periodEnd;
 
   const record = await upsertSubscription({

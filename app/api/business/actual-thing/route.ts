@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { callAI, requireLearnerContext } from "../../ai/_shared";
-import { getSubscription } from "@/src/infrastructure/subscription-repository";
-import { effectiveTier } from "@/src/domain/subscription";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 import { checkFeature, recordUsage } from "@/src/infrastructure/usage-guard";
 import { hitRateLimit } from "@/src/infrastructure/rate-limit";
 
@@ -103,12 +102,12 @@ export async function POST(request: Request) {
   }
 
   // FREE-tier daily quota, same pattern as the AI lesson route (Parts 128–130).
-  const tier = effectiveTier(await getSubscription(learnerId));
+  const tier = await resolveGatingTier(learnerId);
   const guard = await checkFeature(learnerId, tier, "AI_TEACHER");
   if (!guard.allowed) {
     return NextResponse.json({
       error: `You've used today's free AI sessions (${guard.quota}/day). Upgrade to PLUS for 30 a day — your learning data and progress are never limited.`,
-      upgrade: { feature: "AI_TEACHER", neededTier: "PLUS", usedToday: guard.usedToday, quota: guard.quota },
+      upgrade: { feature: "AI_TEACHER", neededTier: "SUBSCRIBED", usedToday: guard.usedToday, quota: guard.quota },
     }, { status: 402 });
   }
 

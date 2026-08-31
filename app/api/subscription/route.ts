@@ -4,12 +4,12 @@ import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
 import { getSubscription, upsertSubscription } from "@/src/infrastructure/subscription-repository";
 import { effectiveTier, planValueModel, SUBSCRIPTION_PLANS, type SubscriptionRecord } from "@/src/domain/subscription";
-import { PLAN_ENTITLEMENTS, type PlanTier } from "@/src/domain/entitlements";
+import { PLAN_ENTITLEMENTS, isPlanTier, SUBSCRIBABLE_PRODUCTS, type PlanTier } from "@/src/domain/entitlements";
 import { effectiveTierWithGrace } from "@/src/domain/billing-webhooks";
 
 export const dynamic = "force-dynamic";
 
-const TIERS: PlanTier[] = ["FREE", "PLUS", "PRO"];
+const TIERS: PlanTier[] = ["FREE", ...SUBSCRIBABLE_PRODUCTS];
 
 export async function GET() {
   const user = await currentUser();
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
   switch (body?.action) {
     case "CHANGE_PLAN": {
-      if (!body.tier || !TIERS.includes(body.tier as PlanTier)) {
+      if (!body.tier || !isPlanTier(body.tier) || !TIERS.includes(body.tier)) {
         return NextResponse.json({ error: `tier must be one of ${TIERS.join(", ")}.` }, { status: 400 });
       }
       const record = await save({ tier: body.tier as PlanTier, status: "ACTIVE", cancelAtPeriodEnd: false, provider: body.provider ?? "NONE", ...(body.externalReference ? { externalReference: body.externalReference } : {}) });
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     }
     case "PROVIDER_EVENT": {
       if (!body.externalReference) return NextResponse.json({ error: "externalReference is required for provider events." }, { status: 400 });
-      if (body.tier && !TIERS.includes(body.tier as PlanTier)) return NextResponse.json({ error: `tier must be one of ${TIERS.join(", ")}.` }, { status: 400 });
+      if (body.tier && (!isPlanTier(body.tier) || !TIERS.includes(body.tier))) return NextResponse.json({ error: `tier must be one of ${TIERS.join(", ")}.` }, { status: 400 });
       const record = await save({
         tier: (body.tier ?? current?.tier ?? "FREE") as PlanTier,
         provider: body.provider ?? "PROVIDER",

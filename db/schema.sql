@@ -54,6 +54,14 @@ CREATE TABLE IF NOT EXISTS streak_state (learner_id UUID PRIMARY KEY REFERENCES 
 ALTER TABLE subscriptions DROP CONSTRAINT IF EXISTS subscriptions_status_check;
 ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_status_check CHECK (status IN ('ACTIVE','CANCELLED','PAUSED','PAST_DUE','TRIALING'));
 
+-- Migration: commercial consolidation to the 2.0 catalogue — the plan is now the
+-- subscribed product (Parts 77-79): FREE or one catalogue line (All Access supersedes
+-- individual products). Rebuild the legacy FREE/PLUS/PRO constraint idempotently;
+-- any pre-launch PLUS/PRO rows migrate to the equivalent catalogue line.
+UPDATE subscriptions SET tier = 'all-access' WHERE tier IN ('PLUS','PRO');
+ALTER TABLE subscriptions DROP CONSTRAINT IF EXISTS subscriptions_tier_check;
+ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_tier_check CHECK (tier IN ('FREE','general-english','business-english','fluency-track','ielts','cambridge','all-access'));
+
 CREATE TABLE IF NOT EXISTS referrals (id UUID PRIMARY KEY,code TEXT UNIQUE NOT NULL,referrer_id UUID NOT NULL REFERENCES learners(id) ON DELETE CASCADE,invited_id UUID REFERENCES learners(id) ON DELETE SET NULL,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),completed_at TIMESTAMPTZ);
 CREATE INDEX IF NOT EXISTS referrals_referrer_idx ON referrals(referrer_id);
 
