@@ -247,8 +247,9 @@ export default function LevelCheckPage() {
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "linear-gradient(160deg, #0f1535, #2a1a4a)", color: "white", textAlign: "center" }}>
       <div style={{ maxWidth: 640 }}>
         <LevelCheckMark />
-        <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>Adaptive English Placement Assessment</p>
-        <h1 style={{ fontSize: 34, margin: "12px 0", letterSpacing: ".06em" }}>LEVELCHECK</h1>
+        <p className="eyebrow" style={{ color: "var(--info)", marginTop: 14 }}>English Wizard</p>
+        <h1 style={{ fontSize: 34, margin: "12px 0 6px", letterSpacing: ".06em" }}>LEVELCHECK</h1>
+        <p style={{ fontSize: 12.5, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 800, opacity: .82, margin: "0 auto 14px" }}>CEFR-aligned English proficiency assessment</p>
         <p style={{ fontSize: 16, lineHeight: 1.7, opacity: .88, maxWidth: 560, margin: "0 auto 26px" }}>
           LevelCheck adapts to you. As your answers demonstrate stronger English ability, the challenge increases.
           If questions become too difficult, the assessment adjusts to accurately identify your current level.
@@ -274,8 +275,9 @@ export default function LevelCheckPage() {
     <Centered>
       <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
         <LevelCheckMark />
-        <p className="eyebrow" style={{ color: "var(--accent-primary)", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>Adaptive English Placement Assessment</p>
+        <p className="eyebrow" style={{ color: "var(--accent-primary)", margin: "16px 0 6px", letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 800, fontSize: 12.5 }}>English Wizard</p>
         <h1 style={{ fontSize: "clamp(30px,5vw,40px)", margin: "0 0 6px", fontWeight: 900, color: "var(--text-primary)", letterSpacing: ".05em" }}>LEVELCHECK</h1>
+        <p style={{ fontSize: 12.5, letterSpacing: ".16em", textTransform: "uppercase", fontWeight: 800, color: "var(--text-secondary)", margin: "0 auto 12px" }}>CEFR-aligned English proficiency assessment</p>
         <p style={{ fontSize: 16, lineHeight: 1.75, color: "var(--text-secondary)", maxWidth: 560, margin: "6px auto 20px" }}>
           You&rsquo;ll have <strong style={{ color: "var(--text-primary)" }}>30 minutes</strong>. Questions adapt to your demonstrated ability —
           you can navigate back and forward, flag questions, and change answers before finishing.

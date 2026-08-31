@@ -101,7 +101,7 @@ function entry(
 const WORLDWIDE: PriceEntry[] = [
   entry("general-english", "General English", "WW", 12.99, 119.99,
     { products: ["general-english"], features: [...CORE_FEATURES, "Full Pre-A1 → C2 curriculum"] },
-    "Everyday English that holds up in the real world."),
+    "Build your complete English foundation."),
   entry("business-english", "Business English", "WW", 16.99, 159.99,
     { products: ["business-english"], features: [...CORE_FEATURES, "Workplace outcomes: emails, meetings, interviews", "Practise Your Actual Thing"] },
     "English that works in meetings, emails and interviews."),
@@ -122,7 +122,7 @@ const WORLDWIDE: PriceEntry[] = [
 const EGYPT: PriceEntry[] = [
   entry("general-english", "General English", "EG", 399, 3599,
     { products: ["general-english"], features: [...CORE_FEATURES, "Full Pre-A1 → C2 curriculum"] },
-    "Everyday English that holds up in the real world."),
+    "Build your complete English foundation."),
   entry("business-english", "Business English", "EG", 499, 4499,
     { products: ["business-english"], features: [...CORE_FEATURES, "Workplace outcomes: emails, meetings, interviews", "Practise Your Actual Thing"] },
     "English that works in meetings, emails and interviews."),

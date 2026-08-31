@@ -211,7 +211,7 @@ export default function DashboardPage() {
         <section className="nba-card" aria-label="Your first step">
           <span className="nba-eyebrow">Welcome to English Wizard</span>
           <h2>Start by checking your English</h2>
-          <p>A short adaptive assessment finds your level across reading, writing and listening — then everything on this dashboard is built around you.</p>
+          <p>An adaptive assessment finds your level across reading, writing and listening — then everything on this dashboard is built around you.</p>
           <div className="nba-actions">
             <Link href="/diagnostic" className="button nba-btn">Check my level</Link>
             <Link href="/learning-path" className="button nba-btn-ghost">Preview the journey</Link>
@@ -226,7 +226,7 @@ export default function DashboardPage() {
             <p>
               {lesson
                 ? `${lesson.mission.charAt(0).toUpperCase()}${lesson.mission.slice(1)} — ${skillWhy(String(lesson.skill))}.`
-                : "A short adaptive assessment keeps your level and recommendations accurate."}
+                : "An adaptive assessment keeps your level and recommendations accurate."}
             </p>
             <div className="nba-meta">
               {lesson ? <span>{lesson.level} · {lesson.skill}</span> : <span>Adaptive · {data.level} standard</span>}
