@@ -1,7 +1,7 @@
 import type { LearnerState } from "@/src/domain/learner";
 import type { NextActionType, NextActionRecommendation } from "@/src/domain/next-action";
 import { buildMasteryGraph } from "@/src/domain/mastery-graph";
-import { getDatabase, query } from "./database";
+import { ensureSchema, getDatabase, query } from "./database";
 
 type LearnerStateRow = {
   learner_id: string;
@@ -79,6 +79,7 @@ export async function getLearnerState(learnerId: string): Promise<LearnerState |
 }
 
 export async function saveLearnerState(state: LearnerState): Promise<LearnerState> {
+  await ensureSchema();
   const db = getDatabase();
   const client = await db.connect();
 

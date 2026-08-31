@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Runtime schema self-healing reads db/schema.sql from the deployed
+  // functions (src/infrastructure/database.ts ensureSchema). Tracing it here
+  // guarantees the file ships inside serverless bundles on Vercel.
+  outputFileTracingIncludes: {
+    "/api/**": ["./db/schema.sql"],
+  },
 };
 
 export default nextConfig;
