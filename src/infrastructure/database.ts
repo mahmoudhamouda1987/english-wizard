@@ -76,12 +76,51 @@ async function loadSchemaSql(): Promise<string> {
 export function ensureSchema(): Promise<void> {
   schemaPromise ??= (async () => {
     const sql = await loadSchemaSql();
-    await getDatabase().query(sql);
+    const db = getDatabase();
+    const statements = splitStatements(sql);
+    let failures = 0;
+    let firstError: unknown = null;
+    for (const statement of statements) {
+      try {
+        await db.query(statement);
+      } catch (error) {
+        // Per-statement tolerance: a restricted runtime role (statement
+        // timeout, table ownership, concurrent cold-start race) must not
+        // block the remaining statements — most importantly the column
+        // additions the deployed code depends on. Benign "already exists"
+        // outcomes land here too and are equally harmless.
+        failures++;
+        firstError ??= error;
+      }
+    }
+    if (failures >= statements.length) {
+      // Nothing applied — the database itself is unreachable; surface it.
+      throw firstError instanceof Error ? firstError : new Error(String(firstError));
+    }
+    if (failures > 0) {
+      console.warn(
+        `[schema] runtime apply finished with ${failures}/${statements.length} statements skipped; ` +
+        `first: ${firstError instanceof Error ? firstError.message : String(firstError)}`,
+      );
+    }
   })().catch((error: unknown) => {
     schemaPromise = null; // allow the next query to retry the apply
     throw error;
   });
   return schemaPromise;
+}
+
+/** Split the schema file into individual statements. db/schema.sql is written
+ * one statement per line/block with no semicolons inside string literals or
+ * functions, so a comment-strip + semicolon split is exact for this file. */
+function splitStatements(sql: string): string[] {
+  return sql
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("--"))
+    .join("\n")
+    .split(";")
+    .map((statement) => statement.trim())
+    .filter(Boolean);
 }
 
 export async function query<T extends QueryResultRow = QueryResultRow>(text: string, values: unknown[] = []) {
