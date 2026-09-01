@@ -392,9 +392,17 @@ input::placeholder { color: var(--text-disabled); }
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
   grid-template-columns: repeat(5, 1fr);
 }
-.mobile-tabbar a { display: grid; justify-items: center; gap: 3px; padding: 7px 4px; border-radius: var(--radius-sm); color: var(--text-tertiary); font-size: 10.5px; font-weight: 700; }
-.mobile-tabbar a svg { width: 21px; height: 21px; }
-.mobile-tabbar a.active { color: var(--accent-primary); }
+/* The More tab is a <button>, not an <a>: reset the UA button skin explicitly,
+   otherwise it renders with the default ButtonFace background — a stray light-gray
+   pill that turns white-on-white in dark mode (invisible active tab). */
+.mobile-tabbar a, .mobile-tabbar button {
+  display: grid; justify-items: center; gap: 3px; padding: 7px 4px; border-radius: var(--radius-sm);
+  color: var(--text-tertiary); font-size: 10.5px; font-weight: 700;
+  background: none; border: 0; cursor: pointer;
+}
+.mobile-tabbar a svg, .mobile-tabbar button svg { width: 21px; height: 21px; }
+.mobile-tabbar a.active, .mobile-tabbar button.active { color: var(--accent-primary); }
+.mobile-tabbar a:focus-visible, .mobile-tabbar button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .mobile-drawer-bg { display: none; }
 
 /* Dashboard host */
@@ -1906,9 +1914,11 @@ button.lib-card { cursor: pointer; font: inherit; color: inherit; text-align: le
 .exam-card .button { background: #f6b73c; color: #241a05; border-color: transparent; font-weight: 800; }
 .exam-card .button.secondary { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.3); }
 
-/* Mobile tab bar active pill */
-.mobile-tabbar a.active { color: var(--accent-primary); }
-.mobile-tabbar a.active svg { filter: drop-shadow(0 3px 8px color-mix(in srgb, var(--accent-primary) 45%, transparent)); }
+/* Mobile tab bar active pill — covers both the <a> tabs and the More <button> */
+.mobile-tabbar a.active, .mobile-tabbar button.active { color: var(--accent-primary); }
+.mobile-tabbar a.active svg, .mobile-tabbar button.active svg {
+  filter: drop-shadow(0 3px 8px color-mix(in srgb, var(--accent-primary) 45%, transparent));
+}
 
 @media (max-width: 760px) {
   .settings-hero { padding: 20px; }
