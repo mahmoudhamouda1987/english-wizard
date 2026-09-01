@@ -88,13 +88,17 @@ test.describe("Panel redesign — identity, navigation and commercial surfaces",
     expect(body).toMatch(/7-day trial|Included with every account/);
   });
 
-  test("dashboard shows the five learning paths with subscription states", async ({ page }) => {
+  test("dashboard adapts to the current path with the premium hero (no product-grid showcase)", async ({ page }) => {
     await registerAndSignIn(page, "showcase");
     await page.goto("/dashboard");
-    const showcase = page.getByRole("region", { name: "Your learning paths" });
-    await expect(showcase).toBeVisible();
-    for (const product of ["General English", "Business English", "Fluency Track (Conversation)", "IELTS Preparation", "Cambridge English Qualifications"]) {
-      await expect(showcase.getByRole("link", { name: new RegExp(product.replace(/[()]/g, "\\$&")) })).toBeVisible();
-    }
+    // The premium hero replaces the old five-card grid (products live in /learning-paths now).
+    const hero = page.getByRole("region", { name: "Your journey at a glance" });
+    await expect(hero).toBeVisible();
+    await expect(hero.getByRole("link", { name: /Current path: .*Open Learning Paths/i })).toBeVisible();
+    const main = page.locator("main");
+    await expect(main.locator(".path-grid")).toHaveCount(0);
+    // The path context module names the current product and links to the hub.
+    await expect(main.getByRole("region", { name: "Your current path" })).toBeVisible();
+    await expect(main.getByRole("link", { name: "All five paths" })).toBeVisible();
   });
 });

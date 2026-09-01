@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/app/components/page-header";
+import { CurrentPathBanner } from "@/app/components/current-path-banner";
 import { WORLDS_V2, totalExerciseCount } from "@/src/domain/worlds-curriculum";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 import { IconCheck } from "@/app/components/nav-icons";
@@ -41,6 +42,8 @@ export default function WorldsPage() {
         title="Worlds & Missions"
         purpose="Every level is a set of worlds. Every world is a coherent story of skills — organised by CEFR level, delivered through missions with real outcomes."
       />
+
+      <CurrentPathBanner />
 
       <div className="filters" role="group" aria-label="Filter worlds by CEFR level">
         <span className="f-label">Level</span>

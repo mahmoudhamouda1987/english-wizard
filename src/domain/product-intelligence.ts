@@ -85,7 +85,7 @@ const SKILL_SURFACE: Record<string, { productId: ProductId; surface: string; hre
   grammar: { productId: "GENERAL_ENGLISH", surface: "Grammar studio", href: "/grammar" },
   vocabulary: { productId: "GENERAL_ENGLISH", surface: "Vocabulary studio", href: "/vocabulary" },
   listening: { productId: "GENERAL_ENGLISH", surface: "English Ear", href: "/english-ear" },
-  reading: { productId: "GENERAL_ENGLISH", surface: "Reading Engine", href: "/reading" },
+  reading: { productId: "GENERAL_ENGLISH", surface: "Reading Studio", href: "/reading" },
   writing: { productId: "GENERAL_ENGLISH", surface: "Writing studio", href: "/writing" },
   speaking: { productId: "FLUENCY_TRACK", surface: "Conversation Gym", href: "/conversation" },
   pronunciation: { productId: "GENERAL_ENGLISH", surface: "Speaking Coach", href: "/pronunciation" },

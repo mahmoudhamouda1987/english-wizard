@@ -44,33 +44,34 @@ test.describe("Product surfaces (Parts 54–84, 107–108)", () => {
   test("General English product page wires the core curriculum surfaces", async ({ page }) => {
     await register(page, "ge");
     await page.goto("/general-english");
-    const body = await page.locator("main").innerText();
-    for (const marker of ["Worlds & Missions", "My Journey", "English Ear", "Reading Engine"]) {
-      expect(body).toContain(marker);
+    // The ProductGate resolves the subscription asynchronously — assert with
+    // auto-retrying expectations instead of a single innerText snapshot.
+    const main = page.locator("main");
+    for (const marker of ["Worlds & Missions", "My Journey", "English Ear", "Reading Studio"]) {
+      await expect(main).toContainText(marker, { timeout: 10_000 });
     }
   });
 
   test("Business English product page shows outcome model and Practise Your Actual Thing", async ({ page }) => {
     await register(page, "be");
     await page.goto("/business-english");
-    const body = await page.locator("main").innerText();
-    expect(body).toContain("Write this email");
-    expect(body).toMatch(/Practise your actual thing/i);
+    const main = page.locator("main");
+    await expect(main).toContainText("Write this email", { timeout: 10_000 });
+    await expect(main).toContainText(/Practise your actual thing/i);
   });
 
   test("Practise Your Actual Thing accepts a pasted real task", async ({ page }) => {
     await register(page, "actual");
     await page.goto("/business-english/actual-thing");
-    await expect(page.locator("main")).toBeVisible();
-    const body = await page.locator("main").innerText();
-    expect(body).toContain("Practise Your Actual Thing");
+    const main = page.locator("main");
+    await expect(main).toContainText("Practise Your Actual Thing", { timeout: 10_000 });
   });
 
   test("IELTS product hub exposes course, variants and honest non-certification language", async ({ page }) => {
     await register(page, "ielts-hub");
     await page.goto("/ielts");
-    const body = await page.locator("main").innerText();
-    expect(body).toContain("IELTS Preparation");
+    const main = page.locator("main");
+    await expect(main).toContainText("IELTS Preparation", { timeout: 10_000 });
   });
 
   test("IELTS course surface loads", async ({ page }) => {
@@ -82,9 +83,9 @@ test.describe("Product surfaces (Parts 54–84, 107–108)", () => {
   test("Cambridge product hub lists the five qualifications", async ({ page }) => {
     await register(page, "cam-hub");
     await page.goto("/cambridge");
-    const body = await page.locator("main").innerText();
-    expect(body).toContain("Cambridge English Qualifications");
-    expect(body).toContain("Choose your qualification");
+    const main = page.locator("main");
+    await expect(main).toContainText("Cambridge English Qualifications", { timeout: 10_000 });
+    await expect(main).toContainText("Choose your qualification");
   });
 
   test("Cambridge course surface loads", async ({ page }) => {
@@ -123,21 +124,66 @@ test.describe("Route closures (audit dispositions)", () => {
   });
 });
 
-test.describe("Sidebar LEARNING PATHS group (Parts 3/14/16 + learning-paths consolidation)", () => {
-  test("app sidebar shows Learning Paths group with five product destinations and lock badges", async ({ page }) => {
+test.describe("Sidebar LEARN group (learning-paths IA: products live ONLY in the hub)", () => {
+  test("app sidebar shows the LEARN group with the hub and no per-product items", async ({ page }) => {
     await register(page, "nav");
     await page.goto("/dashboard");
     const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
-    const pathsToggle = sidebar.getByRole("button", { name: "Learning Paths", exact: true });
-    await expect(pathsToggle).toBeVisible();
-    if ((await pathsToggle.getAttribute("aria-expanded")) === "false") {
-      await pathsToggle.click();
+    const learnToggle = sidebar.getByRole("button", { name: "Learn", exact: true });
+    await expect(learnToggle).toBeVisible();
+    if ((await learnToggle.getAttribute("aria-expanded")) === "false") {
+      await learnToggle.click();
     }
-    for (const product of ["General English", "Business English", "Fluency Track (Conversation)", "IELTS Preparation", "Cambridge English Qualifications"]) {
-      await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${product.replace(/[()]/g, "\\$&")}`) })).toBeVisible();
+    for (const item of ["Learning Paths", "My Journey", "Lessons", "Worlds & Missions"]) {
+      await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${item}`) })).toBeVisible();
     }
-    // A free account subscribes to no product — the five product rows carry lock badges.
-    await expect(sidebar.getByRole("img", { name: /is not in your subscription/ }).first()).toBeVisible();
+    // The five products are NOT sidebar destinations any more (spec §3/§15).
+    for (const product of ["General English", "Business English", "Fluency Track", "IELTS", "Cambridge"]) {
+      await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${product}\\b`) })).toHaveCount(0);
+    }
+    // Skill Studios is an expandable subgroup of PRACTISE with the seven studios
+    // (spec §3: Practise → Conversation & Role-play / Speaking Coach / Say It Better / Skill Studios ▾).
+    const practiseToggle = sidebar.getByRole("button", { name: "Practise", exact: true });
+    await expect(practiseToggle).toBeVisible();
+    if ((await practiseToggle.getAttribute("aria-expanded")) === "false") {
+      await practiseToggle.click();
+    }
+    const studios = sidebar.getByRole("button", { name: /Skill Studios/ });
+    await expect(studios).toBeVisible();
+    await studios.click();
+    for (const studio of ["Reading Studio", "Writing Studio", "Vocabulary Studio", "Grammar Studio", "Thinking in English"]) {
+      await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${studio}`) })).toBeVisible();
+    }
+  });
+
+  test("Learning Paths hub shows the five products with access states and explore CTA", async ({ page }) => {
+    await register(page, "hub");
+    await page.goto("/learning-paths");
+    await expect(page.getByRole("heading", { name: "Learning Paths", level: 1 })).toBeVisible();
+    for (const product of ["General English", "Business English", "Fluency Track", "IELTS", "Cambridge"]) {
+      await expect(page.getByRole("heading", { name: product, level: 2 })).toBeVisible();
+    }
+    await expect(page.getByText(/Not subscribed/i).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Explore" }).first()).toBeVisible();
+  });
+
+  test("Explore page renders the full product preview without premium content", async ({ page }) => {
+    await register(page, "explore");
+    await page.goto("/learning-paths/ielts");
+    await expect(page.getByRole("heading", { name: "IELTS", level: 1 })).toBeVisible();
+    await expect(page.getByText("Where this path takes you")).toBeVisible();
+    await expect(page.getByText("The journey, module by module")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Start 7-day trial/ })).toBeVisible();
+  });
+
+  test("Current Path switcher in the header switches the active path", async ({ page }) => {
+    await register(page, "switcher");
+    await page.goto("/dashboard");
+    const switcher = page.getByRole("button", { name: /Current path: .* — switch learning path/i });
+    await expect(switcher).toBeVisible();
+    await switcher.click();
+    await page.getByRole("option", { name: /Business English/ }).click();
+    await expect(page.getByRole("button", { name: /Current path: Business English — switch learning path/i })).toBeVisible();
   });
 
   test("Assess group keeps Tests & Exams as a pure assessment area", async ({ page }) => {

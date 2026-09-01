@@ -1,5 +1,6 @@
 import type { CEFRLevel } from "./learner";
 import type { PathwaySelectionRecord } from "./pathways";
+import type { CatalogueProduct } from "./entitlements";
 
 export type AvatarKind = "initials" | "photo" | "avatar";
 
@@ -14,6 +15,8 @@ export interface LearnerProfile {
   avatarUrl?: string | null;
   avatarKind?: AvatarKind;
   pathwaySelection?: PathwaySelectionRecord | null;
+  /** Current Path (2.0 learning-paths IA): the product the learner is using right now. */
+  activeProduct?: CatalogueProduct;
   englishDna: {
     overallLevel: string;
     strengths: string[];

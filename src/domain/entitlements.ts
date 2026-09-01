@@ -133,3 +133,28 @@ export function productAccessible(tier: PlanTier, product: CatalogueProduct): bo
   if (AUDIT_MODE) return true;
   return isProductUnlockedFor(tier, product);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * LEARNING PATHS HUB — access states for the product cards and the Current
+ * Path switcher (learning-paths IA, spec parts 5–11).
+ *
+ *   "CURRENT"  the product the learner is using right now (activeProduct)
+ *   "ACTIVE"   entitled but not currently selected
+ *   "LOCKED"   visible but not in the subscription — explore-only
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+export type ProductAccessState = "CURRENT" | "ACTIVE" | "LOCKED";
+
+/** Every catalogue product the learner's plan covers (all five with All Access / trial). */
+export function subscribedProducts(tier: PlanTier): CatalogueProduct[] {
+  if (tier === "all-access") return [...CATALOGUE_PRODUCTS];
+  if (tier === "FREE") return [];
+  return [tier as CatalogueProduct];
+}
+
+/** Card + switcher state for one product, given the plan and current selection. */
+export function productAccessState(tier: PlanTier, product: CatalogueProduct, activeProduct?: string | null): ProductAccessState {
+  if (!isProductUnlockedFor(tier, product)) return "LOCKED";
+  if (activeProduct && activeProduct === product) return "CURRENT";
+  return "ACTIVE";
+}

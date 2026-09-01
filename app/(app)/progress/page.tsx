@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/app/components/page-header";
+import { CurrentPathBanner } from "@/app/components/current-path-banner";
 import { IconCheck } from "@/app/components/nav-icons";
 import { track } from "@/app/lib/track";
 
@@ -99,6 +100,8 @@ export default function ProgressPage() {
         action="Assessment history"
         actionHref="/portfolio"
       />
+
+      <CurrentPathBanner />
 
       {!dash ? (
         <div aria-busy="true" aria-label="Loading your progress">

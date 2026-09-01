@@ -1,11 +1,10 @@
 import type { ComponentType } from "react";
 import {
-  IconHome, IconRoute, IconBook, IconGlobe, IconChat, IconMask, IconMic, IconWand,
-  IconClock, IconShield, IconTarget, IconFolder, IconEar, IconFilm, IconPen,
+  IconHome, IconRoute, IconBook, IconGlobe, IconChat, IconMic, IconWand,
+  IconShield, IconTarget, IconFolder, IconEar, IconFilm, IconPen,
   IconLetters, IconPuzzle, IconBulb, IconCertificate, IconTeacher, IconUsers,
-  IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame,
+  IconGift, IconGear, IconChart, IconBriefcase, IconBoard, IconFlame, IconLock,
 } from "./nav-icons";
-import type { CatalogueProduct } from "@/src/domain/entitlements";
 
 export interface NavItem {
   label: string;
@@ -13,8 +12,8 @@ export interface NavItem {
   icon: ComponentType<{ size?: number }>;
   /** One-line description shown under group headings and in the mobile drawer. */
   desc?: string;
-  /** When set, the item is a subscribable product — the shell renders a lock/unlock badge from the subscription. */
-  product?: CatalogueProduct;
+  /** Nested destinations (e.g. the Skill Studios studios) rendered indented. */
+  children?: NavItem[];
 }
 
 export interface NavGroup {
@@ -25,15 +24,14 @@ export interface NavGroup {
 }
 
 /**
- * 2.0 information architecture (Part 37 + learning-paths consolidation):
- * LEARNING PATHS is the commercial spine — the five products are its
- * sub-tabs (lock badges reflect the subscription; during AUDIT_MODE every
- * path stays accessible). ASSESS is a pure assessment area (Tests & Exams:
- * Full Check placement and full mock exams only). The former standalone
- * PRODUCTS group is retired — its five courses live under Learning Paths.
- * Still absent by design: Quick Practice, Leaderboard, LevelCheck duplicate
- * navigation, standalone Mistakes/Achievements (redirected), Chunks & Mediation
- * and Search (routes remain reachable; deliberately not in the sidebar).
+ * 2.0 final information architecture (learning-paths spec, parts 2/45).
+ *
+ * The sidebar answers WHAT CAN I DO?; the five products live ONLY inside
+ * LEARN → Learning Paths (the commercial hub) and are surfaced contextually
+ * by the Current Path switcher in the header. No product appears twice.
+ * Removed by design: standalone Products group, per-product sidebar items,
+ * Check My English, Quick Practice, Leaderboard, LevelQuest destination,
+ * Voice Time Machine / Review & Mastery nav rows (routes stay reachable).
  */
 export const NAV_GROUPS: NavGroup[] = [
   {
@@ -44,15 +42,12 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     key: "learn",
-    label: "Learning Paths",
-    desc: "Five products, one journey.",
+    label: "Learn",
+    desc: "Choose and follow your journey.",
     items: [
-      { label: "General English", href: "/general-english", icon: IconGlobe, product: "general-english", desc: "Pre-A1 → C2 core curriculum" },
-      { label: "Business English", href: "/business-english", icon: IconBriefcase, product: "business-english", desc: "Real workplace outcomes" },
-      { label: "Fluency Track (Conversation)", href: "/fluency-track", icon: IconFlame, product: "fluency-track", desc: "Spoken fluency, B1 → C2" },
-      { label: "IELTS Preparation", href: "/ielts", icon: IconBoard, product: "ielts", desc: "Academic & General Training" },
-      { label: "Cambridge English Qualifications", href: "/cambridge", icon: IconCertificate, product: "cambridge", desc: "A2 Key → C2 Proficiency" },
+      { label: "Learning Paths", href: "/learning-paths", icon: IconGlobe, desc: "The five English Wizard products" },
       { label: "My Journey", href: "/learning-path", icon: IconRoute, desc: "Your level-by-level path" },
+      { label: "Lessons", href: "/lessons", icon: IconBook, desc: "Lessons from your current path" },
       { label: "Worlds & Missions", href: "/worlds", icon: IconGlobe, desc: "Learn through worlds" },
     ],
   },
@@ -61,44 +56,44 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Practise",
     desc: "Live skills, every day.",
     items: [
-      { label: "Conversation", href: "/conversation", icon: IconChat },
-      { label: "Role-play", href: "/roleplay", icon: IconMask },
+      { label: "Conversation & Role-play", href: "/conversation", icon: IconChat },
       { label: "Speaking Coach", href: "/pronunciation", icon: IconMic },
       { label: "Say It Better", href: "/say-it-better", icon: IconWand },
-      { label: "Voice Time Machine", href: "/time-machine", icon: IconClock },
-      { label: "Reality Checkpoints", href: "/checkpoints", icon: IconShield },
-    ],
-  },
-  {
-    key: "review-progress",
-    label: "Review & Progress",
-    desc: "Strengthen and measure.",
-    items: [
-      { label: "Review & Mastery", href: "/review", icon: IconTarget },
-      { label: "Progress & Insights", href: "/progress", icon: IconChart },
-      { label: "Portfolio & Evidence", href: "/portfolio", icon: IconFolder },
-    ],
-  },
-  {
-    key: "skills",
-    label: "Skills",
-    desc: "Focused skill studios.",
-    items: [
-      { label: "English Ear", href: "/english-ear", icon: IconEar },
-      { label: "Scenes", href: "/scenes", icon: IconFilm },
-      { label: "Reading Engine", href: "/reading", icon: IconBook },
-      { label: "Writing", href: "/writing", icon: IconPen },
-      { label: "Vocabulary", href: "/vocabulary", icon: IconLetters },
-      { label: "Grammar", href: "/grammar", icon: IconPuzzle },
-      { label: "Thinking in English", href: "/thinking-in-english", icon: IconBulb },
+      {
+        label: "Skill Studios",
+        href: "/english-ear",
+        icon: IconBulb,
+        desc: "Focused skill studios.",
+        children: [
+          { label: "English Ear", href: "/english-ear", icon: IconEar },
+          { label: "Scenes", href: "/scenes", icon: IconFilm },
+          { label: "Reading Studio", href: "/reading", icon: IconBook },
+          { label: "Writing Studio", href: "/writing", icon: IconPen },
+          { label: "Vocabulary Studio", href: "/vocabulary", icon: IconLetters },
+          { label: "Grammar Studio", href: "/grammar", icon: IconPuzzle },
+          { label: "Thinking in English", href: "/thinking-in-english", icon: IconBulb },
+        ],
+      },
     ],
   },
   {
     key: "assess",
     label: "Assess",
-    desc: "Checkpoints and exams.",
+    desc: "Measure where you are.",
     items: [
-      { label: "Tests & Exams", href: "/pathways", icon: IconCertificate, desc: "LevelCheck, mocks and module tests" },
+      { label: "LevelCheck", href: "/diagnostic", icon: IconTarget, desc: "Adaptive placement — retake any time" },
+      { label: "Checkpoints", href: "/checkpoints", icon: IconShield },
+      { label: "Mock Exams", href: "/pathways", icon: IconCertificate, desc: "Full mock exams" },
+    ],
+  },
+  {
+    key: "track",
+    label: "Track",
+    desc: "Strengthen and prove it.",
+    items: [
+      { label: "Progress & Insights", href: "/progress", icon: IconChart },
+      { label: "Study Plan & Readiness", href: "/study-plan", icon: IconTarget },
+      { label: "Portfolio & Evidence", href: "/portfolio", icon: IconFolder },
     ],
   },
   {
@@ -115,9 +110,27 @@ export const NAV_GROUPS: NavGroup[] = [
     key: "account",
     label: "Account",
     desc: "Your preferences.",
-    items: [{ label: "Settings", href: "/settings", icon: IconGear }],
+    items: [
+      { label: "Settings", href: "/settings", icon: IconGear },
+      { label: "Billing & Subscription", href: "/billing", icon: IconGift },
+    ],
   },
 ];
 
-/** Flat list for search and mobile tab bar lookups. */
-export const NAV_FLAT = NAV_GROUPS.flatMap((g) => g.items.map((i) => ({ ...i, group: g.label })));
+/** Flat list for search and mobile tab bar lookups (children included). */
+export const NAV_FLAT: Array<NavItem & { group: string }> = NAV_GROUPS.flatMap((g) =>
+  g.items.flatMap((i) => [
+    { ...i, group: g.label },
+    ...(i.children ?? []).map((c) => ({ ...c, group: g.label })),
+  ]),
+);
+
+/** Icon lookup for catalogue product tiles (shared by hub, switcher, dashboard). */
+export const PRODUCT_ICON_COMPONENTS = {
+  globe: IconGlobe,
+  briefcase: IconBriefcase,
+  flame: IconFlame,
+  board: IconBoard,
+  certificate: IconCertificate,
+  lock: IconLock,
+} as const;

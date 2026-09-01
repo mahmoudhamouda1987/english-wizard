@@ -32,7 +32,7 @@ test("onboarding creates a persisted learner and dashboard loads state", async (
   await expect(page).toHaveURL(/\/diagnostic/);
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: /Good (morning|afternoon|evening)|Your learning journey/ })).toBeVisible();
-  await expect(page.getByText(/Your English journey continues at/i)).toBeVisible();
+  await expect(page.getByText(/of the way from/i)).toBeVisible();
   await expect(page.getByText(/next best step|Start by checking your English/i)).toBeVisible();
 });
 
@@ -96,14 +96,14 @@ test("new learning surfaces render from the authenticated dashboard", async ({ p
     await expect(page.locator("main")).toBeVisible();
   }
   await page.goto("/dashboard");
-  // Expand the LEARNING PATHS group in the desktop sidebar, then the skill links are present.
+  // Expand the LEARN and PRACTISE groups in the desktop sidebar, then the skill links are present.
   const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
-  await sidebar.getByRole("button", { name: "Learning Paths" }).click();
-  await sidebar.getByRole("button", { name: "Skills" }).click();
-  await sidebar.getByRole("button", { name: "Practise" }).click();
+  await sidebar.getByRole("button", { name: "Learn", exact: true }).click();
+  await sidebar.getByRole("button", { name: "Practise", exact: true }).click();
+  await sidebar.getByRole("button", { name: /Skill Studios/ }).click();
   await expect(sidebar.getByRole("link", { name: /Worlds & Missions/i })).toBeVisible();
   await expect(sidebar.getByRole("link", { name: "English Ear" })).toBeVisible();
-  await expect(sidebar.getByRole("link", { name: "Reading Engine" })).toBeVisible();
+  await expect(sidebar.getByRole("link", { name: "Reading Studio" })).toBeVisible();
   await expect(sidebar.getByRole("link", { name: "Say It Better" })).toBeVisible();
 });
 

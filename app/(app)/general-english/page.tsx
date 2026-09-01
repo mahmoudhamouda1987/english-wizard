@@ -6,6 +6,7 @@ import { PageHeader } from "@/app/components/page-header";
 import { WORLDS_V2, worldsForLevel } from "@/src/domain/worlds-curriculum";
 import type { CEFRLevel } from "@/src/domain/curriculum";
 import { track } from "@/app/lib/track";
+import { ProductGate } from "@/app/components/product-gate";
 
 /** Single source of truth for level: the platform dashboard payload (Part 105). */
 interface DashboardData {
@@ -29,7 +30,7 @@ const SKILL_COLUMNS: Array<{ skill: string; fromIndex: number }> = [
 
 const FOCUS_STUDIO: Record<string, { href: string; why: string }> = {
   Listening: { href: "/english-ear", why: "English Ear trains exactly this — fast, natural speech, one ear at a time." },
-  Reading: { href: "/reading", why: "The Reading Engine meets you at your level and stretches it gently." },
+  Reading: { href: "/reading", why: "The Reading Studio meets you at your level and stretches it gently." },
   Writing: { href: "/writing", why: "The Writing studio corrects your own sentences line by line." },
   Speaking: { href: "/pronunciation", why: "Speaking Coach listens to you and rebuilds the sounds that slip." },
   Grammar: { href: "/grammar", why: "The Grammar studio rebuilds the patterns your evidence flags." },
@@ -45,7 +46,7 @@ const JOURNEY_SURFACES = [
 const SKILL_STUDIOS = [
   { title: "English Ear", href: "/english-ear", why: "Train the ear for real, fast, connected speech — the skill classrooms skip." },
   { title: "Scenes", href: "/scenes", why: "Rehearse real situations before they happen, so the real one feels familiar." },
-  { title: "Reading Engine", href: "/reading", why: "Read genuine texts at exactly your level, and feel the level rise." },
+  { title: "Reading Studio", href: "/reading", why: "Read genuine texts at exactly your level, and feel the level rise." },
   { title: "Vocabulary", href: "/vocabulary", why: "Words that stick — spaced review does the remembering for you." },
   { title: "Grammar", href: "/grammar", why: "Patterns rebuilt from your own mistakes, not from a rulebook dump." },
   { title: "Writing", href: "/writing", why: "Write real pieces and get line-by-line correction on your own words." },
@@ -58,7 +59,7 @@ const PRACTISE_SURFACES = [
   { title: "Reality Checkpoints", href: "/checkpoints", why: "Prove what you can do against real-life tasks — evidence, not vibes." },
 ];
 
-export default function GeneralEnglishPage() {
+function GeneralEnglishPageContent() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [authed, setAuthed] = useState(true);
 
@@ -290,5 +291,14 @@ export default function GeneralEnglishPage() {
         </p>
       </section>
     </main>
+  );
+}
+
+
+export default function GeneralEnglishPage() {
+  return (
+    <ProductGate product="general-english">
+      <GeneralEnglishPageContent />
+    </ProductGate>
   );
 }

@@ -21,6 +21,7 @@ import {
   IconSpark,
   IconTarget,
 } from "@/app/components/nav-icons";
+import { ProductGate } from "@/app/components/product-gate";
 
 /**
  * THE FLUENCY TRACK — product landing and module runner (Parts 77–88, 107/108).
@@ -728,7 +729,7 @@ function ModuleRunner({
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-export default function FluencyTrackPage() {
+function FluencyTrackPageContent() {
   const [level, setLevel] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [trackFilter, setTrackFilter] = useState<TrackFilter>("ALL");
@@ -990,5 +991,14 @@ export default function FluencyTrackPage() {
         </>
       )}
     </main>
+  );
+}
+
+
+export default function FluencyTrackPage() {
+  return (
+    <ProductGate product="fluency-track">
+      <FluencyTrackPageContent />
+    </ProductGate>
   );
 }

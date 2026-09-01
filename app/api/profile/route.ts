@@ -4,6 +4,8 @@ import { getProfile, upsertProfile } from "@/src/infrastructure/profile-reposito
 import { currentUser } from "@/src/infrastructure/auth";
 import { query } from "@/src/infrastructure/database";
 import { generateStudentId } from "@/src/domain/trial";
+import { CATALOGUE_PRODUCTS, productAccessible, type CatalogueProduct } from "@/src/domain/entitlements";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 
 function validTargetLevel(value: unknown): value is LearnerProfile["targetLevel"] {
   return typeof value === "string" && ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"].includes(value);
@@ -43,6 +45,21 @@ export async function POST(request: Request) {
   const targetLevel = validTargetLevel(body.targetLevel) ? body.targetLevel : "B1";
   const existing = await getProfile(session.learnerId);
 
+  // Current Path switch (learning-paths IA): allowed only for products the
+  // learner is entitled to — locked products are preview/explore-only. In
+  // audit mode every product stays selectable so reviewers can walk all paths.
+  let activeProduct: CatalogueProduct | null = null;
+  if (body.activeProduct !== undefined) {
+    if (typeof body.activeProduct !== "string" || !(CATALOGUE_PRODUCTS as string[]).includes(body.activeProduct)) {
+      return NextResponse.json({ error: "activeProduct must be one of the five catalogue products." }, { status: 400 });
+    }
+    const tier = await resolveGatingTier(session.learnerId);
+    if (!productAccessible(tier, body.activeProduct as CatalogueProduct)) {
+      return NextResponse.json({ error: "This path is not part of your subscription. Explore it first, then choose it from Learning Paths." }, { status: 403 });
+    }
+    activeProduct = body.activeProduct as CatalogueProduct;
+  }
+
   // Avatar update (standalone use is fine — the other profile fields are
   // optional in the body and fall back to current values).
   let avatarUrl = existing?.avatarUrl ?? null;
@@ -68,6 +85,7 @@ export async function POST(request: Request) {
     avatarKind,
     englishDna: existing?.englishDna ?? { overallLevel: "Not assessed", strengths: [], focusAreas: [], preferredSkills: [], confidence: 0 },
     updatedAt: new Date().toISOString(),
+    activeProduct: activeProduct ?? existing?.activeProduct,
   });
 
   // Assign an idempotent Student ID (EW-YY-XXXXXX, e.g. EW-26-7F4K82) on first

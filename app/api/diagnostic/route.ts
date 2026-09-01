@@ -48,7 +48,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Invalid adaptive diagnostic state." }, { status: 400 });
     }
   }
-  return NextResponse.json({ questions: diagnosticQuestions, adaptive: adaptiveSnapshot(answers), profile: await getProfile(session.learnerId) });
+  const attemptRows = await query<{ cefr_level: string; created_at: string | Date }>(
+    `SELECT cefr_level, created_at FROM diagnostic_attempts WHERE learner_id = $1 ORDER BY created_at DESC LIMIT 10`,
+    [session.learnerId],
+  ).catch(() => ({ rows: [] as Array<{ cefr_level: string; created_at: string | Date }> }));
+  const history = attemptRows.rows.map((r) => ({ level: r.cefr_level, date: new Date(r.created_at).toISOString() }));
+  return NextResponse.json({ questions: diagnosticQuestions, adaptive: adaptiveSnapshot(answers), profile: await getProfile(session.learnerId), history });
 }
 
 export async function POST(request: Request) {

@@ -5,56 +5,101 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
 import { track } from "@/app/lib/track";
-import { IconCheck, IconBulb, IconFlag, IconGlobe, IconBriefcase, IconFlame, IconBoard, IconCertificate, IconLock } from "@/app/components/nav-icons";
-import { PRODUCT_CATALOGUE, type ProductIconKey } from "@/src/domain/product-catalogue";
-import type { PlanTier } from "@/src/domain/entitlements";
-import { isProductUnlockedFor } from "@/src/domain/entitlements";
+import { IconCheck, IconBulb, IconFlag } from "@/app/components/nav-icons";
+import { PRODUCT_ICON_COMPONENTS } from "@/app/components/nav-config";
+import { productMeta } from "@/src/domain/product-catalogue";
+import type { CatalogueProduct } from "@/src/domain/entitlements";
 
-const PATH_ICONS: Record<ProductIconKey, (props: { size?: number }) => React.JSX.Element> = {
-  globe: IconGlobe,
-  briefcase: IconBriefcase,
-  flame: IconFlame,
-  board: IconBoard,
-  certificate: IconCertificate,
+const LEVEL_NAMES: Record<string, string> = {
+  "Pre-A1": "Starter",
+  A1: "Beginner",
+  A2: "Elementary",
+  B1: "Intermediate",
+  B2: "Upper-Intermediate",
+  C1: "Advanced",
+  C2: "Proficient",
 };
 
-/** The five products as a premium showcase — the commercial spine of the dashboard. */
-function LearningPathsShowcase() {
-  const [tier, setTier] = useState<PlanTier | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/subscription", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier); })
-      .catch(() => { /* cards stay neutral */ });
-    return () => { cancelled = true; };
-  }, []);
+/**
+ * DASH HERO (design spec §4/§5) — the first-impression moment: who I am,
+ * where I am, what I am learning, how I am progressing. Left: greeting +
+ * current path context. Right: the progress ring and the journey line.
+ */
+function DashHero({ data, activeProduct }: { data: Dash; activeProduct: CatalogueProduct | null }) {
+  const meta = productMeta(activeProduct ?? "general-english");
+  const Icon = PRODUCT_ICON_COMPONENTS[meta?.icon ?? "globe"];
+  const pct = Math.min(100, Math.max(0, data.overallPercent));
+  const ladder = ["Pre-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
+  const idx = ladder.indexOf(data.level);
+  const nodes = ladder.slice(Math.max(0, idx - 1), Math.min(ladder.length, idx + 3));
   return (
-    <section aria-label="Your learning paths" style={{ display: "grid", gap: 12 }}>
-      <div className="panel-title" style={{ marginBottom: 0 }}>
-        <h3>Your learning paths</h3>
-        <Link href="/learning-path">My journey</Link>
+    <section className="dash-hero" aria-label="Your journey at a glance">
+      <div className="dh-greeting">
+        <h1>{greeting()}, {data.firstName}</h1>
+        <p className="subtle">
+          You&rsquo;re <strong>{pct}%</strong> of the way from <strong>{data.level} · {LEVEL_NAMES[data.level] ?? data.level}</strong> to <strong>{data.nextLevel || "the next level"}</strong>.
+        </p>
+        <div className="dh-context">
+          <Link href="/learning-paths" className="dh-chip" aria-label={`Current path: ${meta?.name}. Open Learning Paths`}>
+            <span className="dh-chip-label">Current path</span>
+            <span className="ps2-dot" style={{ background: meta?.gradient }} aria-hidden="true" />
+            {meta?.name}
+          </Link>
+          <span className="dh-chip neutral"><span className="dh-chip-label">Level</span>{data.level} · {LEVEL_NAMES[data.level] ?? data.level}</span>
+          <span className="dh-chip neutral"><span className="dh-chip-label">Next</span>{data.nextLevel || "Checkpoint"}</span>
+        </div>
+        <div className="momentum" aria-label="Weekly momentum">
+          <div className="momentum-bar" aria-hidden="true">
+            {(data.week ?? []).map((d, i) => (
+              <span key={`${d.label}-${i}`} className={d.value > 0 ? "filled" : ""} style={{ height: `${Math.max(10, Math.min(100, d.value))}%` }} />
+            ))}
+          </div>
+          <div className="momentum-caption"><span>Mon</span><span>Sun</span></div>
+        </div>
       </div>
-      <p className="path-audit-note"><span className="dot" aria-hidden="true" /> Every path is open while English Wizard 2.0 is in build — explore freely.</p>
-      <div className="path-grid">
-        {PRODUCT_CATALOGUE.map((p) => {
-          const Icon = PATH_ICONS[p.icon];
-          const unlocked = tier ? isProductUnlockedFor(tier, p.id) : true;
-          return (
-            <Link key={p.id} href={p.href} className="path-card">
-              <span className="path-icon" style={{ background: p.gradient }} aria-hidden="true"><Icon size={22} /></span>
-              <h3>{p.name}</h3>
-              <p className="path-tag">{p.tagline}</p>
-              <div className="path-meta">
-                <span className={`path-state ${unlocked ? "unlocked" : "locked"}`}>
-                  {unlocked ? <IconCheck size={12} /> : <IconLock size={11} />}
-                  {unlocked ? "Open" : "Locked"}
-                </span>
-                <span className="path-open">Open path →</span>
-              </div>
-            </Link>
-          );
-        })}
+      <div className="dh-metric">
+        <div className="dh-ring" style={{ "--pct": pct } as React.CSSProperties} role="img" aria-label={`${pct}% towards ${data.nextLevel || "the next level"}`}>
+          <div className="dh-ring-core">
+            <strong>{pct}%</strong>
+            <small>to {data.nextLevel || "next"}</small>
+          </div>
+        </div>
+        <div className="journey-line" aria-hidden="true">
+          {nodes.map((lv, i) => (
+            <span key={lv} style={{ display: "contents" }}>
+              {i > 0 && <span className={`journey-seg ${ladder.indexOf(lv) <= idx ? "done" : ""}`} />}
+              <span className={`journey-node ${lv === data.level ? "current" : ladder.indexOf(lv) < idx ? "reached" : ""}`}>
+                <span className="journey-dot" />
+                <small>{lv}</small>
+              </span>
+            </span>
+          ))}
+        </div>
+        <p className="dh-ring-caption">
+          <span style={{ display: "inline-flex", verticalAlign: "-3px", marginRight: 5 }} aria-hidden="true"><Icon size={13} /></span>{meta?.name} · {data.completedLessons}/{data.totalLessons} lessons
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/** Current-path context module (spec §39) — one framework, product modules. */
+function PathContextCard({ activeProduct }: { activeProduct: CatalogueProduct | null }) {
+  const meta = productMeta(activeProduct ?? "general-english");
+  const Icon = PRODUCT_ICON_COMPONENTS[meta?.icon ?? "globe"];
+  return (
+    <section className="panel" aria-label="Your current path">
+      <div className="panel-title"><h3>Your path · {meta?.name}</h3><Link href="/learning-paths">All five paths</Link></div>
+      <div style={{ display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <span className="lp-icon" style={{ background: meta?.gradient, width: 44, height: 44, borderRadius: 13 }} aria-hidden="true"><Icon size={21} /></span>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <p style={{ margin: "0 0 6px", fontSize: 14.5, fontWeight: 700 }}>{meta?.tagline}</p>
+          <p className="subtle" style={{ margin: 0, fontSize: 13 }}>{meta?.outcome}</p>
+          <div className="lp-actions" style={{ marginTop: 12 }}>
+            <Link className="lp-cta primary" href={meta?.href ?? "/general-english"}>Open path</Link>
+            <Link className="lp-cta explore" href="/lessons">Path lessons</Link>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -75,16 +120,6 @@ interface Dash {
   totalLessons: number;
   vocabularyWords: number;
 }
-
-const LEVEL_NAMES: Record<string, string> = {
-  "Pre-A1": "Starter",
-  A1: "Beginner",
-  A2: "Elementary",
-  B1: "Intermediate",
-  B2: "Upper-Intermediate",
-  C1: "Advanced",
-  C2: "Proficient",
-};
 
 const BAND_SKILLS: Record<string, string[]> = {
   "Pre-A1": ["Reading", "Writing", "Listening"],
@@ -191,6 +226,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<Dash | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activeProduct, setActiveProduct] = useState<CatalogueProduct | null>(null);
 
   useEffect(() => {
     track("dashboard_entered");
@@ -206,7 +242,16 @@ export default function DashboardPage() {
         if (String(reason?.message ?? reason).toLowerCase().includes("authentication")) router.push("/auth");
         else setError(reason instanceof Error ? reason.message : "Unable to load your dashboard.");
       });
-    return () => { cancelled = true; };
+    fetch("/api/profile", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => { if (!cancelled && p?.profile?.activeProduct) setActiveProduct(p.profile.activeProduct as CatalogueProduct); })
+      .catch(() => { /* default path */ });
+    function onPathChanged(e: Event) {
+      const detail = (e as CustomEvent<{ productId?: string }>).detail;
+      if (detail?.productId) setActiveProduct(detail.productId as CatalogueProduct);
+    }
+    window.addEventListener("ew-path-changed", onPathChanged);
+    return () => { cancelled = true; window.removeEventListener("ew-path-changed", onPathChanged); };
   }, [router]);
 
   const lesson = useMemo(
@@ -241,40 +286,33 @@ export default function DashboardPage() {
   if (!data) return <DashboardSkeleton />;
 
   const skills = coreSkills(data.level, data.skills);
-  const levelName = LEVEL_NAMES[data.level] ?? data.level;
   const isNewLearner = data.completedLessons === 0 && data.overallPercent === 0;
 
   return (
     <main id="main-content" className="dash-main">
-      {/* 1 — Welcome + current level (Part 18) */}
-      <header className="dash-header">
-        <div>
-          <h1>{greeting()}, {data.firstName}</h1>
-          <p className="subtle">
-            Your English journey continues at <strong>{data.level} · {levelName}</strong>
-            {data.nextLevel && data.nextLevel !== data.level ? <> — next milestone <strong>{data.nextLevel}</strong></> : null}.
-          </p>
-        </div>
-      </header>
+      {/* 1 — First-impression hero: who, where, what, how far (design spec §4/§5) */}
+      <DashHero data={data} activeProduct={activeProduct} />
 
       <TrialBanner />
 
-      <LearningPathsShowcase />
-
       {isNewLearner ? (
-        /* New learner: one clear first step (Parts 71/92) */
-        <section className="nba-card" aria-label="Your first step">
-          <span className="nba-eyebrow">Welcome to English Wizard</span>
-          <h2>Start by checking your English</h2>
-          <p>An adaptive assessment finds your level across reading, writing and listening — then everything on this dashboard is built around you.</p>
-          <div className="nba-actions">
-            <Link href="/diagnostic" className="button nba-btn">Check my level</Link>
-            <Link href="/learning-path" className="button nba-btn-ghost">Preview the journey</Link>
-          </div>
-        </section>
+        /* New learner: one clear first step (Parts 71/92) — plus the current-path
+           context module so the dashboard framework adapts from minute zero (spec §39). */
+        <>
+          <section className="nba-card" aria-label="Your first step">
+            <span className="nba-eyebrow">Welcome to English Wizard</span>
+            <h2>Start by checking your English</h2>
+            <p>An adaptive assessment finds your level across reading, writing and listening — then everything on this dashboard is built around you.</p>
+            <div className="nba-actions">
+              <Link href="/diagnostic" className="button nba-btn">Check my level</Link>
+              <Link href="/learning-path" className="button nba-btn-ghost">Preview the journey</Link>
+            </div>
+          </section>
+          <PathContextCard activeProduct={activeProduct} />
+        </>
       ) : (
         <>
-          {/* 2 — Next best action (Part 20) */}
+          {/* 2 — Next best action: the ONE dominant action (design spec §6) */}
           <section className="nba-card" aria-label="Your next best step">
             <span className="nba-eyebrow">Your next best step</span>
             <h2>{lesson ? `Continue: ${lesson.title}` : "Check my level"}</h2>
@@ -289,11 +327,14 @@ export default function DashboardPage() {
             </div>
             <div className="nba-actions">
               <Link href={lesson ? `/learn?lesson=${encodeURIComponent(lesson.id)}` : "/diagnostic"} className="button nba-btn">
-                {lesson ? "Continue" : "Check my level"}
+                {lesson ? "Continue lesson" : "Check my level"}
               </Link>
               <Link href="/learning-path" className="button nba-btn-ghost">View my journey</Link>
             </div>
           </section>
+
+          {/* 3 — Current path context (spec §39: one framework, product modules) */}
+          <PathContextCard activeProduct={activeProduct} />
 
           {/* 3 + 4 — Today's plan (Part 21) and current path (Part 22) */}
           <div className="grid-two-wide">

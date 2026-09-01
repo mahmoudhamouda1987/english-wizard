@@ -27,6 +27,10 @@ import { ALL_LESSONS } from "@/src/domain/all-lessons";
 export const dynamic = "force-dynamic";
 
 const TOTAL_SECONDS = 30 * 60;
+/** LevelCheck revisit throttle (learning-paths IA §23): completed sittings a
+ * learner may finalize per rolling 24h in production. Audit mode stays
+ * unlimited by design so reviewers can reset freely. */
+const LEVELCHECK_DAILY_LIMIT = 3;
 
 interface Graded { correct: boolean; expected?: string; explanation?: string; given: string }
 /**
@@ -175,6 +179,20 @@ export async function GET() {
     }
 
     if (!state) {
+      // §23 anti-abuse throttle — counts only COMPLETED sittings, so an
+      // abandoned or expired sitting never consumes the learner's quota.
+      if (!isAuditMode()) {
+        const recent = await query<{ n: number }>(
+          `SELECT COUNT(*)::int AS n FROM levelquest_sessions WHERE learner_id = $1::uuid AND status = 'COMPLETE' AND completed_at > now() - interval '24 hours'`,
+          [session.learnerId],
+        ).catch(() => ({ rows: [] as Array<{ n: number }> }));
+        if ((recent.rows[0]?.n ?? 0) >= LEVELCHECK_DAILY_LIMIT) {
+          return NextResponse.json(
+            { error: "You have reached today's LevelCheck limit — your level is locked in for now. Come back tomorrow for a fresh sitting.", limit: LEVELCHECK_DAILY_LIMIT },
+            { status: 429 },
+          );
+        }
+      }
       const sessionId = crypto.randomUUID();
       const startedAt = new Date();
       const deadlineAt = new Date(startedAt.getTime() + TOTAL_SECONDS * 1000).toISOString();
@@ -215,6 +233,16 @@ export async function GET() {
       await query(`UPDATE levelquest_sessions SET status = 'COMPLETE', payload = $2, completed_at = now() WHERE id = $1`, [state.sessionId, JSON.stringify(returnedState)]);
     }
 
+    // LevelCheck revisit (spec §23): recent attempt history for the start screen.
+    let attemptHistory: Array<{ level: string; date: string }> = [];
+    try {
+      const attempts = await query<{ cefr_level: string; created_at: string | Date }>(
+        `SELECT cefr_level, created_at FROM diagnostic_attempts WHERE learner_id = $1 ORDER BY created_at DESC LIMIT 8`,
+        [session.learnerId],
+      );
+      attemptHistory = attempts.rows.map((r) => ({ level: r.cefr_level, date: new Date(r.created_at).toISOString() }));
+    } catch { /* history is decorative — never block the sitting */ }
+
     return NextResponse.json({
       paper: exposed,
       sessionId: returnedState.sessionId,
@@ -226,6 +254,7 @@ export async function GET() {
       progress: progressFor(returnedState),
       variantTheme: VARIANT_THEMES[(returnedState.variant - 1) % VARIANT_THEMES.length],
       remainingSeconds: Math.max(0, remaining),
+      attemptHistory,
       ...(knownLevel ? { startLevel: knownLevel } : {}),
     });
   } catch (e) {

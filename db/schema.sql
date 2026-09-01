@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS learner_chunk_states (
 CREATE INDEX IF NOT EXISTS learner_chunk_review_idx ON learner_chunk_states(learner_id, next_review_at);
 CREATE TABLE IF NOT EXISTS learner_profiles (learner_id UUID PRIMARY KEY REFERENCES learners(id) ON DELETE CASCADE,display_name TEXT NOT NULL DEFAULT 'Learner',native_language TEXT NOT NULL DEFAULT 'Arabic',target_level TEXT NOT NULL DEFAULT 'B1',daily_minutes INTEGER NOT NULL DEFAULT 20 CHECK (daily_minutes BETWEEN 5 AND 180),goals JSONB NOT NULL DEFAULT '[]'::jsonb,english_dna JSONB NOT NULL DEFAULT '{}'::jsonb,pathway_selection JSONB,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS pathway_selection JSONB;
+-- Current Path (2.0 learning-paths IA): the product the learner is using
+-- right now. One dashboard/lessons/journey context switches on this column;
+-- entitlements still govern access — switching only among entitled products
+-- is enforced in the API, the column itself just stores the selection.
+ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS active_product TEXT NOT NULL DEFAULT 'general-english';
 -- Profile identity: learner-chosen profile picture — an uploaded photo or a
 -- preset avatar, stored as a data URL; 'initials' renders the name monogram.
 ALTER TABLE learner_profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;

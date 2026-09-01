@@ -7,6 +7,7 @@ import { levelIndex } from "@/src/domain/product-intelligence";
 import { PROFESSIONAL_LIBRARY } from "@/src/domain/professional-library";
 import { PROFESSIONAL_CURRICULUM, PROFESSIONAL_LEVELS } from "@/src/domain/professional-curriculum";
 import { track } from "@/app/lib/track";
+import { ProductGate } from "@/app/components/product-gate";
 
 /** Single source of truth for level: the platform dashboard payload (Part 105). */
 interface DashboardData {
@@ -93,7 +94,7 @@ const MODULE_STORAGE_KEY = "ew-business-module-progress";
 /** A curated view of the professional library domains — architecture visibility only (Part 57). */
 const TRACK_PREVIEW_IDS = ["general-business", "finance", "human-resources", "information-technology", "sales", "marketing", "customer-service", "logistics", "engineering", "consulting"];
 
-export default function BusinessEnglishPage() {
+function BusinessEnglishPageContent() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [authed, setAuthed] = useState(true);
   const [doneModules, setDoneModules] = useState<string[]>([]);
@@ -278,5 +279,14 @@ export default function BusinessEnglishPage() {
         </section>
       )}
     </main>
+  );
+}
+
+
+export default function BusinessEnglishPage() {
+  return (
+    <ProductGate product="business-english">
+      <BusinessEnglishPageContent />
+    </ProductGate>
   );
 }

@@ -35,7 +35,7 @@ const NAV_SUBLABELS: Record<string, string> = {
   "Portfolio & Evidence": "Verified work you can share",
   "English Ear": "Hear the sounds English really uses",
   Scenes: "Animated dialogue scenes",
-  "Reading Engine": "Graded reading with word support",
+  "Reading Studio": "Graded reading with word support",
   Writing: "Guided writing with feedback",
   Vocabulary: "Words with Arabic glosses",
   Grammar: "Grammar-in-use practice",

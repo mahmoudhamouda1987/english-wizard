@@ -82,6 +82,7 @@ export default function LevelCheckPage() {
   const [started, setStarted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [estimate, setEstimate] = useState<number | null>(null);
+  const [attemptHistory, setAttemptHistory] = useState<Array<{ level: string; date: string }>>([]);
   const finished = useRef(false);
 
   useEffect(() => {
@@ -102,6 +103,7 @@ export default function LevelCheckPage() {
         setFlags(p.flags ?? []);
         setProgress(p.progress ?? null);
         if (typeof p.estimate === "number") setEstimate(p.estimate);
+        if (Array.isArray(p.attemptHistory)) setAttemptHistory(p.attemptHistory as Array<{ level: string; date: string }>);
         if (typeof p.remainingSeconds === "number") setSecondsLeft(Math.max(0, p.remainingSeconds));
         // Resume: place the learner on their first unanswered question.
         const firstUnanswered = (p.paper ?? []).findIndex((it: ExposedItem) => p.answered?.[it.id] === undefined);
@@ -141,6 +143,7 @@ export default function LevelCheckPage() {
       if (!r.ok) throw new Error(p.error ?? "Unable to save.");
       setAnsweredCorrect(p.answered ?? {});
       if (typeof p.estimate === "number") setEstimate(p.estimate);
+      if (Array.isArray(p.attemptHistory)) setAttemptHistory(p.attemptHistory as Array<{ level: string; date: string }>);
       if (p.progress) setProgress(p.progress);
       appendItem(p.appended ?? null);
       track("levelquest_question_answered", { itemId });
@@ -298,7 +301,18 @@ export default function LevelCheckPage() {
             </div>
           ))}
         </div>
-        <p className="subtle" style={{ fontSize: 12.5, marginBottom: 20 }}>Estimated completion: ~25 minutes &middot; your progress is saved automatically</p>
+        <p className="subtle" style={{ fontSize: 12.5, marginBottom: 16 }}>Estimated completion: ~25 minutes &middot; your progress is saved automatically</p>
+        {attemptHistory.length > 0 ? (
+          <div style={{ maxWidth: 560, margin: "0 auto 16px", padding: "14px 18px", borderRadius: 14, background: "var(--accent-softer, #f7f5fe)", border: "1px solid var(--accent-border, #d9d0f2)", textAlign: "left" }} aria-label="Your assessment history">
+            <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--accent-text, #4f2fb8)" }}>Assessment history</div>
+            <div style={{ fontSize: 14.5, fontWeight: 800, color: "var(--text-primary)", margin: "5px 0 2px" }}>
+              Current level: {attemptHistory[0]?.level ?? "—"} <span style={{ fontWeight: 600, color: "var(--text-tertiary)", fontSize: 12 }}>&middot; last checked {new Date(attemptHistory[0]?.date).toLocaleDateString()}</span>
+            </div>
+            <div style={{ fontSize: 12.5, color: "var(--text-secondary)", marginTop: 4 }}>
+              {attemptHistory.length} sitting{attemptHistory.length === 1 ? "" : "s"} on record — retaking keeps your history and sharpens your level estimate.
+            </div>
+          </div>
+        ) : null}
         <button onClick={() => { setStarted(true); track("levelcheck_started"); }} className="button" style={{ padding: "16px 44px", fontSize: 16, background: "linear-gradient(135deg,#6840d6,#8b5cf6)", boxShadow: "0 10px 26px rgba(104,64,214,.35)", letterSpacing: ".03em" }}>Start LevelCheck →</button>
       </div>
     </Centered>

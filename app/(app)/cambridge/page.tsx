@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/app/components/page-header";
 import { QUALIFICATIONS } from "@/src/domain/cambridge";
+import { ProductGate } from "@/app/components/product-gate";
 
 /**
  * Cambridge — separate premium product (2.0 contract, Parts 72–76).
@@ -15,7 +16,7 @@ type Dashboard = { level?: string; overallPercent?: number };
 
 const QUAL_LIST = Object.values(QUALIFICATIONS);
 
-export default function CambridgeProductPage() {
+function CambridgeProductPageContent() {
   const [level, setLevel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -121,5 +122,14 @@ export default function CambridgeProductPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+
+export default function CambridgeProductPage() {
+  return (
+    <ProductGate product="cambridge">
+      <CambridgeProductPageContent />
+    </ProductGate>
   );
 }

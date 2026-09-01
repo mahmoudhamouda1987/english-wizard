@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ALL_LESSONS } from "@/src/domain/all-lessons";
 import { PROFESSIONAL_CURRICULUM } from "@/src/domain/professional-curriculum";
 import { PageHeader } from "@/app/components/page-header";
+import { CurrentPathBanner } from "@/app/components/current-path-banner";
 import { track } from "@/app/lib/track";
 
 const LEVEL_RANK: Record<string, number> = { "Pre-A1": 0, A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
@@ -77,6 +78,12 @@ export default function LearningPathPage() {
       })
       .catch(() => { if (!cancelled) { setError("Sign in to see your personal journey."); setLoaded(true); } });
     fetch("/api/admin/overview").then((r) => { if (r.ok && !cancelled) setIsAdmin(true); }).catch(() => {});
+    // Current-path adaptation: a learner on Business English lands on their
+    // own curriculum tab; everyone else starts on the general ladder.
+    fetch("/api/profile", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => { if (!cancelled && p?.profile?.activeProduct === "business-english") setTab("professional"); })
+      .catch(() => { /* general tab stays */ });
     return () => { cancelled = true; };
   }, [generalOrdered]);
 
@@ -108,6 +115,8 @@ export default function LearningPathPage() {
         action="Worlds & missions"
         actionHref="/worlds"
       />
+
+      <CurrentPathBanner />
 
       <div className="filters" role="group" aria-label="Choose programme">
         <button type="button" className="f-chip" data-active={tab === "general"} onClick={() => setTab("general")}>

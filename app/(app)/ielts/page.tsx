@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/app/components/page-header";
 import { BAND_TARGETS } from "@/src/domain/ielts";
+import { ProductGate } from "@/app/components/product-gate";
 
 /**
  * IELTS — separate premium product (2.0 contract, Parts 58–71).
@@ -21,7 +22,7 @@ const SKILLS = [
   { key: "speaking", label: "Speaking", outcome: "Part 1, 2 and 3 with examiner-style flow — one minute of prep, two of talk." },
 ] as const;
 
-export default function IeltsProductPage() {
+function IeltsProductPageContent() {
   const [level, setLevel] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -139,5 +140,14 @@ export default function IeltsProductPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+
+export default function IeltsProductPage() {
+  return (
+    <ProductGate product="ielts">
+      <IeltsProductPageContent />
+    </ProductGate>
   );
 }
