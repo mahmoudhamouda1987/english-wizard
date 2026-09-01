@@ -2004,8 +2004,13 @@ button.lib-card { cursor: pointer; font: inherit; color: inherit; text-align: le
 .path-switcher-header .path-switcher-btn .ps2-name { font-size: 13px; }
 .path-switcher-header .path-switcher-menu { left: 0; right: auto; min-width: 300px; top: calc(100% + 10px); }
 
-/* ── Skill Studios subgroup + depth ─────────────────────────────────────── */
+/* ── Skills Studio subgroup + depth ─────────────────────────────────────── */
 .snav-subtree { display: grid; gap: 2px; }
+/* Nav rows are Links OR buttons (the Skills Studio parent). A button must not
+   keep the UA skin: default ButtonFace bg turned the INACTIVE tab into a
+   light-gray pill with white text — an invisible tab on the navy rail.
+   `.snav-item.active` / `:hover` (higher specificity) still paint over this. */
+button.snav-item { background: none; border: 0; cursor: pointer; }
 .snav-item.snav-parent .chev { margin-left: auto; transition: transform .18s ease; opacity: .7; }
 .snav-children { display: grid; gap: 2px; margin: 2px 0 4px; padding-left: 14px; position: relative; }
 .snav-children::before { content: ""; position: absolute; left: 19px; top: 4px; bottom: 4px; width: 1px; background: rgba(255,255,255,.1); }

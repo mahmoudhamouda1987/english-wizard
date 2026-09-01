@@ -168,7 +168,7 @@ function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate }: {
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * SIDEBAR NAVIGATION — premium grouped rail with icon tiles, animated active
- * indicator and the expandable Skill Studios subgroup (auto-opens when a
+ * indicator and the expandable Skills Studio subgroup (auto-opens when a
  * studio route is active).
  * ═══════════════════════════════════════════════════════════════════════════ */
 

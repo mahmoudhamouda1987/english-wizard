@@ -100,7 +100,7 @@ test("new learning surfaces render from the authenticated dashboard", async ({ p
   const sidebar = page.getByRole("complementary").getByRole("navigation", { name: "Primary navigation" });
   await sidebar.getByRole("button", { name: "Learn", exact: true }).click();
   await sidebar.getByRole("button", { name: "Practise", exact: true }).click();
-  await sidebar.getByRole("button", { name: /Skill Studios/ }).click();
+  await sidebar.getByRole("button", { name: /Skills Studio/ }).click();
   await expect(sidebar.getByRole("link", { name: /Worlds & Missions/i })).toBeVisible();
   await expect(sidebar.getByRole("link", { name: "English Ear" })).toBeVisible();
   await expect(sidebar.getByRole("link", { name: "Reading Studio" })).toBeVisible();

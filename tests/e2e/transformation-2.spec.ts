@@ -156,14 +156,14 @@ test.describe("Sidebar LEARN group (learning-paths IA: products live ONLY in the
     for (const product of ["General English", "Business English", "Fluency Track", "IELTS", "Cambridge"]) {
       await expect(sidebar.getByRole("link", { name: new RegExp(`^\\s*${product}\\b`) })).toHaveCount(0);
     }
-    // Skill Studios is an expandable subgroup of PRACTISE with the seven studios
-    // (spec §3: Practise → Conversation & Role-play / Speaking Coach / Say It Better / Skill Studios ▾).
+    // Skills Studio is an expandable subgroup of PRACTISE with the seven studios
+    // (spec §3: Practise → Conversation & Role-play / Speaking Coach / Say It Better / Skills Studio ▾).
     const practiseToggle = sidebar.getByRole("button", { name: "Practise", exact: true });
     await expect(practiseToggle).toBeVisible();
     if ((await practiseToggle.getAttribute("aria-expanded")) === "false") {
       await practiseToggle.click();
     }
-    const studios = sidebar.getByRole("button", { name: /Skill Studios/ });
+    const studios = sidebar.getByRole("button", { name: /Skills Studio/ });
     await expect(studios).toBeVisible();
     await studios.click();
     for (const studio of ["Reading Studio", "Writing Studio", "Vocabulary Studio", "Grammar Studio", "Thinking in English"]) {

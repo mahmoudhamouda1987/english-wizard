@@ -12,7 +12,7 @@ export interface NavItem {
   icon: ComponentType<{ size?: number }>;
   /** One-line description shown under group headings and in the mobile drawer. */
   desc?: string;
-  /** Nested destinations (e.g. the Skill Studios studios) rendered indented. */
+  /** Nested destinations (e.g. the Skills Studio studios) rendered indented. */
   children?: NavItem[];
 }
 
@@ -60,7 +60,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Speaking Coach", href: "/pronunciation", icon: IconMic },
       { label: "Say It Better", href: "/say-it-better", icon: IconWand },
       {
-        label: "Skill Studios",
+        label: "Skills Studio",
         href: "/english-ear",
         icon: IconBulb,
         desc: "Focused skill studios.",
