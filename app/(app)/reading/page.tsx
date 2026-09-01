@@ -645,7 +645,7 @@ export default function ReadingPage() {
   return (
     <main id="main-content" className="dash-main">
       <PageHeader
-        eyebrow="Reading engine"
+        eyebrow="Reading Studio"
         title="Reading"
         purpose="Choose a text at your level, read it comfortably, then check your understanding — organised by CEFR level, genre and topic."
       />
