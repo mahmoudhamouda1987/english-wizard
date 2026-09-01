@@ -32,6 +32,10 @@ test("keyboard users can skip navigation and every page exposes a labelled main 
 
 test("text size control adjusts and persists the reading scale", async ({ page }) => {
   await page.goto("/chunks");
+  // The control ships as a collapsed floating "Aa" pill — expand it first.
+  const toggle = page.getByRole("button", { name: "Adjust text size" });
+  await expect(toggle).toBeVisible();
+  await toggle.click();
   const control = page.getByRole("group", { name: "Text size" });
   await expect(control).toBeVisible();
   await control.getByRole("button", { name: "A++" }).click();

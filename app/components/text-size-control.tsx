@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const SIZES = ["NORMAL", "LARGE", "XLARGE"] as const;
 type TextSize = (typeof SIZES)[number];
@@ -52,24 +52,61 @@ function choose(next: TextSize) {
   for (const listener of listeners) listener();
 }
 
+/**
+ * TEXT SIZE CONTROL (accessibility) — a collapsed floating "Aa" pill that
+ * expands upward into the reading-scale options. Collapsed by default so the
+ * resting footprint (44px) never covers page content; outside click, Escape
+ * or the toggle collapses it again. The chosen scale persists per learner
+ * (localStorage + <html data-text-size>).
+ */
 export function TextSizeControl() {
   const size = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [expanded, setExpanded] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!expanded) return;
+    function onDocClick(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setExpanded(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setExpanded(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
 
   return (
-    <div role="group" aria-label="Text size" style={{ display: "inline-flex", gap: 6, alignItems: "center", background: "var(--surface-inverse)", color: "var(--bg-elevated)", padding: "6px 10px", borderRadius: 12 }}>
-      <span aria-hidden="true">Text size</span>
-      {SIZES.map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={size === option}
-          className={size === option ? "button secondary" : "button"}
-          style={{ padding: "4px 10px", fontSize: 13 }}
-          onClick={() => choose(option)}
-        >
-          {option === "NORMAL" ? "A" : option === "LARGE" ? "A+" : "A++"}
-        </button>
-      ))}
+    <div ref={rootRef} className="ts-root">
+      {expanded && (
+        <div role="group" aria-label="Text size" className="ts-panel">
+          <span aria-hidden="true">Text size</span>
+          {SIZES.map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={size === option}
+              className={size === option ? "button secondary" : "button"}
+              onClick={() => choose(option)}
+            >
+              {option === "NORMAL" ? "A" : option === "LARGE" ? "A+" : "A++"}
+            </button>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        className="ts-toggle"
+        aria-expanded={expanded}
+        aria-label={expanded ? "Close text size control" : "Adjust text size"}
+        onClick={() => setExpanded((v) => !v)}
+      >
+        Aa
+      </button>
     </div>
   );
 }

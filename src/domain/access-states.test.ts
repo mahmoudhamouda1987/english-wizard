@@ -78,14 +78,20 @@ describe("subscribedProducts (plan coverage)", () => {
 });
 
 describe("productAccessible (enforcement boundary)", () => {
-  it("audit mode keeps every surface open — badges show intent, nothing is enforced", () => {
-    expect(AUDIT_MODE).toBe(true); // flip to false at commercial launch
-    expect(productAccessible("FREE", "ielts")).toBe(true);
-    expect(productAccessible("FREE", "cambridge")).toBe(true);
+  it("commercial launch: audit mode is OFF — enforcement equals badge semantics", () => {
+    // Flipped at commercial launch; the developer-only audit LAYER (personas,
+    // level overrides, resets) remains environment-locked in
+    // infrastructure/audit-mode.ts and never touches this switch.
+    expect(AUDIT_MODE).toBe(false);
+    expect(productAccessible("FREE", "ielts")).toBe(false);
+    expect(productAccessible("FREE", "cambridge")).toBe(false);
+    expect(productAccessible("ielts", "ielts")).toBe(true);
+    expect(productAccessible("ielts", "cambridge")).toBe(false);
+    expect(productAccessible("all-access", "general-english")).toBe(true);
   });
 
-  it("with audit enforcement off, access equals badge semantics", () => {
-    // Direct call on the un-enforcing helper keeps this lock valid after the flip.
+  it("access equals badge semantics", () => {
+    // Enforcement and badges read the same helper — they cannot drift.
     expect(isProductUnlockedFor("all-access", "ielts")).toBe(true);
     expect(isProductUnlockedFor("FREE", "ielts")).toBe(false);
   });

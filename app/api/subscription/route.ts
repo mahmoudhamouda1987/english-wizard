@@ -6,6 +6,7 @@ import { getSubscription, upsertSubscription } from "@/src/infrastructure/subscr
 import { effectiveTier, planValueModel, SUBSCRIPTION_PLANS, type SubscriptionRecord } from "@/src/domain/subscription";
 import { PLAN_ENTITLEMENTS, isPlanTier, SUBSCRIBABLE_PRODUCTS, type PlanTier } from "@/src/domain/entitlements";
 import { effectiveTierWithGrace } from "@/src/domain/billing-webhooks";
+import { resolveGatingTier } from "@/src/infrastructure/usage-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +18,14 @@ export async function GET() {
   const subscription = await getSubscription(user.learnerId);
   const access = effectiveTierWithGrace(subscription ? { status: subscription.status, tier: subscription.tier, periodEnd: subscription.periodEnd } : null);
   const tier = access.inGrace ? access.tier : effectiveTier(subscription);
+  // Gating view: an ACTIVE 7-day trial resolves to all-access (Parts 18/22).
+  // Billing surfaces keep reading effectiveTier; enforcement surfaces (the
+  // ProductGate, the Current Path switcher, the hub badges) read gatingTier.
+  const gating = await resolveGatingTier(user.learnerId);
   return NextResponse.json({
     subscription,
     effectiveTier: tier,
+    gatingTier: gating,
     inGrace: access.inGrace,
     graceMessage: access.inGrace ? "A payment failed, but your premium access continues while billing is retried — nothing is lost." : undefined,
     entitlements: PLAN_ENTITLEMENTS[tier],

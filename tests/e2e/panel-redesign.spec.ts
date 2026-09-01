@@ -78,14 +78,19 @@ test.describe("Panel redesign — identity, navigation and commercial surfaces",
   test("/plan presents the catalogue (five products + All Access) and no legacy tiers", async ({ page }) => {
     await registerAndSignIn(page, "plan");
     await page.goto("/plan");
-    const body = await page.locator("main").innerText();
+    // The plan page resolves the subscription asynchronously (gating tier now
+    // also merges the trial) — assert with auto-retrying expectations instead
+    // of a single innerText snapshot.
+    const main = page.locator("main");
+    await expect(main).toContainText("General English", { timeout: 10_000 });
+    for (const name of ["Business English", "Fluency Track", "IELTS", "Cambridge", "All Access"]) {
+      await expect(main).toContainText(name);
+    }
+    await expect(main).toContainText(/7-day trial|Included with every account/);
+    const body = await main.innerText();
     expect(body).not.toMatch(/\bStart Plus\b/);
     expect(body).not.toMatch(/\bGo Pro\b/);
     expect(body).not.toMatch(/forever/);
-    for (const name of ["General English", "Business English", "Fluency Track", "IELTS", "Cambridge", "All Access"]) {
-      expect(body).toContain(name);
-    }
-    expect(body).toMatch(/7-day trial|Included with every account/);
   });
 
   test("dashboard adapts to the current path with the premium hero (no product-grid showcase)", async ({ page }) => {

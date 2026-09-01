@@ -12,6 +12,21 @@ async function register(page: import("@playwright/test").Page, prefix: string) {
     data: { email, displayName: "Transformation Learner", password: "StrongPass123!" },
   });
   expect(registered.ok()).toBeTruthy();
+  // Match the production onboarding funnel: completing onboarding auto-starts
+  // the 7-day trial, and an ACTIVE trial gates as all-access. Content-walking
+  // tests mirror that (idempotent — safe to call more than once).
+  const trial = await page.request.post("/api/trial", { data: {} });
+  expect(trial.ok()).toBeTruthy();
+  return email;
+}
+
+/** Registration WITHOUT the onboarding trial — the raw FREE commercial state. */
+async function registerFree(page: import("@playwright/test").Page, prefix: string) {
+  const email = `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@example.com`;
+  const registered = await page.request.post("/api/auth/register", {
+    data: { email, displayName: "Free Learner", password: "StrongPass123!" },
+  });
+  expect(registered.ok()).toBeTruthy();
   return email;
 }
 
@@ -157,7 +172,9 @@ test.describe("Sidebar LEARN group (learning-paths IA: products live ONLY in the
   });
 
   test("Learning Paths hub shows the five products with access states and explore CTA", async ({ page }) => {
-    await register(page, "hub");
+    // registerFree = the raw FREE commercial state — the hub's LOCKED badges
+    // ("Not subscribed", never a bare icon) are exactly what this locks.
+    await registerFree(page, "hub");
     await page.goto("/learning-paths");
     await expect(page.getByRole("heading", { name: "Learning Paths", level: 1 })).toBeVisible();
     for (const product of ["General English", "Business English", "Fluency Track", "IELTS", "Cambridge"]) {
@@ -168,7 +185,8 @@ test.describe("Sidebar LEARN group (learning-paths IA: products live ONLY in the
   });
 
   test("Explore page renders the full product preview without premium content", async ({ page }) => {
-    await register(page, "explore");
+    // Locked-state preview: trial CTA is part of the LOCKED explore page.
+    await registerFree(page, "explore");
     await page.goto("/learning-paths/ielts");
     await expect(page.getByRole("heading", { name: "IELTS", level: 1 })).toBeVisible();
     await expect(page.getByText("Where this path takes you")).toBeVisible();
@@ -267,5 +285,51 @@ test.describe("B2B assessment API (Parts 94–96)", () => {
       data: { label: "Bad key" },
     });
     expect(badKey.status()).toBe(401);
+  });
+});
+
+test.describe("Commercial enforcement (launch flip — AUDIT_MODE=false)", () => {
+  test("a FREE learner with no trial sees the premium panel, never premium content", async ({ page }) => {
+    await registerFree(page, "lock");
+    const sub = await page.request.get("/api/subscription");
+    const payload = (await sub.json()) as { effectiveTier: string; gatingTier: string };
+    expect(payload.effectiveTier).toBe("FREE");
+    expect(payload.gatingTier).toBe("FREE");
+
+    await page.goto("/ielts");
+    const main = page.locator("main");
+    await expect(main).toContainText("Premium path", { timeout: 10_000 });
+    await expect(main).toContainText("This path is not part of your current subscription");
+    await expect(main.getByRole("link", { name: "Explore this path" })).toBeVisible();
+    // The gate's audit note disappears with the flip — enforcement is real now.
+    await expect(main).not.toContainText(/audit note/i);
+  });
+
+  test("hub badges show intent with text — the lock icon is never the sole indicator", async ({ page }) => {
+    await registerFree(page, "lockhub");
+    await page.goto("/learning-paths");
+    const main = page.locator("main");
+    await expect(main).toContainText("Five complete products", { timeout: 10_000 });
+    await expect(main).toContainText("Not subscribed", { timeout: 10_000 });
+    // The build-phase audit banner is gone at launch.
+    await expect(main).not.toContainText(/every path is open to audit/i);
+    // The hub's own audit note (badge semantics) is gone too.
+    await expect(main).not.toContainText(/badges show the intended commercial state/i);
+  });
+
+  test("starting the 7-day trial reopens the gated surface (gatingTier = all-access)", async ({ page }) => {
+    await registerFree(page, "trial");
+    await page.goto("/ielts");
+    await expect(page.locator("main")).toContainText("Premium path", { timeout: 10_000 });
+
+    const trial = await page.request.post("/api/trial", { data: {} });
+    expect(trial.ok()).toBeTruthy();
+    const sub = await page.request.get("/api/subscription");
+    expect(((await sub.json()) as { gatingTier: string }).gatingTier).toBe("all-access");
+
+    await page.goto("/ielts");
+    const main = page.locator("main");
+    await expect(main).toContainText(/IELTS/, { timeout: 10_000 });
+    await expect(main).not.toContainText("Premium path");
   });
 });

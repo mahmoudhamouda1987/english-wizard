@@ -27,7 +27,7 @@ export default function LearningPathsPage() {
     let cancelled = false;
     fetch("/api/subscription", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier); })
+      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.gatingTier ?? s.effectiveTier) as PlanTier); })
       .catch(() => { /* cards stay neutral */ });
     fetch("/api/profile", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))

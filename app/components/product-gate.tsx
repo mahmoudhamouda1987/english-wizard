@@ -24,7 +24,7 @@ export function ProductGate({ product, children }: { product: CatalogueProduct; 
       .then((r) => (r.ok ? r.json() : null))
       .then((s) => {
         if (cancelled) return;
-        if (s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier);
+        if (s?.effectiveTier) setTier(String(s.gatingTier ?? s.effectiveTier) as PlanTier);
         setLoaded(true);
       })
       .catch(() => { if (!cancelled) setLoaded(true); });

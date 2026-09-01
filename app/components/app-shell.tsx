@@ -318,7 +318,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       .catch(() => { /* widget keeps its resting state */ });
     fetch("/api/subscription", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.effectiveTier) as PlanTier); })
+      .then((s) => { if (!cancelled && s?.effectiveTier) setTier(String(s.gatingTier ?? s.effectiveTier) as PlanTier); })
       .catch(() => { /* badges stay neutral */ });
     refreshProfile();
     return () => { cancelled = true; };

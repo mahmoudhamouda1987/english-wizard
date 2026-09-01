@@ -102,14 +102,16 @@ export function canUseFeature(tier: PlanTier, feature: Feature, usedToday = 0): 
  * line, or when All Access (or the 7-day trial, which gates as All Access)
  * covers it.
  *
- * AUDIT_MODE is the build-phase master switch: while English Wizard 2.0 is
- * being audited, EVERY surface stays accessible regardless of the badge, so
- * reviewers can walk all lessons, all paths and all products. Flip it to
- * false at commercial launch and the same function starts enforcing.
+ * AUDIT_MODE was the build-phase master switch: during the 2.0 audit EVERY
+ * surface stayed accessible regardless of the badge so reviewers could walk
+ * all lessons, all paths and all products. It is now flipped to false at
+ * commercial launch: the same function enforces what the badges promise.
+ * (The developer-only audit LAYER — level overrides, personas, resets — is a
+ * separate, environment-locked mechanism: see infrastructure/audit-mode.ts.)
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Build-phase audit switch: true = badges show intent, but nothing is enforced. */
-export const AUDIT_MODE = true;
+/** Commercial launch: badges and gates share one truth. */
+export const AUDIT_MODE = false;
 
 export type CatalogueProduct = Exclude<ProductId, "all-access">;
 
