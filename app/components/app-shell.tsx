@@ -11,8 +11,8 @@ import { NAV_GROUPS, NAV_FLAT, PRODUCT_ICON_COMPONENTS } from "@/app/components/
 import type { NavGroup, NavItem } from "@/app/components/nav-config";
 import type { PlanTier, CatalogueProduct } from "@/src/domain/entitlements";
 import { productAccessible, productAccessState, isProductUnlockedFor } from "@/src/domain/entitlements";
-import { PRODUCT_CATALOGUE, productMeta } from "@/src/domain/product-catalogue";
-import { IconChevron, IconMenu, IconClose, IconSearch, IconHome, IconChat, IconChart, IconBulb, IconLock, IconCheck } from "@/app/components/nav-icons";
+import { PRODUCT_CATALOGUE, productMeta, productEntryLevel, learnerMeetsEntry } from "@/src/domain/product-catalogue";
+import { IconChevron, IconMenu, IconClose, IconSearch, IconHome, IconChat, IconChart, IconBulb, IconLock, IconCheck, IconTarget, IconSpark } from "@/app/components/nav-icons";
 
 /** Mobile bottom tab bar — five calm destinations, everything else in More. */
 const TABBAR = [
@@ -80,12 +80,13 @@ function initialsFor(name: string | undefined | null): string {
  * reviewers can walk every path (spec DoD: audit supports switching).
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate }: {
+function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate, learnerLevel }: {
   variant: "sidebar" | "header";
   tier: PlanTier | null;
   activeProduct: CatalogueProduct | null;
   onSelect: (product: CatalogueProduct) => void;
   onNavigate?: () => void;
+  learnerLevel?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -106,6 +107,8 @@ function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate }: {
   }, [open]);
 
   const canSelect = (product: CatalogueProduct) => (tier ? productAccessible(tier, product) : true);
+  const entry = current ? productEntryLevel(current.id) : undefined;
+  const meetsEntry = entry ? learnerMeetsEntry(learnerLevel, entry.cefr) : true;
 
   return (
     <div className={`path-switcher path-switcher-${variant}`} ref={ref}>
@@ -123,7 +126,18 @@ function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate }: {
           <span className="ps2-name">{current?.name ?? "General English"}</span>
           <span className="chev" aria-hidden="true"><IconChevron size={13} /></span>
         </span>
-        {variant === "sidebar" && <span className="ps2-level">B1 · Intermediate</span>}
+        {variant === "sidebar" && current && entry && (
+          <span
+            className="ps2-entry"
+            data-met={meetsEntry}
+            title={`Required level: ${entry.display}${learnerLevel ? ` — your level: ${learnerLevel}` : ""}. ${current.name} is designed for ${entry.display} and above.`}
+          >
+            <IconTarget size={11} aria-hidden="true" />
+            <span className="ps2-entry-label">Required level</span>
+            <span className="ps2-entry-value">{entry.display}+</span>
+            {!meetsEntry && <span className="ps2-entry-hint">start at your level</span>}
+          </span>
+        )}
       </button>
       {open && (
         <div className="path-switcher-menu" role="listbox" aria-label="Switch learning path">
@@ -147,10 +161,13 @@ function PathSwitcher({ variant, tier, activeProduct, onSelect, onNavigate }: {
                 <span className="psm-icon" style={{ background: p.gradient }} aria-hidden="true"><Icon size={15} /></span>
                 <span className="psm-body">
                   <span className="psm-name">{p.name}</span>
-                  <span className={`psm-state ${state.toLowerCase()}`}>
-                    {state === "CURRENT" && <><IconCheck size={11} /> Current path</>}
-                    {state === "ACTIVE" && <><IconCheck size={11} /> Active</>}
-                    {state === "LOCKED" && <><IconLock size={10} /> Locked</>}
+                  <span className="psm-state-row">
+                    <span className={`psm-state ${state.toLowerCase()}`}>
+                      {state === "CURRENT" && <><IconCheck size={11} /> Current path</>}
+                      {state === "ACTIVE" && <><IconCheck size={11} /> Active</>}
+                      {state === "LOCKED" && <><IconLock size={10} /> Locked</>}
+                    </span>
+                    <span className="psm-entry-mini" title={`Required level: ${productEntryLevel(p.id).display}+`}>{productEntryLevel(p.id).display}+</span>
                   </span>
                 </span>
                 {!selectable && <span className="psm-explore">Explore</span>}
@@ -415,7 +432,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {!collapsed && (
           <div className="snav-path-block">
-            <PathSwitcher variant="sidebar" tier={tier} activeProduct={activeProduct} onSelect={selectPath} />
+            <PathSwitcher variant="sidebar" tier={tier} activeProduct={activeProduct} onSelect={selectPath} learnerLevel={level?.cefr} />
           </div>
         )}
 
@@ -425,12 +442,24 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <div className="snav-bottom">
           <div className="cefr-widget" aria-label="Current level">
-            {!collapsed && <div className="cefr-top"><span>Current level</span></div>}
-            <div className="cefr-level">{level?.cefr ?? "—"}</div>
-            <div className="mini-track" aria-hidden="true"><span style={{ width: `${level?.percent ?? 0}%` }} /></div>
+            <div className="cefr-row">
+              <span className="cefr-ring-wrap">
+                <svg className="cefr-ring" viewBox="0 0 44 44" role="img" aria-label={`${level?.cefr ?? "Level"} — ${level?.percent ?? 0}% towards the next level`}>
+                  <circle className="cefr-ring-bg" cx="22" cy="22" r="19" pathLength={100} />
+                  <circle className="cefr-ring-fg" cx="22" cy="22" r="19" pathLength={100} style={{ strokeDashoffset: 100 - Math.min(100, Math.max(0, level?.percent ?? 0)) }} />
+                </svg>
+                <span className="cefr-ring-level">{level?.cefr ?? "—"}</span>
+              </span>
+              {!collapsed && (
+                <div className="cefr-main">
+                  <div className="cefr-top"><span>Current level</span></div>
+                  <div className="cefr-sub">{level?.percent ?? 0}% to next level</div>
+                </div>
+              )}
+            </div>
           </div>
           {!collapsed && <InstallButton />}
-          {!collapsed && <Link className="upgrade-btn" href="/plan">Go further with All Access</Link>}
+          {!collapsed && <Link className="upgrade-btn" href="/plan"><span className="ub-shine" aria-hidden="true" /><IconSpark size={13} aria-hidden="true" /> Go further with All Access</Link>}
           <div className={`snav-profile ${profileMenu ? "open" : ""}`} ref={profileRef}>
             <button type="button" className="snav-profile-btn" onClick={() => setProfileMenu((v) => !v)} aria-expanded={profileMenu} aria-haspopup="menu" aria-label="Your account menu">
               <span className="avatar avatar-sm" aria-hidden="true">
@@ -471,7 +500,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             English&nbsp;Wizard
           </Link>
           <div className="th-path">
-            <PathSwitcher variant="header" tier={tier} activeProduct={activeProduct} onSelect={selectPath} />
+            <PathSwitcher variant="header" tier={tier} activeProduct={activeProduct} onSelect={selectPath} learnerLevel={level?.cefr} />
           </div>
           <form className="th-search" role="search" onSubmit={search}>
             <IconSearch size={15} />
@@ -521,7 +550,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
         <div className="mobile-drawer-path">
-          <PathSwitcher variant="header" tier={tier} activeProduct={activeProduct} onSelect={selectPath} />
+          <PathSwitcher variant="header" tier={tier} activeProduct={activeProduct} onSelect={selectPath} learnerLevel={level?.cefr} />
         </div>
         <div className="mobile-drawer-scroll">
           <SidebarNav pathname={pathname} compact onNavigate={() => setDrawer(false)} />

@@ -1,4 +1,5 @@
 import type { ProductId } from "./pricing";
+import type { CatalogueProduct } from "./entitlements";
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * PRODUCT CATALOGUE — display metadata for the five learning paths.
@@ -200,3 +201,31 @@ export const ALL_ACCESS_META = {
   tagline: "Every product, every feature — one subscription.",
   gradient: "linear-gradient(135deg, #0d1930, #4f2fb8 60%, #8a63ff)",
 };
+
+/* ── Required entry level per path (Current Path switcher chip, hub badges) ──
+   `display` is the learner-facing label (mirrors the low end of levelRange);
+   `cefr` is the comparable CEFR floor used to check the learner's level.
+   IELTS "Bands 5.0" ≈ B1; Cambridge "A2 Key" = A2. General English is open to
+   everyone from Pre-A1. */
+const PRODUCT_ENTRY_LEVELS: Record<CatalogueProduct, { display: string; cefr: string }> = {
+  "general-english": { display: "Pre-A1", cefr: "Pre-A1" },
+  "business-english": { display: "A2", cefr: "A2" },
+  "fluency-track": { display: "B1", cefr: "B1" },
+  ielts: { display: "Band 5.0", cefr: "B1" },
+  cambridge: { display: "A2 Key", cefr: "A2" },
+};
+
+export function productEntryLevel(id: string): { display: string; cefr: string } {
+  return PRODUCT_ENTRY_LEVELS[id as CatalogueProduct] ?? PRODUCT_ENTRY_LEVELS["general-english"];
+}
+
+const CEFR_ORDER = ["PRE-A1", "A1", "A2", "B1", "B2", "C1", "C2"];
+
+/** True when the learner's CEFR level meets (or exceeds) the path's entry floor. */
+export function learnerMeetsEntry(learnerCefr: string | null | undefined, requiredCefr: string): boolean {
+  if (!learnerCefr) return true;
+  const learner = CEFR_ORDER.indexOf(learnerCefr.trim().toUpperCase());
+  const required = CEFR_ORDER.indexOf(requiredCefr.toUpperCase());
+  if (learner < 0 || required < 0) return true;
+  return learner >= required;
+}
