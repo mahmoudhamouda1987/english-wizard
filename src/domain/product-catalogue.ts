@@ -203,16 +203,16 @@ export const ALL_ACCESS_META = {
 };
 
 /* ── Required entry level per path (Current Path switcher chip, hub badges) ──
-   `display` is the learner-facing label (mirrors the low end of levelRange);
-   `cefr` is the comparable CEFR floor used to check the learner's level.
-   IELTS "Bands 5.0" ≈ B1; Cambridge "A2 Key" = A2. General English is open to
-   everyone from Pre-A1. */
+   `display` is the learner-facing label rendered as "Required level · X+" in
+   the sidebar chip and the switcher menu; `cefr` is the comparable CEFR floor
+   used to check the learner's level. Values fixed by product owner:
+   General A1+ · Business B1+ · IELTS B1+ · Conversation A2+ · Cambridge B1+. */
 const PRODUCT_ENTRY_LEVELS: Record<CatalogueProduct, { display: string; cefr: string }> = {
-  "general-english": { display: "Pre-A1", cefr: "Pre-A1" },
-  "business-english": { display: "A2", cefr: "A2" },
-  "fluency-track": { display: "B1", cefr: "B1" },
-  ielts: { display: "Band 5.0", cefr: "B1" },
-  cambridge: { display: "A2 Key", cefr: "A2" },
+  "general-english": { display: "A1", cefr: "A1" },
+  "business-english": { display: "B1", cefr: "B1" },
+  "fluency-track": { display: "A2", cefr: "A2" },
+  ielts: { display: "B1", cefr: "B1" },
+  cambridge: { display: "B1", cefr: "B1" },
 };
 
 export function productEntryLevel(id: string): { display: string; cefr: string } {
